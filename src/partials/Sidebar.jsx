@@ -138,8 +138,8 @@ function Sidebar({
                 <>
                   {/* QR Scanner */}
                   <li className="px-3 py-2">
-                    <NavLink
-                      end
+                <NavLink
+                  end
                       to="/qr-scanner"
                       className={({ isActive }) =>
                         "block text-gray-800 dark:text-gray-100 truncate transition duration-150 " + (isActive ? "text-violet-500" : "hover:text-gray-900 dark:hover:text-white")
@@ -148,19 +148,19 @@ function Sidebar({
                       <div className="flex items-center gap-2">
                         <svg className={`shrink-0 fill-current ${pathname === "/qr-scanner" ? 'text-violet-500' : 'text-gray-400 dark:text-gray-500'}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
                           <path d="M0 1.5A1.5 1.5 0 0 1 1.5 0h3A1.5 1.5 0 0 1 6 1.5v3A1.5 1.5 0 0 1 4.5 6h-3A1.5 1.5 0 0 1 0 4.5v-3ZM1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3ZM0 10.5A1.5 1.5 0 0 1 1.5 9h3A1.5 1.5 0 0 1 6 10.5v3A1.5 1.5 0 0 1 4.5 15h-3A1.5 1.5 0 0 1 0 13.5v-3ZM1.5 10a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3ZM10 1.5A1.5 1.5 0 0 1 11.5 0h3A1.5 1.5 0 0 1 16 1.5v3A1.5 1.5 0 0 1 14.5 6h-3A1.5 1.5 0 0 1 10 4.5v-3ZM11.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3ZM10 10.5A1.5 1.5 0 0 1 11.5 9h3A1.5 1.5 0 0 1 16 10.5v3A1.5 1.5 0 0 1 14.5 15h-3A1.5 1.5 0 0 1 10 13.5v-3ZM11.5 10a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3Z"/>
-                        </svg>
+                    </svg>
                         <span className="text-sm font-medium duration-200">
                           QR Scanner
-                        </span>
-                      </div>
-                    </NavLink>
-                  </li>
+                    </span>
+                  </div>
+                </NavLink>
+              </li>
                   {/* Rekap Presensi */}
                   <li className="px-3 py-2">
-                    <NavLink
-                      end
+                            <NavLink
+                              end
                       to="/attendance-report"
-                      className={({ isActive }) =>
+                              className={({ isActive }) =>
                         "block text-gray-800 dark:text-gray-100 truncate transition duration-150 " + (isActive ? "text-violet-500" : "hover:text-gray-900 dark:hover:text-white")
                       }
                     >
@@ -171,39 +171,39 @@ function Sidebar({
                         </svg>
                         <span className="text-sm font-medium duration-200">
                           Rekap Presensi
-                        </span>
+                              </span>
                       </div>
-                    </NavLink>
-                  </li>
+                            </NavLink>
+                          </li>
                 </>
               )}
               {role === 'user' && (
                 <>
                   {/* QR Code */}
                   <li className="px-3 py-2">
-                    <NavLink
-                      end
+                            <NavLink
+                              end
                       to="/user-qr"
-                      className={({ isActive }) =>
+                              className={({ isActive }) =>
                         "block text-gray-800 dark:text-gray-100 truncate transition duration-150 " + (isActive ? "text-violet-500" : "hover:text-gray-900 dark:hover:text-white")
                       }
                     >
                       <div className="flex items-center gap-2">
                         <svg className={`shrink-0 fill-current ${pathname === "/user-qr" ? 'text-violet-500' : 'text-gray-400 dark:text-gray-500'}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
                           <path d="M2 2h2v2H2V2zm1 1h1V3H3v1zm2-1h2v2H5V2zm1 1h1V3H6v1zm2-1h2v2H8V2zm1 1h1V3H9v1zm2-1h2v2h-2V2zm1 1h1V3h-1v1zM2 5h2v2H2V5zm1 1h1V6H3v1zm2-1h2v2H5V5zm1 1h1V6H6v1zm2-1h2v2H8V5zm1 1h1V6H9v1zm2-1h2v2h-2V5zm1 1h1V6h-1v1zM2 8h2v2H2V8zm1 1h1V9H3v1zm2-1h2v2H5V8zm1 1h1V9H6v1zm2-1h2v2H8V8zm1 1h1V9H9v1zm2-1h2v2h-2V8zm1 1h1V9h-1v1zM2 11h2v2H2v-2zm1 1h1v-1H3v1zm2-1h2v2H5v-2zm1 1h1v-1H6v1zm2-1h2v2H8v-2zm1 1h1v-1H9v1zm2-1h2v2h-2v-2zm1 1h1v-1h-1v1z"/>
-                        </svg>
+                            </svg>
                         <span className="text-sm font-medium duration-200">
                           QR Code
-                        </span>
+                              </span>
                       </div>
-                    </NavLink>
-                  </li>
+                            </NavLink>
+                          </li>
                   {/* Riwayat Presensi */}
                   <li className="px-3 py-2">
-                    <NavLink
-                      end
+                            <NavLink
+                              end
                       to="/user-history"
-                      className={({ isActive }) =>
+                              className={({ isActive }) =>
                         "block text-gray-800 dark:text-gray-100 truncate transition duration-150 " + (isActive ? "text-violet-500" : "hover:text-gray-900 dark:hover:text-white")
                       }
                     >
@@ -214,7 +214,7 @@ function Sidebar({
                         </svg>
                         <span className="text-sm font-medium duration-200">
                           Riwayat Presensi
-                        </span>
+                              </span>
                       </div>
                     </NavLink>
                   </li>

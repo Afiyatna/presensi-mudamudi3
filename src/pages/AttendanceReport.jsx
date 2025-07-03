@@ -3,6 +3,7 @@ import Sidebar from '../partials/Sidebar';
 import Header from '../partials/Header';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { supabase } from '../supabaseClient';
 
 function AttendanceReport() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -18,107 +19,32 @@ function AttendanceReport() {
   const reportRef = useRef(null);
   const tableRef = useRef(null);
 
-  // Mock data untuk demo
-  const mockAttendanceData = [
-    {
-      id: 1,
-      namaLengkap: 'Ahmad Fauzi',
-      jenisKelamin: 'Laki-laki',
-      namaKelompok: 'Kelompok A',
-      namaDesa: 'Desa Sukamaju',
-      waktuPresensi: '2025-01-03 08:15:30',
-      status: 'Hadir'
-    },
-    {
-      id: 2,
-      namaLengkap: 'Siti Nurhaliza',
-      jenisKelamin: 'Perempuan',
-      namaKelompok: 'Kelompok B',
-      namaDesa: 'Desa Cikarang',
-      waktuPresensi: '2025-01-03 08:20:15',
-      status: 'Hadir'
-    },
-    {
-      id: 3,
-      namaLengkap: 'Muhammad Rizki',
-      jenisKelamin: 'Laki-laki',
-      namaKelompok: 'Kelompok A',
-      namaDesa: 'Desa Sukamaju',
-      waktuPresensi: '2025-01-03 08:25:45',
-      status: 'Hadir'
-    },
-    {
-      id: 4,
-      namaLengkap: 'Nurul Hidayah',
-      jenisKelamin: 'Perempuan',
-      namaKelompok: 'Kelompok C',
-      namaDesa: 'Desa Mekarsari',
-      waktuPresensi: '2025-01-03 08:30:20',
-      status: 'Hadir'
-    },
-    {
-      id: 5,
-      namaLengkap: 'Abdul Rahman',
-      jenisKelamin: 'Laki-laki',
-      namaKelompok: 'Kelompok B',
-      namaDesa: 'Desa Cikarang',
-      waktuPresensi: '2025-01-03 08:35:10',
-      status: 'Hadir'
-    },
-    {
-      id: 6,
-      namaLengkap: 'Fatimah Azzahra',
-      jenisKelamin: 'Perempuan',
-      namaKelompok: 'Kelompok A',
-      namaDesa: 'Desa Sukamaju',
-      waktuPresensi: '2025-01-03 08:40:30',
-      status: 'Hadir'
-    },
-    {
-      id: 7,
-      namaLengkap: 'Hasan Basri',
-      jenisKelamin: 'Laki-laki',
-      namaKelompok: 'Kelompok C',
-      namaDesa: 'Desa Mekarsari',
-      waktuPresensi: '2025-01-03 08:45:15',
-      status: 'Hadir'
-    },
-    {
-      id: 8,
-      namaLengkap: 'Aisyah Putri',
-      jenisKelamin: 'Perempuan',
-      namaKelompok: 'Kelompok B',
-      namaDesa: 'Desa Cikarang',
-      waktuPresensi: '2025-01-03 08:50:25',
-      status: 'Hadir'
-    },
-    {
-      id: 9,
-      namaLengkap: 'Rizki Pratama',
-      jenisKelamin: 'Laki-laki',
-      namaKelompok: 'Kelompok A',
-      namaDesa: 'Desa Sukamaju',
-      waktuPresensi: '2025-01-03 08:55:40',
-      status: 'Hadir'
-    },
-    {
-      id: 10,
-      namaLengkap: 'Dewi Sartika',
-      jenisKelamin: 'Perempuan',
-      namaKelompok: 'Kelompok C',
-      namaDesa: 'Desa Mekarsari',
-      waktuPresensi: '2025-01-03 09:00:10',
-      status: 'Hadir'
-    }
-  ];
-
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setAttendanceData(mockAttendanceData);
-      setFilteredData(mockAttendanceData);
+    // Fetch data asli dari Supabase
+    const fetchPresensi = async () => {
+      setLoading(true);
+      const { data, error } = await supabase.from('presensi').select('*');
+      if (error) {
+        setAttendanceData([]);
+        setFilteredData([]);
+        setLoading(false);
+        return;
+      }
+      // Mapping field dari Supabase ke field yang digunakan di tabel
+      const mapped = (data || []).map((item, idx) => ({
+        id: idx + 1,
+        namaLengkap: item.nama_lengkap || '',
+        jenisKelamin: item.jenis_kelamin || '',
+        namaKelompok: item.kelompok || '',
+        namaDesa: item.desa || '',
+        waktuPresensi: item.waktu_presensi ? item.waktu_presensi.replace('T', ' ').substring(0, 19) : '',
+        status: item.status || '',
+      }));
+      setAttendanceData(mapped);
+      setFilteredData(mapped);
       setLoading(false);
-    }, 1000);
+    };
+    fetchPresensi();
   }, []);
 
   useEffect(() => {

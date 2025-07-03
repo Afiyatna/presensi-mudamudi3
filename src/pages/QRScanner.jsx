@@ -10,9 +10,71 @@ function QRScannerPage() {
   const [scanHistory, setScanHistory] = useState([]);
   const [scanning, setScanning] = useState(false);
   const [presensiLoading, setPresensiLoading] = useState(false);
+  const [jamTepatWaktu, setJamTepatWaktu] = useState('07:00');
+  const [jamTepatWaktuEdit, setJamTepatWaktuEdit] = useState('07:00');
+  const [jamLoading, setJamLoading] = useState(false);
+  const [jamError, setJamError] = useState('');
+  const [success, setSuccess] = useState(false);
+  const [role, setRole] = useState(null);
   const qrId = 'qr-reader';
   const qrRef = useRef();
   const html5QrInstance = useRef(null);
+
+  // Fetch role user
+  useEffect(() => {
+    const fetchRole = async () => {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData?.user) return;
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', userData.user.id)
+        .single();
+      if (profile?.role) setRole(profile.role);
+    };
+    fetchRole();
+  }, []);
+
+  // Fetch jam_tepat_waktu from Supabase on mount
+  useEffect(() => {
+    const fetchJamTepatWaktu = async () => {
+      setJamLoading(true);
+      setJamError('');
+      const { data, error } = await supabase
+        .from('settings')
+        .select('value')
+        .eq('key', 'jam_tepat_waktu')
+        .single();
+      if (error || !data) {
+        setJamError('Gagal mengambil jam tepat waktu');
+      } else {
+        setJamTepatWaktu(data.value);
+        setJamTepatWaktuEdit(data.value);
+      }
+      setJamLoading(false);
+    };
+    fetchJamTepatWaktu();
+  }, []);
+
+  // Update jam_tepat_waktu in Supabase
+  const handleJamTepatWaktuSave = async (e) => {
+    e.preventDefault();
+    setJamLoading(true);
+    setJamError('');
+    setSuccess(false);
+    const { error } = await supabase
+      .from('settings')
+      .update({ value: jamTepatWaktuEdit })
+      .eq('key', 'jam_tepat_waktu');
+    if (error) {
+      setJamError('Gagal menyimpan jam tepat waktu');
+    } else {
+      setJamTepatWaktu(jamTepatWaktuEdit);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 2000);
+    }
+    setJamLoading(false);
+  };
 
   const handleScanPresensi = async (userId) => {
     setPresensiLoading(true);
@@ -29,8 +91,9 @@ function QRScannerPage() {
     }
 
     const now = new Date();
-    const batasJam = 7;
-    const status = (now.getHours() < batasJam || (now.getHours() === batasJam && now.getMinutes() === 0))
+    // Ambil jam dan menit dari jamTepatWaktu
+    const [batasJam, batasMenit] = jamTepatWaktu.split(':').map(Number);
+    const status = (now.getHours() < batasJam || (now.getHours() === batasJam && now.getMinutes() <= batasMenit))
       ? 'hadir'
       : 'terlambat';
 
@@ -39,6 +102,7 @@ function QRScannerPage() {
       kelompok: profile.kelompok,
       desa: profile.desa,
       status: status,
+      waktu_presensi: new Date().toISOString(),
     }]);
 
     setPresensiLoading(false);
@@ -135,6 +199,34 @@ function QRScannerPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* QR Scanner Section */}
               <div className="bg-white dark:bg-gray-800 shadow-xs rounded-xl p-6">
+                {/* Notifikasi sukses */}
+                {success && (
+                  <div className="mb-4 text-green-600 text-center">Jam tepat waktu berhasil disimpan!</div>
+                )}
+                {/* Jam Tepat Waktu Edit Form hanya untuk admin */}
+                {role === 'admin' && (
+                  <form onSubmit={handleJamTepatWaktuSave} className="mb-6 flex items-center gap-4">
+                    <label className="font-medium text-gray-700 dark:text-gray-200">
+                      Jam Tepat Waktu:
+                    </label>
+                    <input
+                      type="time"
+                      value={jamTepatWaktuEdit}
+                      onChange={e => setJamTepatWaktuEdit(e.target.value)}
+                      className="border rounded px-2 py-1 text-gray-800 dark:text-gray-900"
+                      disabled={jamLoading}
+                    />
+                    <button
+                      type="submit"
+                      className="btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1"
+                      disabled={jamLoading || jamTepatWaktuEdit === jamTepatWaktu}
+                    >
+                      Simpan
+                    </button>
+                    {jamLoading && <span className="ml-2 text-xs text-gray-500">Menyimpan...</span>}
+                    {jamError && <span className="ml-2 text-xs text-red-500">{jamError}</span>}
+                  </form>
+                )}
                 <div className="mb-6">
                   <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">
                     Scanner QR Code

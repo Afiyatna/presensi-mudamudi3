@@ -19,31 +19,15 @@ import LayoutDashboard from '../layouts/LayoutDashboard';
 import BarChart01 from '../charts/BarChart01';
 import { supabase } from '../supabaseClient';
 
-// Data mock untuk admin (rekap semua kelompok)
-const mockAttendanceData = [
-  { id: 1, namaLengkap: 'Ahmad Fauzi', namaKelompok: 'Kelompok A', status: 'Hadir', tanggal: '2025-01-03' },
-  { id: 2, namaLengkap: 'Siti Nurhaliza', namaKelompok: 'Kelompok B', status: 'Hadir', tanggal: '2025-01-03' },
-  { id: 3, namaLengkap: 'Muhammad Rizki', namaKelompok: 'Kelompok A', status: 'Hadir', tanggal: '2025-01-03' },
-  { id: 4, namaLengkap: 'Nurul Hidayah', namaKelompok: 'Kelompok C', status: 'Hadir', tanggal: '2025-01-03' },
-  { id: 5, namaLengkap: 'Abdul Rahman', namaKelompok: 'Kelompok B', status: 'Hadir', tanggal: '2025-01-04' },
-  { id: 6, namaLengkap: 'Fatimah Azzahra', namaKelompok: 'Kelompok A', status: 'Hadir', tanggal: '2025-01-04' },
-  { id: 7, namaLengkap: 'Hasan Basri', namaKelompok: 'Kelompok C', status: 'Hadir', tanggal: '2025-01-04' },
-  { id: 8, namaLengkap: 'Aisyah Putri', namaKelompok: 'Kelompok B', status: 'Terlambat', tanggal: '2025-01-04' },
-  { id: 9, namaLengkap: 'Rizki Pratama', namaKelompok: 'Kelompok A', status: 'Terlambat', tanggal: '2025-01-04' },
-  { id: 10, namaLengkap: 'Dewi Sartika', namaKelompok: 'Kelompok C', status: 'Hadir', tanggal: '2025-01-05' },
-  { id: 11, namaLengkap: 'Budi Santoso', namaKelompok: 'Kelompok A', status: 'Terlambat', tanggal: '2025-01-05' },
-  { id: 12, namaLengkap: 'Rina Marlina', namaKelompok: 'Kelompok B', status: 'Hadir', tanggal: '2025-01-05' },
-  { id: 13, namaLengkap: 'Dian Sastro', namaKelompok: 'Kelompok C', status: 'Terlambat', tanggal: '2025-01-05' },
-];
-
 function Dashboard() {
   // State untuk role dan data presensi user
   const [role, setRole] = useState(null);
   const [userPresensi, setUserPresensi] = useState([]);
   const [userLoading, setUserLoading] = useState(true);
   const [userName, setUserName] = useState('');
+  const [allPresensi, setAllPresensi] = useState([]); // untuk admin
 
-  // Ambil role dan data presensi user
+  // Ambil role dan data presensi user/admin
   useEffect(() => {
     const fetchRoleAndPresensi = async () => {
       const { data: userData } = await supabase.auth.getUser();
@@ -65,18 +49,26 @@ function Dashboard() {
           .order('waktu_presensi', { ascending: true });
         setUserPresensi(data || []);
       }
+      // Jika admin, ambil semua data presensi
+      if (profile?.role === 'admin') {
+        const { data } = await supabase
+          .from('presensi')
+          .select('*')
+          .order('waktu_presensi', { ascending: true });
+        setAllPresensi(data || []);
+      }
       setUserLoading(false);
     };
     fetchRoleAndPresensi();
   }, []);
 
   // --- ADMIN: Grafik Rekap Presensi per Kelompok ---
-  const kelompokList = [...new Set(mockAttendanceData.map(d => d.namaKelompok))];
+  const kelompokList = [...new Set(allPresensi.map(d => d.kelompok))];
   const getBarChartData = (kelompok) => {
-    const dataKelompok = mockAttendanceData.filter(d => d.namaKelompok === kelompok);
-    const tanggalList = [...new Set(dataKelompok.map(d => d.tanggal))];
-    const hadirData = tanggalList.map(tgl => dataKelompok.filter(d => d.tanggal === tgl && d.status === 'Hadir').length);
-    const terlambatData = tanggalList.map(tgl => dataKelompok.filter(d => d.tanggal === tgl && d.status === 'Terlambat').length);
+    const dataKelompok = allPresensi.filter(d => d.kelompok === kelompok);
+    const tanggalList = [...new Set(dataKelompok.map(d => d.waktu_presensi ? d.waktu_presensi.split('T')[0] : ''))];
+    const hadirData = tanggalList.map(tgl => dataKelompok.filter(d => d.waktu_presensi && d.waktu_presensi.startsWith(tgl) && d.status === 'Hadir').length);
+    const terlambatData = tanggalList.map(tgl => dataKelompok.filter(d => d.waktu_presensi && d.waktu_presensi.startsWith(tgl) && d.status === 'Terlambat').length);
     return {
       labels: tanggalList,
       datasets: [
