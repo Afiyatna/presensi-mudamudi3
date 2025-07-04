@@ -16,6 +16,7 @@ function QRScannerPage() {
   const [jamError, setJamError] = useState('');
   const [success, setSuccess] = useState(false);
   const [role, setRole] = useState(null);
+  const [cameraFacing, setCameraFacing] = useState('environment'); // 'environment' = belakang, 'user' = depan
   const qrId = 'qr-reader';
   const qrRef = useRef();
   const html5QrInstance = useRef(null);
@@ -126,7 +127,7 @@ function QRScannerPage() {
       const qr = new Html5Qrcode(qrId);
       html5QrInstance.current = qr;
       qr.start(
-        { facingMode: 'environment' },
+        { facingMode: cameraFacing },
         { fps: 10, qrbox: 250 },
         async (decodedText) => {
           setScanResult(decodedText);
@@ -150,7 +151,7 @@ function QRScannerPage() {
         try { html5QrInstance.current.clear(); } catch (e) {}
       }
     };
-  }, [scanning]);
+  }, [scanning, cameraFacing]);
 
   const startScanner = () => {
     setScanResult('');
@@ -239,6 +240,22 @@ function QRScannerPage() {
                   </p>
                 </div>
                 {/* QR Scanner Container */}
+                <div className="flex gap-2 justify-center mb-4">
+                  <button
+                    className={`btn ${cameraFacing === 'environment' ? 'bg-violet-600 text-white' : 'bg-gray-200'}`}
+                    onClick={() => setCameraFacing('environment')}
+                    type="button"
+                  >
+                    Kamera Belakang
+                  </button>
+                  <button
+                    className={`btn ${cameraFacing === 'user' ? 'bg-violet-600 text-white' : 'bg-gray-200'}`}
+                    onClick={() => setCameraFacing('user')}
+                    type="button"
+                  >
+                    Kamera Depan
+                  </button>
+                </div>
                 <div className="flex justify-center mb-6">
                   <div
                     id={qrId}
