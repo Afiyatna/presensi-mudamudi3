@@ -111,7 +111,7 @@ function QRScannerPage() {
 
     setPresensiLoading(false);
     if (presensiError) {
-      alert('Gagal menyimpan presensi!');
+      alert('Gagal menyimpan presensi!\n' + (presensiError.message || JSON.stringify(presensiError)));
     } else {
       alert(`Presensi berhasil! Status: ${status}`);
     }
