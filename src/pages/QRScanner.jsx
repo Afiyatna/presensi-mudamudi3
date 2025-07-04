@@ -80,7 +80,7 @@ function QRScannerPage() {
     setPresensiLoading(true);
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('nama_lengkap, kelompok, desa')
+      .select('nama_lengkap, kelompok, desa, jenis_kelamin')
       .eq('id', userId)
       .single();
 
@@ -101,6 +101,7 @@ function QRScannerPage() {
       nama_lengkap: profile.nama_lengkap,
       kelompok: profile.kelompok,
       desa: profile.desa,
+      jenis_kelamin: profile.jenis_kelamin,
       status: status,
       waktu_presensi: new Date().toISOString(),
     }]);

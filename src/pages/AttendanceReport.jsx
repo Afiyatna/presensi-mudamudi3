@@ -429,7 +429,7 @@ function AttendanceReport() {
                     <div className="ml-4">
                       <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Hadir</p>
                       <p className="text-2xl font-bold text-gray-800 dark:text-gray-100">
-                        {filteredData.filter(item => item.status === 'Hadir').length}
+                        {filteredData.filter(item => item.status.toLowerCase() === 'hadir').length}
                       </p>
                     </div>
                   </div>
@@ -445,7 +445,7 @@ function AttendanceReport() {
                     <div className="ml-4">
                       <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Terlambat</p>
                       <p className="text-2xl font-bold text-gray-800 dark:text-gray-100">
-                        {filteredData.filter(item => item.status === 'Terlambat').length}
+                        {filteredData.filter(item => item.status.toLowerCase() === 'terlambat').length}
                       </p>
                     </div>
                   </div>
@@ -461,7 +461,7 @@ function AttendanceReport() {
                     <div className="ml-4">
                       <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Tidak Hadir</p>
                       <p className="text-2xl font-bold text-gray-800 dark:text-gray-100">
-                        {filteredData.filter(item => item.status === 'Tidak Hadir').length}
+                        {filteredData.filter(item => item.status.toLowerCase() === 'tidak hadir').length}
                       </p>
                     </div>
                   </div>
@@ -557,10 +557,10 @@ function AttendanceReport() {
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                  item.status === 'Hadir' 
+                                  item.status.toLowerCase() === 'hadir' 
                                     ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 print:bg-green-100 print:text-green-800'
-                                    : item.status === 'Terlambat'
-                                    ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 print:bg-yellow-100 print:text-yellow-800'
+                                    : item.status.toLowerCase() === 'terlambat'
+                                    ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 print:bg-red-100 print:text-red-800'
                                     : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 print:bg-red-100 print:text-red-800'
                                 }`}>
                                   {item.status}
