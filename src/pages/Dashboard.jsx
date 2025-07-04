@@ -67,8 +67,8 @@ function Dashboard() {
   const getBarChartData = (kelompok) => {
     const dataKelompok = allPresensi.filter(d => d.kelompok === kelompok);
     const tanggalList = [...new Set(dataKelompok.map(d => d.waktu_presensi ? d.waktu_presensi.split('T')[0] : ''))];
-    const hadirData = tanggalList.map(tgl => dataKelompok.filter(d => d.waktu_presensi && d.waktu_presensi.startsWith(tgl) && d.status === 'Hadir').length);
-    const terlambatData = tanggalList.map(tgl => dataKelompok.filter(d => d.waktu_presensi && d.waktu_presensi.startsWith(tgl) && d.status === 'Terlambat').length);
+    const hadirData = tanggalList.map(tgl => dataKelompok.filter(d => d.waktu_presensi && d.waktu_presensi.startsWith(tgl) && d.status && d.status.toLowerCase() === 'hadir').length);
+    const terlambatData = tanggalList.map(tgl => dataKelompok.filter(d => d.waktu_presensi && d.waktu_presensi.startsWith(tgl) && d.status && d.status.toLowerCase() === 'terlambat').length);
     return {
       labels: tanggalList,
       datasets: [
@@ -81,8 +81,8 @@ function Dashboard() {
   // --- USER: Grafik Riwayat Presensi Sendiri ---
   // Ambil tanggal unik dari presensi user
   const userTanggalList = [...new Set(userPresensi.map(d => d.waktu_presensi ? d.waktu_presensi.split('T')[0] : ''))];
-  const userHadirData = userTanggalList.map(tgl => userPresensi.filter(d => d.waktu_presensi && d.waktu_presensi.startsWith(tgl) && d.status === 'Hadir').length);
-  const userTerlambatData = userTanggalList.map(tgl => userPresensi.filter(d => d.waktu_presensi && d.waktu_presensi.startsWith(tgl) && d.status === 'Terlambat').length);
+  const userHadirData = userTanggalList.map(tgl => userPresensi.filter(d => d.waktu_presensi && d.waktu_presensi.startsWith(tgl) && d.status && d.status.toLowerCase() === 'hadir').length);
+  const userTerlambatData = userTanggalList.map(tgl => userPresensi.filter(d => d.waktu_presensi && d.waktu_presensi.startsWith(tgl) && d.status && d.status.toLowerCase() === 'terlambat').length);
   const userBarChartData = {
     labels: userTanggalList,
     datasets: [
