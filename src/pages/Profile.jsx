@@ -140,11 +140,55 @@ export default function Profile() {
               </div>
               <div>
                 <label className="block text-gray-500 text-sm mb-1">Kelompok</label>
-                <input type="text" name="kelompok" className="w-full p-2 border rounded" value={form.kelompok || ''} onChange={handleChange} required />
+                <select name="kelompok" className="w-full p-2 border rounded" value={form.kelompok || ''} onChange={handleChange} required>
+                  <option value="">Pilih Kelompok</option>
+                  <option value="BANGUNSARI 1">BANGUNSARI 1</option>
+                  <option value="BANGUNSARI 2">BANGUNSARI 2</option>
+                  <option value="BRANGSONG">BRANGSONG</option>
+                  <option value="BRAYO">BRAYO</option>
+                  <option value="CAMPUREJO">CAMPUREJO</option>
+                  <option value="CEPIRING">CEPIRING</option>
+                  <option value="DUDUHAN">DUDUHAN</option>
+                  <option value="JATIBARANG">JATIBARANG</option>
+                  <option value="JATISARI">JATISARI</option>
+                  <option value="KALIWUNGU">KALIWUNGU</option>
+                  <option value="KEBONADEM">KEBONADEM</option>
+                  <option value="KENDAL">KENDAL</option>
+                  <option value="NGABEAN BARAT">NGABEAN BARAT</option>
+                  <option value="NGABEAN TIMUR">NGABEAN TIMUR</option>
+                  <option value="PAGERSARI">PAGERSARI</option>
+                  <option value="PASAR PAGI">PASAR PAGI</option>
+                  <option value="PATEAN">PATEAN</option>
+                  <option value="PAGERUYUNG">PAGERUYUNG</option>
+                  <option value="PESAWAHAN">PESAWAHAN</option>
+                  <option value="SEKRANJANG">SEKRANJANG</option>
+                  <option value="SIROTO">SIROTO</option>
+                  <option value="WELERI">WELERI</option>
+                </select>
               </div>
               <div>
                 <label className="block text-gray-500 text-sm mb-1">Desa</label>
-                <input type="text" name="desa" className="w-full p-2 border rounded" value={form.desa || ''} onChange={handleChange} required />
+                <select name="desa" className="w-full p-2 border rounded" value={form.desa || ''} onChange={handleChange} required>
+                  <option value="">Pilih Desa</option>
+                  <option value="BOJA">BOJA</option>
+                  <option value="BRANGSONG">BRANGSONG</option>
+                  <option value="CEPIRING">CEPIRING</option>
+                  <option value="GEMUH">GEMUH</option>
+                  <option value="KALIWUNGU">KALIWUNGU</option>
+                  <option value="KANGKUNG">KANGKUNG</option>
+                  <option value="KENDAL">KENDAL</option>
+                  <option value="LIMBANGAN">LIMBANGAN</option>
+                  <option value="NGAMPEL">NGAMPEL</option>
+                  <option value="PAGERUYUNG">PAGERUYUNG</option>
+                  <option value="PATEAN">PATEAN</option>
+                  <option value="PEGANDON">PEGANDON</option>
+                  <option value="PLANTUNGAN">PLANTUNGAN</option>
+                  <option value="ROWOSARI">ROWOSARI</option>
+                  <option value="RINGINARUM">RINGINARUM</option>
+                  <option value="SINGOROJO">SINGOROJO</option>
+                  <option value="SUKOREJO">SUKOREJO</option>
+                  <option value="WELERI">WELERI</option>
+                </select>
               </div>
               <div>
                 <span className="block text-gray-500 text-sm">Role</span>
