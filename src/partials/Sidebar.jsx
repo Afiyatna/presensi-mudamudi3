@@ -7,6 +7,7 @@ function Sidebar({
   sidebarOpen,
   setSidebarOpen,
   variant = 'default',
+  children,
 }) {
   const location = useLocation();
   const { pathname } = location;
@@ -175,6 +176,46 @@ function Sidebar({
                       </div>
                             </NavLink>
                           </li>
+                  {/* Dashboard Dummy */}
+                  <li className="px-3 py-2">
+                    <NavLink
+                      end
+                      to="/dashboard-dummy"
+                      className={({ isActive }) =>
+                        "block text-gray-800 dark:text-gray-100 truncate transition duration-150 " + (isActive ? "text-violet-500" : "hover:text-gray-900 dark:hover:text-white")
+                      }
+                    >
+                      <div className="flex items-center gap-2">
+                        <svg className={`shrink-0 fill-current ${pathname === "/dashboard-dummy" ? 'text-violet-500' : 'text-gray-400 dark:text-gray-500'}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                          <path d="M0 0h16v16H0z" fill="none"/>
+                          <path d="M2 13h12V3H2v10zm1-9h10v8H3V4zm2 2h2v2H5V6zm0 3h2v2H5V9zm3-3h2v2H8V6zm0 3h2v2H8V9z"/>
+                        </svg>
+                        <span className="text-sm font-medium duration-200">
+                          Dashboard Dummy
+                        </span>
+                      </div>
+                    </NavLink>
+                  </li>
+                  {/* Rekap Presensi Dummy */}
+                  <li className="px-3 py-2">
+                    <NavLink
+                      end
+                      to="/rekap-presensi-dummy"
+                      className={({ isActive }) =>
+                        "block text-gray-800 dark:text-gray-100 truncate transition duration-150 " + (isActive ? "text-violet-500" : "hover:text-gray-900 dark:hover:text-white")
+                      }
+                    >
+                      <div className="flex items-center gap-2">
+                        <svg className={`shrink-0 fill-current ${pathname === "/rekap-presensi-dummy" ? 'text-violet-500' : 'text-gray-400 dark:text-gray-500'}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                          <path d="M2 2h12v12H2z" fill="none"/>
+                          <path d="M4 4h8v1H4zm0 2h8v1H4zm0 2h8v1H4zm0 2h8v1H4z"/>
+                        </svg>
+                        <span className="text-sm font-medium duration-200">
+                          Rekap Presensi Dummy
+                        </span>
+                      </div>
+                    </NavLink>
+                  </li>
                 </>
               )}
               {role === 'user' && (
