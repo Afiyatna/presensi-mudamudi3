@@ -184,8 +184,8 @@ export default function Register() {
           <option value="">Pilih Kelompok</option>
           <option value="BANGUNSARI 1">BANGUNSARI 1</option>
           <option value="BANGUNSARI 2">BANGUNSARI 2</option>
-          <option value="BRAYO">BRANGSONG</option>
-          <option value="BRANGSONG">BRAYO</option>
+          <option value="BRANGSONG">BRANGSONG</option>
+          <option value="BRAYO">BRAYO</option>
           <option value="CAMPUREJO">CAMPUREJO</option>
           <option value="CEPIRING">CEPIRING</option>
           <option value="DUDUHAN">DUDUHAN</option>
@@ -207,11 +207,11 @@ export default function Register() {
         </select>
         <select name="desa" className="w-full mb-6 p-2 border rounded" value={form.desa} onChange={handleChange} required>
           <option value="">Pilih Desa</option>
-          <option value="BOJA">PATEAN</option>
-          <option value="BRANGSONG">KENDAL</option>
-          <option value="KENDAL">BRANGSONG</option>
-          <option value="MIJEN">BOJA</option>
-          <option value="PATEAN">MIJEN</option>
+          <option value="PATEAN">PATEAN</option>
+          <option value="KENDAL">KENDAL</option>
+          <option value="BRANGSONG">BRANGSONG</option>
+          <option value="BOJA">BOJA</option>
+          <option value="MIJEN">MIJEN</option>
         </select>
         <button type="submit" className="w-full bg-violet-600 text-white py-2 rounded hover:bg-violet-700" disabled={loading}>
           {loading ? 'Loading...' : 'Register'}
