@@ -108,7 +108,7 @@ export default function Register() {
       return;
     }
     setSuccess(true);
-    setTimeout(() => navigate('/login'), 1500);
+    navigate('/dashboard');
   };
 
   return (
@@ -116,7 +116,7 @@ export default function Register() {
       <form onSubmit={handleRegister} className="bg-white dark:bg-gray-800 p-8 rounded shadow-md w-96">
         <h2 className="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-gray-100">Register User Baru</h2>
         {error && <div className="mb-4 text-red-500 text-center">{error}</div>}
-        {success && <div className="mb-4 text-green-600 text-center">Registrasi berhasil! Redirect ke login...</div>}
+        {success && <div className="mb-4 text-green-600 text-center">Registrasi berhasil! Redirect ke dashboard...</div>}
         <input type="email" name="email" placeholder="Email" className="w-full mb-3 p-2 border rounded" value={form.email} onChange={handleChange} required />
         <div className="relative mb-3">
           <input
