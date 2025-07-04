@@ -170,24 +170,11 @@ export default function Profile() {
                 <label className="block text-gray-500 text-sm mb-1">Desa</label>
                 <select name="desa" className="w-full p-2 border rounded" value={form.desa || ''} onChange={handleChange} required>
                   <option value="">Pilih Desa</option>
-                  <option value="BOJA">BOJA</option>
-                  <option value="BRANGSONG">BRANGSONG</option>
-                  <option value="CEPIRING">CEPIRING</option>
-                  <option value="GEMUH">GEMUH</option>
-                  <option value="KALIWUNGU">KALIWUNGU</option>
-                  <option value="KANGKUNG">KANGKUNG</option>
-                  <option value="KENDAL">KENDAL</option>
-                  <option value="LIMBANGAN">LIMBANGAN</option>
-                  <option value="NGAMPEL">NGAMPEL</option>
-                  <option value="PAGERUYUNG">PAGERUYUNG</option>
-                  <option value="PATEAN">PATEAN</option>
-                  <option value="PEGANDON">PEGANDON</option>
-                  <option value="PLANTUNGAN">PLANTUNGAN</option>
-                  <option value="ROWOSARI">ROWOSARI</option>
-                  <option value="RINGINARUM">RINGINARUM</option>
-                  <option value="SINGOROJO">SINGOROJO</option>
-                  <option value="SUKOREJO">SUKOREJO</option>
-                  <option value="WELERI">WELERI</option>
+                  <option value="BOJA">PATEAN</option>
+                  <option value="BOJA">KENDAL</option>
+                  <option value="BRANGSONG">BRANGSONG</option>                              
+                  <option value="KENDAL">BOJA</option>
+                  <option value="PATEAN">MIJEN</option>                
                 </select>
               </div>
               <div>
