@@ -2,6 +2,32 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import LayoutDashboard from '../layouts/LayoutDashboard';
 
+// Daftar kota Indonesia (static, bisa diganti API jika mau dinamis)
+const kotaIndonesia = [
+  'Jakarta', 'Surabaya', 'Bandung', 'Medan', 'Semarang', 'Palembang', 'Makassar', 'Bogor', 'Depok', 'Tangerang',
+  'Bekasi', 'Padang', 'Denpasar', 'Samarinda', 'Pontianak', 'Banjarmasin', 'Yogyakarta', 'Malang', 'Pekanbaru',
+  'Kendari', 'Manado', 'Batam', 'Balikpapan', 'Cirebon', 'Kediri', 'Kendal', 'Kudus', 'Salatiga', 'Solo', 'Magelang',
+  'Madiun', 'Blitar', 'Jambi', 'Palu', 'Ambon', 'Jayapura', 'Kupang', 'Ternate', 'Sorong', 'Banda Aceh', 'Lhokseumawe',
+  'Langsa', 'Binjai', 'Pematangsiantar', 'Sibolga', 'Tebing Tinggi', 'Padangsidempuan', 'Gunungsitoli', 'Sungai Penuh',
+  'Lubuklinggau', 'Prabumulih', 'Pagar Alam', 'Palopo', 'Parepare', 'Bau-Bau', 'Bontang', 'Tarakan', 'Tanjungpinang',
+  'Tanjungbalai', 'Dumai', 'Metro', 'Mojokerto', 'Pasuruan', 'Probolinggo', 'Mataram', 'Bima', 'Tual', 'Tidore',
+  'Tomohon', 'Bitung', 'Kotamobagu', 'Gorontalo', 'Palu', 'Pangkalpinang', 'Sofifi', 'Serang', 'Cilegon', 'Cimahi',
+  'Tasikmalaya', 'Banjar', 'Pontianak', 'Singkawang', 'Palangka Raya', 'Tarakan', 'Bontang', 'Samarinda', 'Balikpapan',
+  'Batam', 'Tanjungpinang', 'Pekanbaru', 'Dumai', 'Padang', 'Bukittinggi', 'Payakumbuh', 'Pariaman', 'Sawahlunto',
+  'Solok', 'Padang Panjang', 'Padang Sidempuan', 'Sibolga', 'Gunungsitoli', 'Tebing Tinggi', 'Binjai', 'Medan',
+  'Pematangsiantar', 'Tanjungbalai', 'Lubuklinggau', 'Palembang', 'Prabumulih', 'Pagar Alam', 'Bengkulu', 'Jambi',
+  'Sungai Penuh', 'Banda Aceh', 'Langsa', 'Lhokseumawe', 'Sabang', 'Subulussalam', 'Banda Aceh', 'Sabang', 'Langsa',
+  'Lhokseumawe', 'Subulussalam', 'Tual', 'Ambon', 'Tidore', 'Sofifi', 'Jayapura', 'Sorong', 'Manokwari', 'Merauke',
+  'Timika', 'Wamena', 'Nabire', 'Biak', 'Serui', 'Fakfak', 'Kaimana', 'Raja Ampat', 'Sorong Selatan', 'Tambrauw',
+  'Maybrat', 'Manokwari Selatan', 'Pegunungan Arfak', 'Mamberamo Raya', 'Mamberamo Tengah', 'Yalimo', 'Lanny Jaya',
+  'Nduga', 'Puncak', 'Puncak Jaya', 'Dogiyai', 'Deiyai', 'Intan Jaya', 'Waropen', 'Supiori', 'Keerom', 'Sarmi',
+  'Jayapura', 'Yapen', 'Mimika', 'Asmat', 'Boven Digoel', 'Mappi', 'Yahukimo', 'Pegunungan Bintang', 'Tolikara',
+  'Paniai', 'Puncak', 'Nabire', 'Biak Numfor', 'Supiori', 'Waropen', 'Sarmi', 'Keerom', 'Jayapura', 'Yapen',
+  'Mamberamo Raya', 'Mamberamo Tengah', 'Yalimo', 'Lanny Jaya', 'Nduga', 'Puncak', 'Puncak Jaya', 'Dogiyai',
+  'Deiyai', 'Intan Jaya', 'Waropen', 'Supiori', 'Keerom', 'Sarmi', 'Jayapura', 'Yapen', 'Mimika', 'Asmat',
+  'Boven Digoel', 'Mappi', 'Yahukimo', 'Pegunungan Bintang', 'Tolikara', 'Paniai', 'Puncak', 'Nabire',
+];
+
 export default function Profile() {
   const [profile, setProfile] = useState(null);
   const [email, setEmail] = useState('');
@@ -10,6 +36,7 @@ export default function Profile() {
   const [form, setForm] = useState({});
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [kotaSuggestions, setKotaSuggestions] = useState([]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -33,6 +60,15 @@ export default function Profile() {
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    if (e.target.name === 'tempat_lahir') {
+      const val = e.target.value.toLowerCase();
+      setKotaSuggestions(val.length > 0 ? kotaIndonesia.filter(k => k.toLowerCase().includes(val)).slice(0, 8) : []);
+    }
+  };
+
+  const handleSuggestionClick = (kota) => {
+    setForm({ ...form, tempat_lahir: kota });
+    setKotaSuggestions([]);
   };
 
   const handleUpdate = async (e) => {
@@ -132,7 +168,30 @@ export default function Profile() {
               </div>
               <div>
                 <label className="block text-gray-500 text-sm mb-1">Tempat Lahir</label>
-                <input type="text" name="tempat_lahir" className="w-full p-2 border rounded" value={form.tempat_lahir || ''} onChange={handleChange} required />
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="tempat_lahir"
+                    className="w-full p-2 border rounded"
+                    value={form.tempat_lahir || ''}
+                    onChange={handleChange}
+                    autoComplete="off"
+                    required
+                  />
+                  {kotaSuggestions.length > 0 && (
+                    <ul className="absolute z-10 bg-white border w-full mt-1 rounded shadow max-h-40 overflow-y-auto">
+                      {kotaSuggestions.map((kota, idx) => (
+                        <li
+                          key={idx}
+                          className="px-3 py-2 hover:bg-indigo-100 cursor-pointer"
+                          onClick={() => handleSuggestionClick(kota)}
+                        >
+                          {kota}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               </div>
               <div>
                 <label className="block text-gray-500 text-sm mb-1">Tanggal Lahir</label>
