@@ -92,8 +92,8 @@ function QRScannerPage() {
     }
 
     const now = new Date();
-    const waktuWIB = new Date(now.getTime() + 7 * 60 * 60 * 1000); // WIB = UTC+7
-    const waktuPresensi = waktuWIB.toISOString().slice(0, 19).replace('T', ' ');
+    const pad = n => n.toString().padStart(2, '0');
+    const waktuPresensi = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}+07:00`;
     // Ambil jam dan menit dari jamTepatWaktu
     const [batasJam, batasMenit] = jamTepatWaktu.split(':').map(Number);
     const status = (now.getHours() < batasJam || (now.getHours() === batasJam && now.getMinutes() <= batasMenit))
