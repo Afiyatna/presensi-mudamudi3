@@ -91,6 +91,8 @@ function QRScannerPage() {
     }
 
     const now = new Date();
+    const waktuWIB = new Date(now.getTime() + 7 * 60 * 60 * 1000); // WIB = UTC+7
+    const waktuPresensi = waktuWIB.toISOString().slice(0, 19).replace('T', ' ');
     // Ambil jam dan menit dari jamTepatWaktu
     const [batasJam, batasMenit] = jamTepatWaktu.split(':').map(Number);
     const status = (now.getHours() < batasJam || (now.getHours() === batasJam && now.getMinutes() <= batasMenit))
@@ -103,7 +105,7 @@ function QRScannerPage() {
       desa: profile.desa,
       jenis_kelamin: profile.jenis_kelamin,
       status: status,
-      waktu_presensi: new Date().toISOString(),
+      waktu_presensi: waktuPresensi,
     }]);
 
     setPresensiLoading(false);
