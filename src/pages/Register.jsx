@@ -93,6 +93,15 @@ export default function Register() {
         role: 'user',
       },
     ]);
+    if (!profileError) {
+      const { data: userData } = await supabase.auth.getUser();
+      if (userData?.user) {
+        await supabase
+          .from('profiles')
+          .update({ email: userData.user.email })
+          .eq('id', userData.user.id);
+      }
+    }
     setLoading(false);
     if (profileError) {
       setError(profileError.message);
