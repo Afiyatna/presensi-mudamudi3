@@ -12,7 +12,10 @@ import './charts/ChartjsConfig';
 // Import pages
 import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
-import QRScanner from './pages/QRScanner';
+// import QRScanner from './pages/QRScanner';
+import QrScannerMenu from './pages/QrScannerMenu';
+import QrScannerDaerah from './pages/QrScannerDaerah';
+import QrScannerDesa from './pages/QrScannerDesa';
 import AttendanceReport from './pages/AttendanceReport';
 import UserQRCode from './pages/UserQRCode';
 import UserPresensiHistory from './pages/UserPresensiHistory';
@@ -35,7 +38,9 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
-        <Route path="/qr-scanner" element={<QRScanner />} />
+        <Route path="/qr-scanner" element={<QrScannerMenu />} />
+        <Route path="/qr-scanner/daerah" element={<QrScannerDaerah />} />
+        <Route path="/qr-scanner/desa" element={<QrScannerDesa />} />
         <Route path="/attendance-report" element={<AttendanceReport />} />
         <Route path="/user-qr" element={<RequireAuth><UserQRCode /></RequireAuth>} />
         <Route path="/user-history" element={<RequireAuth><UserPresensiHistory /></RequireAuth>} />
