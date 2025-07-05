@@ -15,7 +15,9 @@ import DashboardCard11 from '../partials/dashboard/DashboardCard11';
 import DashboardCard12 from '../partials/dashboard/DashboardCard12';
 import DashboardCard13 from '../partials/dashboard/DashboardCard13';
 import Banner from '../partials/Banner';
-import LayoutDashboard from '../layouts/LayoutDashboard';
+import Sidebar from '../partials/Sidebar';
+import Header from '../partials/Header';
+import BottomNavigation from '../components/BottomNavigation';
 import BarChart01 from '../charts/BarChart01';
 import { supabase } from '../supabaseClient';
 
@@ -26,6 +28,7 @@ function Dashboard() {
   const [userLoading, setUserLoading] = useState(true);
   const [userName, setUserName] = useState('');
   const [allPresensi, setAllPresensi] = useState([]); // untuk admin
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Ambil role dan data presensi user/admin
   useEffect(() => {
@@ -94,73 +97,72 @@ function Dashboard() {
   if (userLoading) return <div>Loading...</div>;
 
   return (
-    <LayoutDashboard>
-      <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
-        {/* Dashboard actions */}
-        {/**
-        <div className="sm:flex sm:justify-between sm:items-center mb-8">
-          <div className="mb-4 sm:mb-0">
-            <h1 className="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold">Dashboard</h1>
-          </div>
-          <div className="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
-            <FilterButton align="right" />
-            <Datepicker align="right" />
-            <button className="btn bg-gray-900 text-gray-100 hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-800 dark:hover:bg-white">
-              <svg className="fill-current shrink-0 xs:hidden" width="16" height="16" viewBox="0 0 16 16">
-                <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
-              </svg>
-              <span className="max-xs:sr-only">Add View</span>
-            </button>
-          </div>
-        </div>
-        */}
-        {/* Cards */}
-        {/**
-        <div className="grid grid-cols-12 gap-6 mb-8">
-          <DashboardCard01 />
-          <DashboardCard02 />
-          <DashboardCard03 />
-          <DashboardCard04 />
-          <DashboardCard05 />
-          <DashboardCard06 />
-          <DashboardCard07 />
-          <DashboardCard08 />
-          <DashboardCard09 />
-          <DashboardCard10 />
-          <DashboardCard11 />
-          <DashboardCard12 />
-          <DashboardCard13 />
-        </div>
-        */}
-        {/* ADMIN: Grafik Rekap Presensi per Kelompok */}
-        {role === 'admin' && (
-          <div className="mb-8">
-            <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Rekap Presensi per Kelompok</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {kelompokList.map(kelompok => (
-                <div key={kelompok} className="bg-white dark:bg-gray-800 rounded-xl shadow-xs p-4">
-                  <h3 className="font-semibold text-gray-700 dark:text-gray-200 mb-2">{kelompok}</h3>
-                  <BarChart01 data={getBarChartData(kelompok)} width={320} height={180} />
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-        {/* USER: Grafik Riwayat Presensi Sendiri */}
-        {role === 'user' && (
-          <div className="mb-8">
-            <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Grafik Riwayat Presensi Anda</h2>
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xs p-4 max-w-xl">
-              <BarChart01 data={userBarChartData} width={400} height={220} />
-              {userBarChartData.labels.length === 0 && (
-                <div className="text-gray-500 text-center mt-4">Belum ada data presensi.</div>
-              )}
-            </div>
-          </div>
-        )}
-        {/** <Banner /> */}
+    <div className="flex h-screen overflow-hidden">
+      {/* Sidebar - Desktop Only */}
+      <div className="hidden lg:block">
+        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       </div>
-    </LayoutDashboard>
+      
+      {/* Content Area */}
+      <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
+        {/* Header */}
+        <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} pageTitle="Dashboard" />
+        
+        {/* Main Content */}
+        <main className="grow pb-20 lg:pb-0">
+          <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
+            {/* Cards */}
+            {/**
+            <div className="grid grid-cols-12 gap-6 mb-8">
+              <DashboardCard01 />
+              <DashboardCard02 />
+              <DashboardCard03 />
+              <DashboardCard04 />
+              <DashboardCard05 />
+              <DashboardCard06 />
+              <DashboardCard07 />
+              <DashboardCard08 />
+              <DashboardCard09 />
+              <DashboardCard10 />
+              <DashboardCard11 />
+              <DashboardCard12 />
+              <DashboardCard13 />
+            </div>
+            */}
+            {/* ADMIN: Grafik Rekap Presensi per Kelompok */}
+            {role === 'admin' && (
+              <div className="mb-8">
+                <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Rekap Presensi per Kelompok</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {kelompokList.map(kelompok => (
+                    <div key={kelompok} className="bg-white dark:bg-gray-800 rounded-xl shadow-xs p-4">
+                      <h3 className="font-semibold text-gray-700 dark:text-gray-200 mb-2">{kelompok}</h3>
+                      <BarChart01 data={getBarChartData(kelompok)} width={320} height={180} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {/* USER: Grafik Riwayat Presensi Sendiri */}
+            {role === 'user' && (
+              <div className="mb-8">
+                <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Grafik Riwayat Presensi Anda</h2>
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xs p-4 max-w-xl">
+                  <BarChart01 data={userBarChartData} width={400} height={220} />
+                  {userBarChartData.labels.length === 0 && (
+                    <div className="text-gray-500 text-center mt-4">Belum ada data presensi.</div>
+                  )}
+                </div>
+              </div>
+            )}
+            {/** <Banner /> */}
+          </div>
+        </main>
+        
+        {/* Bottom Navigation - Mobile Only */}
+        <BottomNavigation role={role} />
+      </div>
+    </div>
   );
 }
 

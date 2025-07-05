@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../partials/Sidebar';
 import Header from '../partials/Header';
-import { Link } from 'react-router-dom';
+import BottomNavigation from '../components/BottomNavigation';
 import { supabase } from '../supabaseClient';
 
-export default function LayoutDashboard({ children, pageTitle }) {
+function LayoutDashboard({ children, pageTitle }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [role, setRole] = useState(null);
 
@@ -24,24 +24,21 @@ export default function LayoutDashboard({ children, pageTitle }) {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}>
-        {role === 'admin' && (
-          <>
-            <li>
-              <Link to="/dashboard-dummy" className="sidebar-link">Dashboard Dummy</Link>
-            </li>
-            <li>
-              <Link to="/rekap-presensi-dummy" className="sidebar-link">Rekap Presensi Dummy</Link>
-            </li>
-          </>
-        )}
-      </Sidebar>
+      {/* Sidebar - Desktop Only */}
+      <div className="hidden lg:block">
+        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+      </div>
+      {/* Content Area */}
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
         <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} pageTitle={pageTitle} />
-        <main className="grow">
+        <main className="grow pb-20 lg:pb-0">
           {children}
         </main>
+        {/* Bottom Navigation - Mobile Only */}
+        <BottomNavigation role={role} />
       </div>
     </div>
   );
-} 
+}
+
+export default LayoutDashboard;
