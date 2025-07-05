@@ -20,6 +20,7 @@ import Header from '../partials/Header';
 import BottomNavigation from '../components/BottomNavigation';
 import BarChart01 from '../charts/BarChart01';
 import { supabase } from '../supabaseClient';
+import { useThemeProvider } from '../utils/ThemeContext';
 
 function Dashboard() {
   // State untuk role dan data presensi user
@@ -29,6 +30,7 @@ function Dashboard() {
   const [userName, setUserName] = useState('');
   const [allPresensi, setAllPresensi] = useState([]); // untuk admin
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { currentTheme } = useThemeProvider();
 
   // Ambil role dan data presensi user/admin
   useEffect(() => {
@@ -137,7 +139,7 @@ function Dashboard() {
                   {kelompokList.map(kelompok => (
                     <div key={kelompok} className="bg-white dark:bg-gray-800 rounded-xl shadow-xs p-4">
                       <h3 className="font-semibold text-gray-700 dark:text-gray-200 mb-2">{kelompok}</h3>
-                      <BarChart01 data={getBarChartData(kelompok)} width={320} height={180} />
+                      <BarChart01 key={currentTheme + kelompok} data={getBarChartData(kelompok)} width={320} height={180} />
                     </div>
                   ))}
                 </div>
@@ -148,7 +150,7 @@ function Dashboard() {
               <div className="mb-8">
                 <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Grafik Riwayat Presensi Anda</h2>
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xs p-4 max-w-xl">
-                  <BarChart01 data={userBarChartData} width={400} height={220} />
+                  <BarChart01 key={currentTheme + '-user'} data={userBarChartData} width={400} height={220} />
                   {userBarChartData.labels.length === 0 && (
                     <div className="text-gray-500 text-center mt-4">Belum ada data presensi.</div>
                   )}
