@@ -42,10 +42,10 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
-        <Route path="/qr-scanner" element={<QrScannerMenu />} />
-        <Route path="/qr-scanner/daerah" element={<QrScannerDaerah />} />
-        <Route path="/qr-scanner/desa" element={<QrScannerDesa />} />
-        <Route path="/attendance-report" element={<AttendanceReport />} />
+        <Route path="/qr-scanner" element={<RequireAdmin><QrScannerMenu /></RequireAdmin>} />
+        <Route path="/qr-scanner/daerah" element={<RequireAdmin><QrScannerDaerah /></RequireAdmin>} />
+        <Route path="/qr-scanner/desa" element={<RequireAdmin><QrScannerDesa /></RequireAdmin>} />
+        <Route path="/attendance-report" element={<RequireAdmin><AttendanceReport /></RequireAdmin>} />
         <Route path="/attendance-report-menu" element={<RequireAdmin><AttendanceReportMenu /></RequireAdmin>} />
         <Route path="/attendance-report-daerah" element={<RequireAdmin><AttendanceReportDaerah /></RequireAdmin>} />
         <Route path="/attendance-report-desa" element={<RequireAdmin><AttendanceReportDesa /></RequireAdmin>} />
