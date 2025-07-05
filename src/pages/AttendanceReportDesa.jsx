@@ -204,6 +204,30 @@ function AttendanceReportDesa() {
             <div className="flex items-center gap-4 mb-6">
               <button onClick={() => navigate('/attendance-report-menu')} className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-gray-700 font-semibold transition-all">← Kembali</button>
             </div>
+            {/* Statistik Kehadiran */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              <div className="bg-blue-50 rounded-xl p-6 flex items-center gap-4 shadow animate-fade-in">
+                <div className="bg-blue-200 rounded-full p-3"><svg className="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a4 4 0 0 0-3-3.87M9 20H4v-2a4 4 0 0 1 3-3.87m9-4a4 4 0 1 0-8 0 4 4 0 0 0 8 0zm6 4a4 4 0 0 0-3-3.87M6 16a4 4 0 0 0-3 3.87"/></svg></div>
+                <div>
+                  <div className="text-sm text-blue-700 font-semibold">Total Peserta</div>
+                  <div className="text-2xl font-bold text-blue-900"><CountUp end={filteredData.length} duration={1} /></div>
+                </div>
+              </div>
+              <div className="bg-green-50 rounded-xl p-6 flex items-center gap-4 shadow animate-fade-in">
+                <div className="bg-green-200 rounded-full p-3"><svg className="w-7 h-7 text-green-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4"/></svg></div>
+                <div>
+                  <div className="text-sm text-green-700 font-semibold">Hadir</div>
+                  <div className="text-2xl font-bold text-green-900"><CountUp end={filteredData.filter(d => d.status === 'hadir').length} duration={1} /></div>
+                </div>
+              </div>
+              <div className="bg-yellow-50 rounded-xl p-6 flex items-center gap-4 shadow animate-fade-in">
+                <div className="bg-yellow-200 rounded-full p-3"><svg className="w-7 h-7 text-yellow-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2"/></svg></div>
+                <div>
+                  <div className="text-sm text-yellow-700 font-semibold">Terlambat</div>
+                  <div className="text-2xl font-bold text-yellow-900"><CountUp end={filteredData.filter(d => d.status === 'terlambat').length} duration={1} /></div>
+                </div>
+              </div>
+            </div>
             {/* Filters and Actions */}
             <div className="bg-white shadow-xs rounded-xl p-6 mb-8 print:hidden">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
@@ -252,37 +276,6 @@ function AttendanceReportDesa() {
                 <button onClick={exportToExcel} className="btn bg-green-500 hover:bg-green-600 text-white" disabled={exporting}>Export Excel</button>
                 <button onClick={exportToPDF} className="btn bg-red-500 hover:bg-red-600 text-white" disabled={exporting}>Export PDF</button>
                 <button onClick={exportToJPG} className="btn bg-purple-500 hover:bg-purple-600 text-white" disabled={exporting}>Download JPG</button>
-              </div>
-            </div>
-            {/* Statistik Kehadiran */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <div className="bg-blue-50 rounded-xl p-6 flex items-center gap-4 shadow animate-fade-in">
-                <div className="bg-blue-200 rounded-full p-3"><svg className="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a4 4 0 0 0-3-3.87M9 20H4v-2a4 4 0 0 1 3-3.87m9-4a4 4 0 1 0-8 0 4 4 0 0 0 8 0zm6 4a4 4 0 0 0-3-3.87M6 16a4 4 0 0 0-3 3.87"/></svg></div>
-                <div>
-                  <div className="text-sm text-blue-700 font-semibold">Total Peserta</div>
-                  <div className="text-2xl font-bold text-blue-900"><CountUp end={filteredData.length} duration={1} /></div>
-                </div>
-              </div>
-              <div className="bg-green-50 rounded-xl p-6 flex items-center gap-4 shadow animate-fade-in">
-                <div className="bg-green-200 rounded-full p-3"><svg className="w-7 h-7 text-green-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4"/></svg></div>
-                <div>
-                  <div className="text-sm text-green-700 font-semibold">Hadir</div>
-                  <div className="text-2xl font-bold text-green-900"><CountUp end={filteredData.filter(d => d.status === 'hadir').length} duration={1} /></div>
-                </div>
-              </div>
-              <div className="bg-yellow-50 rounded-xl p-6 flex items-center gap-4 shadow animate-fade-in">
-                <div className="bg-yellow-200 rounded-full p-3"><svg className="w-7 h-7 text-yellow-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2"/></svg></div>
-                <div>
-                  <div className="text-sm text-yellow-700 font-semibold">Terlambat</div>
-                  <div className="text-2xl font-bold text-yellow-900"><CountUp end={filteredData.filter(d => d.status === 'terlambat').length} duration={1} /></div>
-                </div>
-              </div>
-              <div className="bg-red-50 rounded-xl p-6 flex items-center gap-4 shadow animate-fade-in">
-                <div className="bg-red-200 rounded-full p-3"><svg className="w-7 h-7 text-red-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path strokeLinecap="round" strokeLinejoin="round" d="M15 9l-6 6m0-6l6 6"/></svg></div>
-                <div>
-                  <div className="text-sm text-red-700 font-semibold">Tidak Hadir</div>
-                  <div className="text-2xl font-bold text-red-900"><CountUp end={filteredData.filter(d => d.status === 'tidak hadir').length} duration={1} /></div>
-                </div>
               </div>
             </div>
             {/* Table */}

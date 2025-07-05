@@ -15,7 +15,7 @@ export default function AttendanceReportMenu() {
       {/* Content area */}
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
         {/* Site header */}
-        <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+        <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} pageTitle="Rekap Presensi Menu" />
 
         <main className="grow flex flex-col items-center justify-center min-h-[60vh]">
           <div className="flex flex-col items-center gap-8 w-full">

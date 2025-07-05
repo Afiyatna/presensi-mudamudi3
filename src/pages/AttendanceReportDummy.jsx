@@ -161,11 +161,10 @@ export default function AttendanceReportDummy() {
   };
 
   return (
-    <LayoutDashboard>
+    <LayoutDashboard pageTitle="Rekap Presensi Dummy">
       <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
-        <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Tabel Rekap Presensi Dummy Data</h2>
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="bg-white dark:bg-gray-800 shadow-xs rounded-xl p-6">
             <div className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Peserta</div>
             <div className="text-2xl font-bold text-gray-800 dark:text-gray-100">{totalPeserta}</div>

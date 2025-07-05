@@ -4,7 +4,7 @@ import Header from '../partials/Header';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 
-export default function LayoutDashboard({ children }) {
+export default function LayoutDashboard({ children, pageTitle }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [role, setRole] = useState(null);
 
@@ -37,7 +37,7 @@ export default function LayoutDashboard({ children }) {
         )}
       </Sidebar>
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-        <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+        <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} pageTitle={pageTitle} />
         <main className="grow">
           {children}
         </main>
