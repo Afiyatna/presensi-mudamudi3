@@ -151,13 +151,32 @@ function Sidebar({
                           <path d="M0 1.5A1.5 1.5 0 0 1 1.5 0h3A1.5 1.5 0 0 1 6 1.5v3A1.5 1.5 0 0 1 4.5 6h-3A1.5 1.5 0 0 1 0 4.5v-3ZM1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3ZM0 10.5A1.5 1.5 0 0 1 1.5 9h3A1.5 1.5 0 0 1 6 10.5v3A1.5 1.5 0 0 1 4.5 15h-3A1.5 1.5 0 0 1 0 13.5v-3ZM1.5 10a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3ZM10 1.5A1.5 1.5 0 0 1 11.5 0h3A1.5 1.5 0 0 1 16 1.5v3A1.5 1.5 0 0 1 14.5 6h-3A1.5 1.5 0 0 1 10 4.5v-3ZM11.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3ZM10 10.5A1.5 1.5 0 0 1 11.5 9h3A1.5 1.5 0 0 1 16 10.5v3A1.5 1.5 0 0 1 14.5 15h-3A1.5 1.5 0 0 1 10 13.5v-3ZM11.5 10a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3Z"/>
                     </svg>
                         <span className="text-sm font-medium duration-200">
-                          QR Scanner
+                          QR Scanner Menu
                     </span>
                   </div>
                 </NavLink>
               </li>
-                  {/* Rekap Presensi */}
+                  {/* Riwayat Presensi Menu */}
                   <li className="px-3 py-2">
+                    <NavLink
+                      end
+                      to="/attendance-report-menu"
+                      className={({ isActive }) =>
+                        "block text-gray-800 dark:text-gray-100 truncate transition duration-150 " + (isActive ? "text-blue-700" : "hover:text-gray-900 dark:hover:text-white")
+                      }
+                    >
+                      <div className="flex items-center gap-2">
+                        <svg className={`shrink-0 fill-current ${pathname === "/attendance-report-menu" ? 'text-blue-700' : 'text-gray-400 dark:text-gray-500'}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                          <path d="M8 1.333A6.667 6.667 0 1 0 8 14.667 6.667 6.667 0 0 0 8 1.333zm0 12A5.333 5.333 0 1 1 8 2.667a5.333 5.333 0 0 1 0 10.666zm0-8A2.667 2.667 0 1 0 8 10.667 2.667 2.667 0 0 0 8 5.333z"/>
+                        </svg>
+                        <span className="text-sm font-medium duration-200">
+                          Rekap Presensi Menu
+                        </span>
+                      </div>
+                    </NavLink>
+                  </li>
+                  {/* Rekap Presensi */}
+                  {/* <li className="px-3 py-2">
                             <NavLink
                               end
                       to="/attendance-report"
@@ -175,7 +194,7 @@ function Sidebar({
                               </span>
                       </div>
                             </NavLink>
-                          </li>
+                          </li> */}
                   {/* Dashboard Dummy */}
                   <li className="px-3 py-2">
                     <NavLink

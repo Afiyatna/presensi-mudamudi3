@@ -10,6 +10,7 @@ function Header({
   sidebarOpen,
   setSidebarOpen,
   variant = 'default',
+  pageTitle,
 }) {
 
   const [searchModalOpen, setSearchModalOpen] = useState(false)
@@ -20,8 +21,7 @@ function Header({
         <div className={`flex items-center justify-between h-16 ${variant === 'v2' || variant === 'v3' ? '' : 'lg:border-b border-gray-200 dark:border-gray-700/60'}`}>
 
           {/* Header: Left side */}
-          <div className="flex">
-
+          <div className="flex items-center gap-4">
             {/* Hamburger button */}
             <button
               className="text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 lg:hidden"
@@ -36,7 +36,10 @@ function Header({
                 <rect x="4" y="17" width="16" height="2" />
               </svg>
             </button>
-
+            {/* Page Title */}
+            {pageTitle && (
+              <span className="text-lg md:text-xl font-bold text-gray-800 dark:text-gray-100 truncate max-w-xs md:max-w-md lg:max-w-lg" title={pageTitle}>{pageTitle}</span>
+            )}
           </div>
 
           {/* Header: Right side */}

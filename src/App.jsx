@@ -22,6 +22,10 @@ import UserPresensiHistory from './pages/UserPresensiHistory';
 import RequireAuth from './components/RequireAuth';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
+import AttendanceReportMenu from './pages/AttendanceReportMenu';
+import AttendanceReportDaerah from './pages/AttendanceReportDaerah';
+import AttendanceReportDesa from './pages/AttendanceReportDesa';
+import { RequireAdmin } from './components/RequireAuth';
 
 function App() {
 
@@ -42,6 +46,9 @@ function App() {
         <Route path="/qr-scanner/daerah" element={<QrScannerDaerah />} />
         <Route path="/qr-scanner/desa" element={<QrScannerDesa />} />
         <Route path="/attendance-report" element={<AttendanceReport />} />
+        <Route path="/attendance-report-menu" element={<RequireAdmin><AttendanceReportMenu /></RequireAdmin>} />
+        <Route path="/attendance-report-daerah" element={<RequireAdmin><AttendanceReportDaerah /></RequireAdmin>} />
+        <Route path="/attendance-report-desa" element={<RequireAdmin><AttendanceReportDesa /></RequireAdmin>} />
         <Route path="/user-qr" element={<RequireAuth><UserQRCode /></RequireAuth>} />
         <Route path="/user-history" element={<RequireAuth><UserPresensiHistory /></RequireAuth>} />
         <Route path="/register" element={<Register />} />
