@@ -468,7 +468,7 @@ function AttendanceReport() {
                 </div>
               </div>
 
-              {/* Attendance Table */}
+              {/* Attendance Table - Desktop */}
               <div ref={tableRef} className="bg-white dark:bg-gray-800 shadow-xs rounded-xl print:shadow-none print:border print:border-gray-300">
                 <div className="p-6 border-b border-gray-100 dark:border-gray-700/60">
                   <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
@@ -479,7 +479,8 @@ function AttendanceReport() {
                   </p>
                 </div>
 
-                <div className="overflow-x-auto">
+                {/* Desktop Table View */}
+                <div className="hidden md:block overflow-x-auto">
                   {loading ? (
                     <div className="flex items-center justify-center py-12">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-500"></div>
@@ -571,6 +572,72 @@ function AttendanceReport() {
                         )}
                       </tbody>
                     </table>
+                  )}
+                </div>
+
+                {/* Mobile Card View */}
+                <div className="md:hidden">
+                  {loading ? (
+                    <div className="flex items-center justify-center py-12">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-500"></div>
+                      <span className="ml-3 text-gray-600 dark:text-gray-400">Memuat data...</span>
+                    </div>
+                  ) : filteredData.length === 0 ? (
+                    <div className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                      <svg className="w-12 h-12 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      <p>Tidak ada data presensi yang ditemukan</p>
+                    </div>
+                  ) : (
+                    <div className="p-4 space-y-4">
+                      {filteredData.map((item, index) => (
+                        <div key={item.id} className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center space-x-3">
+                              <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                                <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+                                  {index + 1}
+                                </span>
+                              </div>
+                              <div>
+                                <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-base">
+                                  {item.namaLengkap}
+                                </h3>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                  {item.jenisKelamin}
+                                </p>
+                              </div>
+                            </div>
+                            <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+                              item.status.toLowerCase() === 'hadir' 
+                                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+                                : item.status.toLowerCase() === 'terlambat'
+                                ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+                                : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+                            }`}>
+                              {item.status}
+                            </span>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                              <p className="text-gray-500 dark:text-gray-400 font-medium">Kelompok</p>
+                              <p className="text-gray-900 dark:text-gray-100">{item.namaKelompok}</p>
+                            </div>
+                            <div>
+                              <p className="text-gray-500 dark:text-gray-400 font-medium">Desa</p>
+                              <p className="text-gray-900 dark:text-gray-100">{item.namaDesa}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                            <p className="text-gray-500 dark:text-gray-400 font-medium text-sm">Waktu Presensi</p>
+                            <p className="text-gray-900 dark:text-gray-100 text-sm">{item.waktuPresensi}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </div>
               </div>

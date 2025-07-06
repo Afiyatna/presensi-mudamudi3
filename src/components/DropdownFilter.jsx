@@ -1,30 +1,16 @@
 import React, { useState, useRef, useEffect } from "react";
 import Transition from "../utils/Transition";
 
-function DropdownFilter({ align }) {
+function DropdownFilter({ align, options = [], selected = {}, onChange, onApply, onClear }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [localSelected, setLocalSelected] = useState(selected);
 
   const trigger = useRef(null);
   const dropdown = useRef(null);
 
-  //Clear  filtres on click clear button 
-
-  const Checkrefs = {
-    DirectorIndirect: useRef(null),
-    RealTimeValue: useRef(null),
-    Topcahnnels: useRef(null),
-    SalesRefunds: useRef(null),
-    LastOrder: useRef(null),
-    TotalSpent: useRef(null),
-  };
-
-  const handleFilters = () => {
-    Object.keys(Checkrefs).forEach((key) => {
-      if (Checkrefs[key].current.checked) {
-        Checkrefs[key].current.checked = false;
-      }
-    });
-  };
+  useEffect(() => {
+    setLocalSelected(selected);
+  }, [selected]);
 
   // close on click outside
   useEffect(() => {
@@ -52,17 +38,42 @@ function DropdownFilter({ align }) {
     return () => document.removeEventListener("keydown", keyHandler);
   });
 
+  const handleCheckbox = (group, value) => {
+    setLocalSelected((prev) => {
+      const prevArr = prev[group] || [];
+      let newArr;
+      if (prevArr.includes(value)) {
+        newArr = prevArr.filter((v) => v !== value);
+      } else {
+        newArr = [...prevArr, value];
+      }
+      const updated = { ...prev, [group]: newArr };
+      if (onChange) onChange(updated);
+      return updated;
+    });
+  };
+
+  const handleClear = () => {
+    setLocalSelected({});
+    if (onClear) onClear();
+  };
+
+  const handleApply = () => {
+    if (onApply) onApply(localSelected);
+    setDropdownOpen(false);
+  };
+
   return (
     <div className="relative inline-flex">
       <button
         ref={trigger}
-        className="btn px-2.5 bg-white dark:bg-gray-800 border-gray-200 hover:border-gray-300 dark:border-gray-700/60 dark:hover:border-gray-600 text-gray-400 dark:text-gray-500"
+        className="btn px-2.5 bg-white dark:bg-gray-800 border-gray-200 hover:border-gray-300 dark:border-gray-700/60 dark:hover:border-gray-600 text-gray-400 dark:text-gray-500 shadow"
         aria-haspopup="true"
         onClick={() => setDropdownOpen(!dropdownOpen)}
         aria-expanded={dropdownOpen}
+        type="button"
       >
         <span className="sr-only">Filter</span>
-        <wbr />
         <svg
           className="fill-current"
           width="16"
@@ -79,7 +90,7 @@ function DropdownFilter({ align }) {
           align === "right"
             ? "md:left-auto md:right-0"
             : "md:left-0 md:right-auto"
-        }`}
+        } pb-20`}
         enter="transition ease-out duration-200 transform"
         enterStart="opacity-0 -translate-y-2"
         enterEnd="opacity-100 translate-y-0"
@@ -92,79 +103,30 @@ function DropdownFilter({ align }) {
             Filters
           </div>
           <ul className="mb-4">
-            <li className="py-1 px-3">
-              <label className="flex items-center">
-                <input
-                  ref={Checkrefs.DirectorIndirect}
-                  type="checkbox"
-                  className="form-checkbox"
-                />
-                <span className="text-sm font-medium ml-2">
-                  Direct VS Indirect
-                </span>
-              </label>
-            </li>
-            <li className="py-1 px-3">
-              <label className="flex items-center">
-                <input
-                  ref={Checkrefs.RealTimeValue}
-                  type="checkbox"
-                  className="form-checkbox"
-                />
-                <span className="text-sm font-medium ml-2">
-                  Real Time Value
-                </span>
-              </label>
-            </li>
-            <li className="py-1 px-3">
-              <label className="flex items-center">
-                <input
-                  ref={Checkrefs.Topcahnnels}
-                  type="checkbox"
-                  className="form-checkbox"
-                />
-                <span className="text-sm font-medium ml-2">Top Channels</span>
-              </label>
-            </li>
-            <li className="py-1 px-3">
-              <label className="flex items-center">
-                <input
-                  ref={Checkrefs.SalesRefunds}
-                  type="checkbox"
-                  className="form-checkbox"
-                />
-                <span className="text-sm font-medium ml-2">
-                  Sales VS Refunds
-                </span>
-              </label>
-            </li>
-            <li className="py-1 px-3">
-              <label className="flex items-center">
-                <input
-                  ref={Checkrefs.LastOrder}
-                  type="checkbox"
-                  className="form-checkbox"
-                />
-                <span className="text-sm font-medium ml-2">Last Order</span>
-              </label>
-            </li>
-            <li className="py-1 px-3">
-              <label className="flex items-center">
-                <input
-                  ref={Checkrefs.TotalSpent}
-                  type="checkbox"
-                  className="form-checkbox"
-                />
-                <span className="text-sm font-medium ml-2">Total Spent</span>
-              </label>
-            </li>
+            {options.map((group) => (
+              <li key={group.label} className="py-1 px-3">
+                <div className="font-semibold text-gray-700 dark:text-gray-200 text-xs mb-1">{group.label}</div>
+                {group.values.map((val) => (
+                  <label className="flex items-center mb-1" key={val}>
+                    <input
+                      type="checkbox"
+                      className="form-checkbox"
+                      checked={localSelected[group.key]?.includes(val) || false}
+                      onChange={() => handleCheckbox(group.key, val)}
+                    />
+                    <span className="text-sm font-medium ml-2">{val}</span>
+                  </label>
+                ))}
+              </li>
+            ))}
           </ul>
           <div className="py-2 px-3 border-t border-gray-200 dark:border-gray-700/60 bg-gray-50 dark:bg-gray-700/20">
             <ul className="flex items-center justify-between">
               <li>
                 <button
-                  onClick={handleFilters}
+                  onClick={handleClear}
                   className="btn-xs bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700/60 hover:border-gray-300 dark:hover:border-gray-600 text-red-500"
+                  type="button"
                 >
                   Clear
                 </button>
@@ -172,8 +134,8 @@ function DropdownFilter({ align }) {
               <li>
                 <button
                   className="btn-xs bg-gray-900 text-gray-100 hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-800 dark:hover:bg-white"
-                  onClick={() => setDropdownOpen(false)}
-                  onBlur={() => setDropdownOpen(false)}
+                  onClick={handleApply}
+                  type="button"
                 >
                   Apply
                 </button>

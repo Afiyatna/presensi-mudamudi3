@@ -19,8 +19,10 @@ import Sidebar from '../partials/Sidebar';
 import Header from '../partials/Header';
 import BottomNavigation from '../components/BottomNavigation';
 import BarChart01 from '../charts/BarChart01';
+import LineChart01 from '../charts/LineChart01';
 import { supabase } from '../supabaseClient';
 import { useThemeProvider } from '../utils/ThemeContext';
+import DropdownFilter from '../components/DropdownFilter';
 
 function Dashboard() {
   // State untuk role dan data presensi user
@@ -31,6 +33,54 @@ function Dashboard() {
   const [allPresensi, setAllPresensi] = useState([]); // untuk admin
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { currentTheme } = useThemeProvider();
+  // Filter state untuk user
+  const [userChartType, setUserChartType] = useState('bar');
+  const [userStatus, setUserStatus] = useState('');
+  const [userDateRange, setUserDateRange] = useState({ start: '', end: '' });
+  // Tambahan untuk filter panel baru
+  const [filterDropdown, setFilterDropdown] = useState({ jenis: [], status: [] });
+  // State untuk filter admin
+  const [adminFilterDropdown, setAdminFilterDropdown] = useState({ kelompok: [], desa: [], jenis_kelamin: [], status: [] });
+  const [adminDateRange, setAdminDateRange] = useState({ start: '', end: '' });
+
+  // Opsi filter untuk user (tetap)
+  const jenisOptions = ['Presensi Umum', 'Presensi Daerah', 'Presensi Desa'];
+  const statusOptions = ['hadir', 'terlambat'];
+  const filterOptions = [
+    { label: 'Jenis Presensi', key: 'jenis', values: jenisOptions },
+    { label: 'Status', key: 'status', values: statusOptions.map(s => s.charAt(0).toUpperCase() + s.slice(1)) },
+  ];
+
+  // Opsi filter untuk admin (Kelompok, Desa, Jenis Kelamin, Status)
+  const kelompokOptions = [...new Set(allPresensi.map(d => d.kelompok).filter(Boolean))];
+  const desaOptions = [...new Set(allPresensi.map(d => d.desa).filter(Boolean))];
+  const jenisKelaminOptions = [...new Set(allPresensi.map(d => d.jenis_kelamin).filter(Boolean))];
+  const filterOptionsAdmin = [
+    { label: 'Kelompok', key: 'kelompok', values: kelompokOptions },
+    { label: 'Desa', key: 'desa', values: desaOptions },
+    { label: 'Jenis Kelamin', key: 'jenis_kelamin', values: jenisKelaminOptions },
+    { label: 'Status', key: 'status', values: statusOptions.map(s => s.charAt(0).toUpperCase() + s.slice(1)) },
+  ];
+
+  // Handler filter dropdown
+  const handleDropdownApply = (selected) => {
+    setFilterDropdown(selected);
+    // Sinkron ke filter chart
+    setUserStatus(selected.status?.[0]?.toLowerCase() || '');
+    // Jenis presensi: jika ada, filter userPresensi (lihat di bawah)
+  };
+  const handleDropdownClear = () => {
+    setFilterDropdown({ jenis: [], status: [] });
+    setUserStatus('');
+  };
+
+  // Handler filter dropdown admin (update filter kelompok, desa, jenis kelamin, status)
+  const handleAdminDropdownApply = (selected) => {
+    setAdminFilterDropdown(selected);
+  };
+  const handleAdminDropdownClear = () => {
+    setAdminFilterDropdown({ kelompok: [], desa: [], jenis_kelamin: [], status: [] });
+  };
 
   // Ambil role dan data presensi user/admin
   useEffect(() => {
@@ -67,10 +117,39 @@ function Dashboard() {
     fetchRoleAndPresensi();
   }, []);
 
-  // --- ADMIN: Grafik Rekap Presensi per Kelompok ---
-  const kelompokList = [...new Set(allPresensi.map(d => d.kelompok))];
-  const getBarChartData = (kelompok) => {
-    const dataKelompok = allPresensi.filter(d => d.kelompok === kelompok);
+  // Filter data presensi admin sesuai status, tanggal, kelompok, desa, jenis kelamin
+  const filteredAllPresensi = allPresensi.filter(d => {
+    // Date range
+    if (adminDateRange.start || adminDateRange.end) {
+      const tgl = d.waktu_presensi ? d.waktu_presensi.split('T')[0] : '';
+      const tglDate = new Date(tgl);
+      const start = adminDateRange.start ? new Date(adminDateRange.start) : null;
+      const end = adminDateRange.end ? new Date(adminDateRange.end) : null;
+      if (start && tglDate < start) return false;
+      if (end && tglDate > end) return false;
+    }
+    // Status
+    if (adminFilterDropdown.status && adminFilterDropdown.status.length > 0) {
+      if (!adminFilterDropdown.status.includes((d.status || '').charAt(0).toUpperCase() + (d.status || '').slice(1))) return false;
+    }
+    // Kelompok
+    if (adminFilterDropdown.kelompok && adminFilterDropdown.kelompok.length > 0) {
+      if (!adminFilterDropdown.kelompok.includes(d.kelompok)) return false;
+    }
+    // Desa
+    if (adminFilterDropdown.desa && adminFilterDropdown.desa.length > 0) {
+      if (!adminFilterDropdown.desa.includes(d.desa)) return false;
+    }
+    // Jenis Kelamin
+    if (adminFilterDropdown.jenis_kelamin && adminFilterDropdown.jenis_kelamin.length > 0) {
+      if (!adminFilterDropdown.jenis_kelamin.includes(d.jenis_kelamin)) return false;
+    }
+    return true;
+  });
+  // Kelompok list dari data yang sudah difilter
+  const filteredKelompokList = [...new Set(filteredAllPresensi.map(d => d.kelompok))];
+  const getFilteredBarChartData = (kelompok) => {
+    const dataKelompok = filteredAllPresensi.filter(d => d.kelompok === kelompok);
     const tanggalList = [...new Set(dataKelompok.map(d => d.waktu_presensi ? d.waktu_presensi.split('T')[0] : ''))];
     const hadirData = tanggalList.map(tgl => dataKelompok.filter(d => d.waktu_presensi && d.waktu_presensi.startsWith(tgl) && d.status && d.status.toLowerCase() === 'hadir').length);
     const terlambatData = tanggalList.map(tgl => dataKelompok.filter(d => d.waktu_presensi && d.waktu_presensi.startsWith(tgl) && d.status && d.status.toLowerCase() === 'terlambat').length);
@@ -83,16 +162,49 @@ function Dashboard() {
     };
   };
 
-  // --- USER: Grafik Riwayat Presensi Sendiri ---
+  // --- USER: Grafik Riwayat Presensi Sendiri (dengan filter) ---
   // Ambil tanggal unik dari presensi user
   const userTanggalList = [...new Set(userPresensi.map(d => d.waktu_presensi ? d.waktu_presensi.split('T')[0] : ''))];
-  const userHadirData = userTanggalList.map(tgl => userPresensi.filter(d => d.waktu_presensi && d.waktu_presensi.startsWith(tgl) && d.status && d.status.toLowerCase() === 'hadir').length);
-  const userTerlambatData = userTanggalList.map(tgl => userPresensi.filter(d => d.waktu_presensi && d.waktu_presensi.startsWith(tgl) && d.status && d.status.toLowerCase() === 'terlambat').length);
+  // Filter tanggal sesuai range
+  const filteredTanggalList = userTanggalList.filter(tgl => {
+    if (!userDateRange.start && !userDateRange.end) return true;
+    const tglDate = new Date(tgl);
+    const start = userDateRange.start ? new Date(userDateRange.start) : null;
+    const end = userDateRange.end ? new Date(userDateRange.end) : null;
+    if (start && tglDate < start) return false;
+    if (end && tglDate > end) return false;
+    return true;
+  });
+  // Filter data presensi sesuai status, tanggal, dan jenis presensi
+  const filteredUserPresensi = userPresensi.filter(d => {
+    const tgl = d.waktu_presensi ? d.waktu_presensi.split('T')[0] : '';
+    let match = filteredTanggalList.includes(tgl);
+    if (userStatus) match = match && d.status && d.status.toLowerCase() === userStatus;
+    if (filterDropdown.jenis && filterDropdown.jenis.length > 0) {
+      // Mapping jenis presensi dari tabel (default: 'Presensi Umum')
+      let jenis = 'Presensi Umum';
+      if (d.tabel === 'presensi_daerah') jenis = 'Presensi Daerah';
+      if (d.tabel === 'presensi_desa') jenis = 'Presensi Desa';
+      match = match && filterDropdown.jenis.includes(jenis);
+    }
+    return match;
+  });
+  // Tanggal unik setelah filter
+  const filteredUserTanggalList = [...new Set(filteredUserPresensi.map(d => d.waktu_presensi ? d.waktu_presensi.split('T')[0] : ''))];
+  const userHadirData = filteredUserTanggalList.map(tgl => filteredUserPresensi.filter(d => d.waktu_presensi && d.waktu_presensi.startsWith(tgl) && d.status && d.status.toLowerCase() === 'hadir').length);
+  const userTerlambatData = filteredUserTanggalList.map(tgl => filteredUserPresensi.filter(d => d.waktu_presensi && d.waktu_presensi.startsWith(tgl) && d.status && d.status.toLowerCase() === 'terlambat').length);
   const userBarChartData = {
-    labels: userTanggalList,
+    labels: filteredUserTanggalList,
     datasets: [
       { label: 'Hadir', data: userHadirData, backgroundColor: '#4ade80' },
       { label: 'Terlambat', data: userTerlambatData, backgroundColor: '#facc15' },
+    ],
+  };
+  const userLineChartData = {
+    labels: filteredUserTanggalList,
+    datasets: [
+      { label: 'Hadir', data: userHadirData, borderColor: '#4ade80', backgroundColor: 'rgba(74,222,128,0.2)', fill: false },
+      { label: 'Terlambat', data: userTerlambatData, borderColor: '#facc15', backgroundColor: 'rgba(250,204,21,0.2)', fill: false },
     ],
   };
 
@@ -113,6 +225,70 @@ function Dashboard() {
         {/* Main Content */}
         <main className="grow pb-20 lg:pb-0">
           <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
+            {/* Filter Panel (mirip gambar) */}
+            {role === 'user' && (
+              <>
+                {/* Mobile: horizontal, tombol kanan ikon + */}
+                <div className="flex flex-row items-center gap-2 mb-6 sm:hidden">
+                  {/* Dropdown Filter */}
+                  <div>
+                    <DropdownFilter
+                      options={filterOptions}
+                      selected={filterDropdown}
+                      onApply={handleDropdownApply}
+                      onClear={handleDropdownClear}
+                      align="left"
+                    />
+                  </div>
+                  {/* Date Range Picker */}
+                  <div>
+                    <Datepicker
+                      value={userDateRange}
+                      onChange={setUserDateRange}
+                    />
+                  </div>
+                  {/* Tombol + */}
+                  <button
+                    className="flex items-center justify-center bg-gray-900 hover:bg-gray-800 text-white rounded-lg shadow w-10 h-10 p-0"
+                    onClick={() => {
+                      // Terapkan filter (sudah otomatis di chart, bisa tambahkan aksi lain jika perlu)
+                    }}
+                    type="button"
+                  >
+                    <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
+                      <path d="M10 5v10M5 10h10" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                  </button>
+                </div>
+                {/* Desktop/tablet: label Filter */}
+                <div className="hidden sm:flex flex-row items-center gap-3 mb-8">
+                  <div className="w-auto">
+                    <DropdownFilter
+                      options={filterOptions}
+                      selected={filterDropdown}
+                      onApply={handleDropdownApply}
+                      onClear={handleDropdownClear}
+                      align="left"
+                    />
+                  </div>
+                  <div className="min-w-[15.5rem]">
+                    <Datepicker
+                      value={userDateRange}
+                      onChange={setUserDateRange}
+                    />
+                  </div>
+                  <button
+                    className="btn bg-gray-900 hover:bg-gray-800 text-white font-semibold px-5 py-2 rounded-lg shadow"
+                    onClick={() => {
+                      // Terapkan filter (sudah otomatis di chart, bisa tambahkan aksi lain jika perlu)
+                    }}
+                    type="button"
+                  >
+                    Filter
+                  </button>
+                </div>
+              </>
+            )}
             {/* Cards */}
             {/**
             <div className="grid grid-cols-12 gap-6 mb-8">
@@ -134,12 +310,65 @@ function Dashboard() {
             {/* ADMIN: Grafik Rekap Presensi per Kelompok */}
             {role === 'admin' && (
               <div className="mb-8">
+                {/* Filter Panel Admin */}
+                {/* Mobile: horizontal, tombol kanan ikon + */}
+                <div className="flex flex-row items-center gap-2 mb-6 sm:hidden">
+                  <div>
+                    <DropdownFilter
+                      options={filterOptionsAdmin}
+                      selected={adminFilterDropdown}
+                      onApply={handleAdminDropdownApply}
+                      onClear={handleAdminDropdownClear}
+                      align="left"
+                    />
+                  </div>
+                  <div>
+                    <Datepicker
+                      value={adminDateRange}
+                      onChange={setAdminDateRange}
+                    />
+                  </div>
+                  <button
+                    className="flex items-center justify-center bg-gray-900 hover:bg-gray-800 text-white rounded-lg shadow w-10 h-10 p-0"
+                    onClick={() => {}}
+                    type="button"
+                  >
+                    <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
+                      <path d="M10 5v10M5 10h10" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                  </button>
+                </div>
+                {/* Desktop/tablet: label Filter */}
+                <div className="hidden sm:flex flex-row items-center gap-3 mb-8">
+                  <div className="w-auto">
+                    <DropdownFilter
+                      options={filterOptionsAdmin}
+                      selected={adminFilterDropdown}
+                      onApply={handleAdminDropdownApply}
+                      onClear={handleAdminDropdownClear}
+                      align="left"
+                    />
+                  </div>
+                  <div className="min-w-[15.5rem]">
+                    <Datepicker
+                      value={adminDateRange}
+                      onChange={setAdminDateRange}
+                    />
+                  </div>
+                  <button
+                    className="btn bg-gray-900 hover:bg-gray-800 text-white font-semibold px-5 py-2 rounded-lg shadow"
+                    onClick={() => {}}
+                    type="button"
+                  >
+                    Filter
+                  </button>
+                </div>
                 <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Rekap Presensi per Kelompok</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {kelompokList.map(kelompok => (
+                  {filteredKelompokList.map(kelompok => (
                     <div key={kelompok} className="bg-white dark:bg-gray-800 rounded-xl shadow-xs p-4">
                       <h3 className="font-semibold text-gray-700 dark:text-gray-200 mb-2">{kelompok}</h3>
-                      <BarChart01 key={currentTheme + kelompok} data={getBarChartData(kelompok)} width={320} height={180} />
+                      <BarChart01 key={currentTheme + kelompok} data={getFilteredBarChartData(kelompok)} width={320} height={180} />
                     </div>
                   ))}
                 </div>
@@ -150,7 +379,11 @@ function Dashboard() {
               <div className="mb-8">
                 <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Grafik Riwayat Presensi Anda</h2>
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xs p-4 max-w-xl">
-                  <BarChart01 key={currentTheme + '-user'} data={userBarChartData} width={400} height={220} />
+                  {userChartType === 'bar' ? (
+                    <BarChart01 key={currentTheme + '-user'} data={userBarChartData} width={400} height={220} />
+                  ) : (
+                    <LineChart01 key={currentTheme + '-user'} data={userLineChartData} width={400} height={220} />
+                  )}
                   {userBarChartData.labels.length === 0 && (
                     <div className="text-gray-500 text-center mt-4">Belum ada data presensi.</div>
                   )}
