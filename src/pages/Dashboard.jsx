@@ -199,7 +199,9 @@ function Dashboard() {
     ],
   };
 
-  if (userLoading) return <div>Loading...</div>;
+  // if (userLoading) return <div>Loading...</div>;
+  if (userLoading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  
 
   return (
     <div className="flex h-screen overflow-hidden">

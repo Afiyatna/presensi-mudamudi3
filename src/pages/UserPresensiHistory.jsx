@@ -77,18 +77,20 @@ export default function UserPresensiHistory() {
   const jenisOptions = ['Presensi Umum', 'Presensi Daerah', 'Presensi Desa'];
   const statusOptions = ['hadir', 'terlambat'];
 
-  if (loading) {
-    return (
-      <LayoutDashboard pageTitle="Riwayat Presensi">
-        <div className="max-w-4xl mx-auto py-8 px-4">
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-            <span className="ml-3 text-gray-600">Memuat data...</span>
-          </div>
-        </div>
-      </LayoutDashboard>
-    );
-  }
+  if (loading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
+
+  // if (loading) {
+  //   return (
+  //     <LayoutDashboard pageTitle="Riwayat Presensi">
+  //       <div className="max-w-4xl mx-auto py-8 px-4">
+  //         <div className="flex items-center justify-center py-12">
+  //           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+  //           <span className="ml-3 text-gray-600">Memuat data...</span>
+  //         </div>
+  //       </div>
+  //     </LayoutDashboard>
+  //   );
+  // }
 
   return (
     <LayoutDashboard pageTitle="Riwayat Presensi">

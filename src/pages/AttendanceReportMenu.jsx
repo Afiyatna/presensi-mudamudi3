@@ -6,7 +6,7 @@ import LayoutDashboard from '../layouts/LayoutDashboard';
 
 export default function AttendanceReportMenu() {
   const navigate = useNavigate();
-  const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);  
 
   return (
     <LayoutDashboard pageTitle="Riwayat Presensi">
