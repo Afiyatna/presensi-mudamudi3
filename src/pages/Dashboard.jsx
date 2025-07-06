@@ -36,12 +36,12 @@ function Dashboard() {
   // Filter state untuk user
   const [userChartType, setUserChartType] = useState('bar');
   const [userStatus, setUserStatus] = useState('');
-  const [userDateRange, setUserDateRange] = useState({ start: '', end: '' });
+  const [userDate, setUserDate] = useState('');
   // Tambahan untuk filter panel baru
   const [filterDropdown, setFilterDropdown] = useState({ jenis: [], status: [] });
   // State untuk filter admin
   const [adminFilterDropdown, setAdminFilterDropdown] = useState({ kelompok: [], desa: [], jenis_kelamin: [], status: [] });
-  const [adminDateRange, setAdminDateRange] = useState({ start: '', end: '' });
+  const [adminDate, setAdminDate] = useState('');
 
   // Opsi filter untuk user (tetap)
   const jenisOptions = ['Presensi Umum', 'Presensi Daerah', 'Presensi Desa'];
@@ -119,14 +119,10 @@ function Dashboard() {
 
   // Filter data presensi admin sesuai status, tanggal, kelompok, desa, jenis kelamin
   const filteredAllPresensi = allPresensi.filter(d => {
-    // Date range
-    if (adminDateRange.start || adminDateRange.end) {
+    // Single date
+    if (adminDate) {
       const tgl = d.waktu_presensi ? d.waktu_presensi.split('T')[0] : '';
-      const tglDate = new Date(tgl);
-      const start = adminDateRange.start ? new Date(adminDateRange.start) : null;
-      const end = adminDateRange.end ? new Date(adminDateRange.end) : null;
-      if (start && tglDate < start) return false;
-      if (end && tglDate > end) return false;
+      if (tgl !== adminDate) return false;
     }
     // Status
     if (adminFilterDropdown.status && adminFilterDropdown.status.length > 0) {
@@ -165,15 +161,10 @@ function Dashboard() {
   // --- USER: Grafik Riwayat Presensi Sendiri (dengan filter) ---
   // Ambil tanggal unik dari presensi user
   const userTanggalList = [...new Set(userPresensi.map(d => d.waktu_presensi ? d.waktu_presensi.split('T')[0] : ''))];
-  // Filter tanggal sesuai range
+  // Filter tanggal sesuai single date
   const filteredTanggalList = userTanggalList.filter(tgl => {
-    if (!userDateRange.start && !userDateRange.end) return true;
-    const tglDate = new Date(tgl);
-    const start = userDateRange.start ? new Date(userDateRange.start) : null;
-    const end = userDateRange.end ? new Date(userDateRange.end) : null;
-    if (start && tglDate < start) return false;
-    if (end && tglDate > end) return false;
-    return true;
+    if (!userDate) return true;
+    return tgl === userDate;
   });
   // Filter data presensi sesuai status, tanggal, dan jenis presensi
   const filteredUserPresensi = userPresensi.filter(d => {
@@ -243,22 +234,10 @@ function Dashboard() {
                   {/* Date Range Picker */}
                   <div>
                     <Datepicker
-                      value={userDateRange}
-                      onChange={setUserDateRange}
+                      value={userDate}
+                      onChange={setUserDate}
                     />
                   </div>
-                  {/* Tombol + */}
-                  <button
-                    className="flex items-center justify-center bg-gray-900 hover:bg-gray-800 text-white rounded-lg shadow w-10 h-10 p-0"
-                    onClick={() => {
-                      // Terapkan filter (sudah otomatis di chart, bisa tambahkan aksi lain jika perlu)
-                    }}
-                    type="button"
-                  >
-                    <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
-                      <path d="M10 5v10M5 10h10" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-                    </svg>
-                  </button>
                 </div>
                 {/* Desktop/tablet: label Filter */}
                 <div className="hidden sm:flex flex-row items-center gap-3 mb-8">
@@ -273,19 +252,10 @@ function Dashboard() {
                   </div>
                   <div className="min-w-[15.5rem]">
                     <Datepicker
-                      value={userDateRange}
-                      onChange={setUserDateRange}
+                      value={userDate}
+                      onChange={setUserDate}
                     />
                   </div>
-                  <button
-                    className="btn bg-gray-900 hover:bg-gray-800 text-white font-semibold px-5 py-2 rounded-lg shadow"
-                    onClick={() => {
-                      // Terapkan filter (sudah otomatis di chart, bisa tambahkan aksi lain jika perlu)
-                    }}
-                    type="button"
-                  >
-                    Filter
-                  </button>
                 </div>
               </>
             )}
@@ -324,19 +294,10 @@ function Dashboard() {
                   </div>
                   <div>
                     <Datepicker
-                      value={adminDateRange}
-                      onChange={setAdminDateRange}
+                      value={adminDate}
+                      onChange={setAdminDate}
                     />
                   </div>
-                  <button
-                    className="flex items-center justify-center bg-gray-900 hover:bg-gray-800 text-white rounded-lg shadow w-10 h-10 p-0"
-                    onClick={() => {}}
-                    type="button"
-                  >
-                    <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
-                      <path d="M10 5v10M5 10h10" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-                    </svg>
-                  </button>
                 </div>
                 {/* Desktop/tablet: label Filter */}
                 <div className="hidden sm:flex flex-row items-center gap-3 mb-8">
@@ -351,17 +312,10 @@ function Dashboard() {
                   </div>
                   <div className="min-w-[15.5rem]">
                     <Datepicker
-                      value={adminDateRange}
-                      onChange={setAdminDateRange}
+                      value={adminDate}
+                      onChange={setAdminDate}
                     />
                   </div>
-                  <button
-                    className="btn bg-gray-900 hover:bg-gray-800 text-white font-semibold px-5 py-2 rounded-lg shadow"
-                    onClick={() => {}}
-                    type="button"
-                  >
-                    Filter
-                  </button>
                 </div>
                 <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Rekap Presensi per Kelompok</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
