@@ -53,11 +53,22 @@ export default function UserQRCode() {
     pdf.save(getSafeFileName(namaLengkap, 'pdf'));
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return (
+      <LayoutDashboard>
+        <div className="max-w-4xl mx-auto py-8 px-4">
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            <span className="ml-3 text-gray-600">Memuat data...</span>
+          </div>
+        </div>
+      </LayoutDashboard>
+    );
+  }
   if (!userId) return <div>Anda belum login.</div>;
 
   return (
-    <LayoutDashboard>
+    <LayoutDashboard pageTitle="QR Code">
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
         <h2 className="text-2xl font-bold mb-4">QR Code Presensi Anda</h2>
         <div ref={qrRef}>
