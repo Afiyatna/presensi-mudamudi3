@@ -35,7 +35,7 @@ function LayoutDashboard({ children, pageTitle }) {
           {children}
         </main>
         {/* Bottom Navigation - Mobile Only */}
-        <BottomNavigation role={role} />
+        {role && <BottomNavigation role={role} />}
       </div>
     </div>
   );
