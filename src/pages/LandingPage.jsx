@@ -55,8 +55,11 @@ export default function LandingPage() {
     setResetError('');
     setResetMessage('');
     setResetLoading(true);
+    const redirectTo = window.location.hostname === 'localhost'
+      ? 'http://localhost:5173/reset-password'
+      : 'https://generusmuda.vercel.app/reset-password';
     const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-      redirectTo: 'http://localhost:5173/reset-password'
+      redirectTo
     });
     setResetLoading(false);
     if (error) {
