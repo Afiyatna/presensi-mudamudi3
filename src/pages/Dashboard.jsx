@@ -217,7 +217,7 @@ function Dashboard() {
         
         {/* Main Content */}
         <main className="grow pb-20 lg:pb-0">
-          <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
+      <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
             {/* Filter Panel (mirip gambar) */}
             {role === 'user' && (
               <>
@@ -251,37 +251,37 @@ function Dashboard() {
                       onClear={handleDropdownClear}
                       align="left"
                     />
-                  </div>
+          </div>
                   <div className="min-w-[15.5rem]">
                     <Datepicker
                       value={userDate}
                       onChange={setUserDate}
                     />
-                  </div>
-                </div>
+          </div>
+        </div>
               </>
             )}
-            {/* Cards */}
-            {/**
-            <div className="grid grid-cols-12 gap-6 mb-8">
-              <DashboardCard01 />
-              <DashboardCard02 />
-              <DashboardCard03 />
-              <DashboardCard04 />
-              <DashboardCard05 />
-              <DashboardCard06 />
-              <DashboardCard07 />
-              <DashboardCard08 />
-              <DashboardCard09 />
-              <DashboardCard10 />
-              <DashboardCard11 />
-              <DashboardCard12 />
-              <DashboardCard13 />
-            </div>
-            */}
-            {/* ADMIN: Grafik Rekap Presensi per Kelompok */}
-            {role === 'admin' && (
-              <div className="mb-8">
+        {/* Cards */}
+        {/**
+        <div className="grid grid-cols-12 gap-6 mb-8">
+          <DashboardCard01 />
+          <DashboardCard02 />
+          <DashboardCard03 />
+          <DashboardCard04 />
+          <DashboardCard05 />
+          <DashboardCard06 />
+          <DashboardCard07 />
+          <DashboardCard08 />
+          <DashboardCard09 />
+          <DashboardCard10 />
+          <DashboardCard11 />
+          <DashboardCard12 />
+          <DashboardCard13 />
+        </div>
+        */}
+        {/* ADMIN: Grafik Rekap Presensi per Kelompok */}
+        {role === 'admin' && (
+          <div className="mb-8">
                 {/* Filter Panel Admin */}
                 {/* Mobile: horizontal, tombol kanan ikon + */}
                 <div className="flex flex-row items-center gap-2 mb-6 sm:hidden">
@@ -319,35 +319,35 @@ function Dashboard() {
                     />
                   </div>
                 </div>
-                <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Rekap Presensi per Kelompok</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Rekap Presensi per Kelompok</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredKelompokList.map(kelompok => (
-                    <div key={kelompok} className="bg-white dark:bg-gray-800 rounded-xl shadow-xs p-4">
-                      <h3 className="font-semibold text-gray-700 dark:text-gray-200 mb-2">{kelompok}</h3>
+                <div key={kelompok} className="bg-white dark:bg-gray-800 rounded-xl shadow-xs p-4">
+                  <h3 className="font-semibold text-gray-700 dark:text-gray-200 mb-2">{kelompok}</h3>
                       <BarChart01 key={currentTheme + kelompok} data={getFilteredBarChartData(kelompok)} width={320} height={180} />
-                    </div>
-                  ))}
                 </div>
-              </div>
-            )}
-            {/* USER: Grafik Riwayat Presensi Sendiri */}
-            {role === 'user' && (
-              <div className="mb-8">
-                <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Grafik Riwayat Presensi Anda</h2>
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xs p-4 max-w-xl">
+              ))}
+            </div>
+          </div>
+        )}
+        {/* USER: Grafik Riwayat Presensi Sendiri */}
+        {role === 'user' && (
+          <div className="mb-8">
+            <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Grafik Riwayat Presensi Anda</h2>
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xs p-4 max-w-xl">
                   {userChartType === 'bar' ? (
                     <BarChart01 key={currentTheme + '-user'} data={userBarChartData} width={400} height={220} />
                   ) : (
                     <LineChart01 key={currentTheme + '-user'} data={userLineChartData} width={400} height={220} />
                   )}
-                  {userBarChartData.labels.length === 0 && (
-                    <div className="text-gray-500 text-center mt-4">Belum ada data presensi.</div>
-                  )}
-                </div>
-              </div>
-            )}
-            {/** <Banner /> */}
+              {userBarChartData.labels.length === 0 && (
+                <div className="text-gray-500 text-center mt-4">Belum ada data presensi.</div>
+              )}
+            </div>
           </div>
+        )}
+        {/** <Banner /> */}
+      </div>
         </main>
         
         {/* Bottom Navigation - Mobile Only */}

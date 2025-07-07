@@ -159,8 +159,8 @@ export default function UserPresensiHistory() {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         Status
                       </th>
-                    </tr>
-                  </thead>
+              </tr>
+            </thead>
                   <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                     {filteredPresensi.map((row) => (
                       <tr key={row.id + row.jenis_presensi} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
@@ -187,13 +187,13 @@ export default function UserPresensiHistory() {
                             {row.status}
                           </span>
                         </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                </tr>
+              ))}
+            </tbody>
+          </table>
               </div>
             </>
-          )}
+        )}
         </div>
       </div>
     </LayoutDashboard>

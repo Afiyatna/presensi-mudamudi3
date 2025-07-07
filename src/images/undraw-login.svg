@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: undraw.co -->
+<svg width="300" height="300" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#F3F4F6"/>
+  <ellipse cx="400" cy="500" rx="300" ry="50" fill="#E0E7FF"/>
+  <rect x="300" y="200" width="200" height="200" rx="30" fill="#6366F1"/>
+  <rect x="340" y="260" width="120" height="20" rx="10" fill="#fff"/>
+  <rect x="340" y="300" width="120" height="20" rx="10" fill="#fff"/>
+  <rect x="340" y="340" width="120" height="20" rx="10" fill="#fff"/>
+  <circle cx="400" cy="240" r="20" fill="#fff"/>
+  <rect x="370" y="380" width="60" height="20" rx="10" fill="#A5B4FC"/>
+</svg> 

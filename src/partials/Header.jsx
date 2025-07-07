@@ -93,9 +93,9 @@ function Header({
                 </svg>
               </button>
               <SearchModal id="search-modal" searchId="search" modalOpen={searchModalOpen} setModalOpen={setSearchModalOpen} />
-              <Notifications align="right" />
-              <Help align="right" />
-              <ThemeToggle />
+            <Notifications align="right" />
+            <Help align="right" />
+            <ThemeToggle />
             </div>
           </div>
         </div>

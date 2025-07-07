@@ -108,16 +108,16 @@ function DropdownFilter({ align, options = [], selected = {}, onChange, onApply,
                 <div className="font-semibold text-gray-700 dark:text-gray-200 text-xs mb-1">{group.label}</div>
                 {group.values.map((val) => (
                   <label className="flex items-center mb-1" key={val}>
-                    <input
-                      type="checkbox"
-                      className="form-checkbox"
+                <input
+                  type="checkbox"
+                  className="form-checkbox"
                       checked={localSelected[group.key]?.includes(val) || false}
                       onChange={() => handleCheckbox(group.key, val)}
-                    />
+                />
                     <span className="text-sm font-medium ml-2">{val}</span>
-                  </label>
+              </label>
                 ))}
-              </li>
+            </li>
             ))}
           </ul>
           <div className="py-2 px-3 border-t border-gray-200 dark:border-gray-700/60 bg-gray-50 dark:bg-gray-700/20">
