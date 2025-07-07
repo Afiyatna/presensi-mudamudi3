@@ -42,13 +42,13 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
-        <Route path="/qr-scanner" element={<RequireAdmin><QrScannerMenu /></RequireAdmin>} />
-        <Route path="/qr-scanner/daerah" element={<RequireAdmin><QrScannerDaerah /></RequireAdmin>} />
-        <Route path="/qr-scanner/desa" element={<RequireAdmin><QrScannerDesa /></RequireAdmin>} />
-        <Route path="/attendance-report" element={<RequireAdmin><AttendanceReport /></RequireAdmin>} />
-        <Route path="/attendance-report-menu" element={<RequireAdmin><AttendanceReportMenu /></RequireAdmin>} />
-        <Route path="/attendance-report-daerah" element={<RequireAdmin><AttendanceReportDaerah /></RequireAdmin>} />
-        <Route path="/attendance-report-desa" element={<RequireAdmin><AttendanceReportDesa /></RequireAdmin>} />
+        <Route path="/qr-scanner" element={<RequireAuth><RequireAdmin><QrScannerMenu /></RequireAdmin></RequireAuth>} />
+        <Route path="/qr-scanner/daerah" element={<RequireAuth><RequireAdmin><QrScannerDaerah /></RequireAdmin></RequireAuth>} />
+        <Route path="/qr-scanner/desa" element={<RequireAuth><RequireAdmin><QrScannerDesa /></RequireAdmin></RequireAuth>} />
+        <Route path="/attendance-report" element={<RequireAuth><RequireAdmin><AttendanceReport /></RequireAdmin></RequireAuth>} />
+        <Route path="/attendance-report-menu" element={<RequireAuth><RequireAdmin><AttendanceReportMenu /></RequireAdmin></RequireAuth>} />
+        <Route path="/attendance-report-daerah" element={<RequireAuth><RequireAdmin><AttendanceReportDaerah /></RequireAdmin></RequireAuth>} />
+        <Route path="/attendance-report-desa" element={<RequireAuth><RequireAdmin><AttendanceReportDesa /></RequireAdmin></RequireAuth>} />
         <Route path="/user-qr" element={<RequireAuth><UserQRCode /></RequireAuth>} />
         <Route path="/user-history" element={<RequireAuth><UserPresensiHistory /></RequireAuth>} />
         <Route path="/register" element={<Register />} />
