@@ -22,6 +22,7 @@ import AttendanceReportMenu from './pages/AttendanceReportMenu';
 import AttendanceReportDaerah from './pages/AttendanceReportDaerah';
 import AttendanceReportDesa from './pages/AttendanceReportDesa';
 import { RequireAdmin } from './components/RequireAuth';
+import ResetPassword from './pages/ResetPassword';
 
 function App() {
 
@@ -49,6 +50,7 @@ function App() {
         <Route path="/user-history" element={<RequireAuth><UserPresensiHistory /></RequireAuth>} />
         <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
+        <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
     </>
   );
