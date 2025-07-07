@@ -5,6 +5,7 @@ import Header from '../partials/Header';
 import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
+import LayoutDashboard from '../layouts/LayoutDashboard';
 
 const beepUrl = '/beep.mp3';
 
@@ -171,195 +172,189 @@ export default function QrScannerDesa() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-      <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-        <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} pageTitle="QR Scanner Presensi Desa" />
-        <main className="grow">
-          <Toaster position="top-right" />
-          <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto animate-fade-in">
-            <div className="flex items-center gap-4 mb-6">
-              <button onClick={() => navigate('/qr-scanner')} className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-gray-700 font-semibold transition-all">← Kembali</button>
+    <LayoutDashboard pageTitle="QR Scanner Presensi Desa">
+      <Toaster position="top-right" />
+      <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto animate-fade-in">
+        <div className="flex items-center gap-4 mb-6">
+          <button onClick={() => navigate('/qr-scanner')} className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-gray-700 font-semibold transition-all">← Kembali</button>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* QR Scanner Section */}
+          <div className="bg-white shadow-xs rounded-xl p-6">
+            <div className="mb-6">
+              <h2 className="text-lg font-semibold text-green-700 mb-2">
+                Scanner QR Code
+              </h2>
+              <p className="text-sm text-gray-600">
+                Arahkan kamera ke QR Code untuk memulai presensi desa
+              </p>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* QR Scanner Section */}
-              <div className="bg-white shadow-xs rounded-xl p-6">
-                <div className="mb-6">
-                  <h2 className="text-lg font-semibold text-green-700 mb-2">
-                    Scanner QR Code
-                  </h2>
-                  <p className="text-sm text-gray-600">
-                    Arahkan kamera ke QR Code untuk memulai presensi desa
-                  </p>
+            {/* QR Scanner Controls */}
+            <div className="flex gap-2 justify-center mb-4">
+              <button
+                className={`btn ${cameraFacing === 'environment' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}
+                onClick={() => setCameraFacing('environment')}
+                type="button"
+              >
+                Kamera Belakang
+              </button>
+              <button
+                className={`btn ${cameraFacing === 'user' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}
+                onClick={() => setCameraFacing('user')}
+                type="button"
+              >
+                Kamera Depan
+              </button>
+            </div>
+            <div className="flex justify-center mb-6">
+              {!showSuccess && (
+                <div
+                  ref={qrRef}
+                  id={qrId}
+                  className="w-full max-w-md rounded-xl border-2 border-green-200 shadow-lg flex items-center justify-center min-h-[300px] bg-white"
+                  style={{ minHeight: '300px' }}
+                />
+              )}
+              {showSuccess && (
+                <div className="w-full max-w-md rounded-xl border-2 border-green-200 shadow-lg flex flex-col items-center justify-center min-h-[300px] bg-white animate-fade-in">
+                  <div className={`text-5xl mb-2 ${successStatus === 'hadir' ? 'text-green-500' : 'text-red-500'} animate-bounce`}>{successStatus === 'hadir' ? '✅' : '⏰'}</div>
+                  <div className={`text-xl font-bold ${successStatus === 'hadir' ? 'text-green-600' : 'text-red-600'} mb-1`}>{successMessage}</div>
+                  <div className="text-gray-500 animate-pulse">Menyiapkan scanner berikutnya...</div>
                 </div>
-                {/* QR Scanner Controls */}
-                <div className="flex gap-2 justify-center mb-4">
+              )}
+            </div>
+            {/* Scanner Controls */}
+            <div className="flex gap-3 justify-center">
+              {scanning ? (
+                <>
                   <button
-                    className={`btn ${cameraFacing === 'environment' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}
-                    onClick={() => setCameraFacing('environment')}
-                    type="button"
+                    onClick={stopScanner}
+                    className="btn bg-red-500 hover:bg-red-600 text-white"
                   >
-                    Kamera Belakang
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Matikan Scanner
                   </button>
                   <button
-                    className={`btn ${cameraFacing === 'user' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}
-                    onClick={() => setCameraFacing('user')}
-                    type="button"
+                    onClick={startScanner}
+                    className="btn bg-green-200 hover:bg-green-300 text-green-700"
                   >
-                    Kamera Depan
+                    Restart Scanner
                   </button>
-                </div>
-                <div className="flex justify-center mb-6">
-                  {!showSuccess && (
-                    <div
-                      ref={qrRef}
-                      id={qrId}
-                      className="w-full max-w-md rounded-xl border-2 border-green-200 shadow-lg flex items-center justify-center min-h-[300px] bg-white"
-                      style={{ minHeight: '300px' }}
-                    />
-                  )}
-                  {showSuccess && (
-                    <div className="w-full max-w-md rounded-xl border-2 border-green-200 shadow-lg flex flex-col items-center justify-center min-h-[300px] bg-white animate-fade-in">
-                      <div className={`text-5xl mb-2 ${successStatus === 'hadir' ? 'text-green-500' : 'text-red-500'} animate-bounce`}>{successStatus === 'hadir' ? '✅' : '⏰'}</div>
-                      <div className={`text-xl font-bold ${successStatus === 'hadir' ? 'text-green-600' : 'text-red-600'} mb-1`}>{successMessage}</div>
-                      <div className="text-gray-500 animate-pulse">Menyiapkan scanner berikutnya...</div>
-                    </div>
-                  )}
-                </div>
-                {/* Scanner Controls */}
-                <div className="flex gap-3 justify-center">
-                  {scanning ? (
-                    <>
-                      <button
-                        onClick={stopScanner}
-                        className="btn bg-red-500 hover:bg-red-600 text-white"
-                      >
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                        Matikan Scanner
-                      </button>
-                      <button
-                        onClick={startScanner}
-                        className="btn bg-green-200 hover:bg-green-300 text-green-700"
-                      >
-                        Restart Scanner
-                      </button>
-                    </>
-                  ) : (
-                    <button
-                      onClick={() => setScanning(true)}
-                      className="btn bg-green-600 hover:bg-green-700 text-white"
-                    >
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                      </svg>
-                      Mulai Scan
-                    </button>
-                  )}
-                </div>
-                {/* Error Scanner */}
-                {scannerError && (
-                  <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-center">
-                    {scannerError}
-                  </div>
-                )}
-                {/* Loading Spinner */}
-                {presensiLoading && (
-                  <div className="flex justify-center items-center mt-4">
-                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-500"></div>
-                    <span className="ml-2 text-green-600">Menyimpan presensi...</span>
-                  </div>
-                )}
-                {/* Last Scan Result */}
-                {scanResult && (
-                  <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <h3 className="text-sm font-medium text-green-800 mb-2">
-                      Hasil Scan Terakhir:
-                    </h3>
-                    <p className="text-sm text-green-700 break-all">
-                      {scanResult}
-                    </p>
-                  </div>
-                )}
+                </>
+              ) : (
+                <button
+                  onClick={() => setScanning(true)}
+                  className="btn bg-green-600 hover:bg-green-700 text-white"
+                >
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  Mulai Scan
+                </button>
+              )}
+            </div>
+            {/* Error Scanner */}
+            {scannerError && (
+              <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-center">
+                {scannerError}
               </div>
-              {/* Scan History Section */}
-              <div className="bg-white shadow-xs rounded-xl p-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-lg font-semibold text-green-700">
-                    Riwayat Scan
-                  </h2>
-                  <button
-                    onClick={clearHistory}
-                    className="text-sm text-red-600 hover:text-red-700"
-                  >
-                    Bersihkan
-                  </button>
+            )}
+            {/* Loading Spinner */}
+            {presensiLoading && (
+              <div className="flex justify-center items-center mt-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-500"></div>
+                <span className="ml-2 text-green-600">Menyimpan presensi...</span>
+              </div>
+            )}
+            {/* Last Scan Result */}
+            {scanResult && (
+              <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <h3 className="text-sm font-medium text-green-800 mb-2">
+                  Hasil Scan Terakhir:
+                </h3>
+                <p className="text-sm text-green-700 break-all">
+                  {scanResult}
+                </p>
+              </div>
+            )}
+          </div>
+          {/* Scan History Section */}
+          <div className="bg-white shadow-xs rounded-xl p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-semibold text-green-700">
+                Riwayat Scan
+              </h2>
+              <button
+                onClick={clearHistory}
+                className="text-sm text-red-600 hover:text-red-700"
+              >
+                Bersihkan
+              </button>
+            </div>
+            <div className="space-y-3 max-h-96 overflow-y-auto">
+              {scanHistory.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <svg className="w-12 h-12 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <p>Belum ada riwayat scan</p>
                 </div>
-                <div className="space-y-3 max-h-96 overflow-y-auto">
-                  {scanHistory.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500">
-                      <svg className="w-12 h-12 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      <p>Belum ada riwayat scan</p>
-                    </div>
-                  ) : (
-                    scanHistory.map((scan) => (
-                      <div
-                        key={scan.id}
-                        className="p-3 bg-gray-50 rounded-lg border border-gray-200"
-                      >
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-800 truncate">
-                              {scan.text}
-                            </p>
-                            <p className="text-xs text-gray-500 mt-1">
-                              {scan.timestamp}
-                            </p>
-                          </div>
-                          <div className="ml-2 flex-shrink-0">
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                              Berhasil
-                            </span>
-                          </div>
-                        </div>
+              ) : (
+                scanHistory.map((scan) => (
+                  <div
+                    key={scan.id}
+                    className="p-3 bg-gray-50 rounded-lg border border-gray-200"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-800 truncate">
+                          {scan.text}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {scan.timestamp}
+                        </p>
                       </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            </div>
-            {/* Instructions */}
-            <div className="mt-8 bg-green-50 border border-green-200 rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-green-800 mb-3">
-                Cara Menggunakan QR Scanner
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-green-700">
-                <div className="flex items-start">
-                  <span className="flex-shrink-0 w-6 h-6 bg-green-200 rounded-full flex items-center justify-center text-green-800 font-medium mr-3 mt-0.5">
-                    1
-                  </span>
-                  <p>Pastikan QR Code terlihat jelas dan tidak terhalang</p>
-                </div>
-                <div className="flex items-start">
-                  <span className="flex-shrink-0 w-6 h-6 bg-green-200 rounded-full flex items-center justify-center text-green-800 font-medium mr-3 mt-0.5">
-                    2
-                  </span>
-                  <p>Arahkan kamera ke QR Code dan tunggu hingga terdeteksi</p>
-                </div>
-                <div className="flex items-start">
-                  <span className="flex-shrink-0 w-6 h-6 bg-green-200 rounded-full flex items-center justify-center text-green-800 font-medium mr-3 mt-0.5">
-                    3
-                  </span>
-                  <p>Sistem akan otomatis memproses presensi setelah QR Code terdeteksi</p>
-                </div>
-              </div>
+                      <div className="ml-2 flex-shrink-0">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          Berhasil
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
-        </main>
+        </div>
+        {/* Instructions */}
+        <div className="mt-8 bg-green-50 border border-green-200 rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-green-800 mb-3">
+            Cara Menggunakan QR Scanner
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-green-700">
+            <div className="flex items-start">
+              <span className="flex-shrink-0 w-6 h-6 bg-green-200 rounded-full flex items-center justify-center text-green-800 font-medium mr-3 mt-0.5">
+                1
+              </span>
+              <p>Pastikan QR Code terlihat jelas dan tidak terhalang</p>
+            </div>
+            <div className="flex items-start">
+              <span className="flex-shrink-0 w-6 h-6 bg-green-200 rounded-full flex items-center justify-center text-green-800 font-medium mr-3 mt-0.5">
+                2
+              </span>
+              <p>Arahkan kamera ke QR Code dan tunggu hingga terdeteksi</p>
+            </div>
+            <div className="flex items-start">
+              <span className="flex-shrink-0 w-6 h-6 bg-green-200 rounded-full flex items-center justify-center text-green-800 font-medium mr-3 mt-0.5">
+                3
+              </span>
+              <p>Sistem akan otomatis memproses presensi setelah QR Code terdeteksi</p>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </LayoutDashboard>
   );
 } 
