@@ -23,6 +23,7 @@ import AttendanceReportDaerah from './pages/AttendanceReportDaerah';
 import AttendanceReportDesa from './pages/AttendanceReportDesa';
 import { RequireAdmin } from './components/RequireAuth';
 import ResetPassword from './pages/ResetPassword';
+import Footer from './components/Footer';
 
 function App() {
 

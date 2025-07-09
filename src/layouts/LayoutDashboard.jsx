@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from '../partials/Sidebar';
 import Header from '../partials/Header';
 import BottomNavigation from '../components/BottomNavigation';
+import Footer from '../components/Footer';
 import { supabase } from '../supabaseClient';
 
 function LayoutDashboard({ children, pageTitle }) {
@@ -31,9 +32,11 @@ function LayoutDashboard({ children, pageTitle }) {
       {/* Content Area */}
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
         <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} pageTitle={pageTitle} />
-        <main className="grow pb-20 lg:pb-0">
+        <main className="grow pb-32 lg:pb-0">
           {children}
         </main>
+        {/* Footer di atas Bottom Navigation */}
+        <Footer className="mb-20" />
         {/* Bottom Navigation - Mobile Only */}
         {role && <BottomNavigation role={role} />}
       </div>

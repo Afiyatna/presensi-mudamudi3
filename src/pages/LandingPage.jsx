@@ -3,6 +3,7 @@ import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import undrawLogin from '../images/undraw-login.svg';
 import undrawSide from '../images/undraw-side.svg';
+import Footer from '../components/Footer';
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -211,6 +212,7 @@ export default function LandingPage() {
           <img src={undrawSide} alt="Ilustrasi Samping" className="w-full h-auto" />
         </div>
       </main>
+      <Footer />
     </div>
   );
 } 

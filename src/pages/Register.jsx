@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
+import Footer from '../components/Footer';
 
 // Daftar kota Indonesia (bisa diganti dengan hasil fetch API jika ingin dinamis)
 const kotaIndonesia = [
@@ -277,6 +278,7 @@ export default function Register() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 } 

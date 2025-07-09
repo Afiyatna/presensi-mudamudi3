@@ -15,14 +15,12 @@ import DashboardCard11 from '../partials/dashboard/DashboardCard11';
 import DashboardCard12 from '../partials/dashboard/DashboardCard12';
 import DashboardCard13 from '../partials/dashboard/DashboardCard13';
 import Banner from '../partials/Banner';
-import Sidebar from '../partials/Sidebar';
-import Header from '../partials/Header';
-import BottomNavigation from '../components/BottomNavigation';
 import BarChart01 from '../charts/BarChart01';
 import LineChart01 from '../charts/LineChart01';
 import { supabase } from '../supabaseClient';
 import { useThemeProvider } from '../utils/ThemeContext';
 import DropdownFilter from '../components/DropdownFilter';
+import LayoutDashboard from '../layouts/LayoutDashboard';
 
 function Dashboard() {
   // State untuk role dan data presensi user
@@ -204,19 +202,7 @@ function Dashboard() {
   
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      {/* Sidebar - Desktop Only */}
-      <div className="hidden lg:block">
-        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-      </div>
-      
-      {/* Content Area */}
-      <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-        {/* Header */}
-        <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} pageTitle="Dashboard" />
-        
-        {/* Main Content */}
-        <main className="grow pb-20 lg:pb-0">
+    <LayoutDashboard pageTitle="Dashboard">
       <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
             {/* Filter Panel (mirip gambar) */}
             {role === 'user' && (
@@ -348,12 +334,7 @@ function Dashboard() {
         )}
         {/** <Banner /> */}
       </div>
-        </main>
-        
-        {/* Bottom Navigation - Mobile Only */}
-        <BottomNavigation role={role} />
-      </div>
-    </div>
+    </LayoutDashboard>
   );
 }
 
