@@ -9,7 +9,7 @@ function BottomNavigation({ role }) {
     { path: '/dashboard', icon: '🏠', label: 'Dashboard', activePaths: ['/dashboard'] },
     { path: '/qr-scanner', icon: '📷', label: 'QR Scanner', activePaths: ['/qr-scanner', '/qr-scanner-daerah', '/qr-scanner-desa'] },
     { path: '/attendance-report-menu', icon: '📊', label: 'Rekap Presensi', activePaths: ['/attendance-report-menu', '/attendance-report', '/attendance-report-daerah', '/attendance-report-desa', '/attendance-report-dummy'] },
-    { path: '/profile', icon: '👤', label: 'Profile', activePaths: ['/profile'] },
+    { path: '/data-profile-user', icon: '👥', label: 'Data Profile User', activePaths: ['/data-profile-user'] },
   ];
   const userItems = [
     { path: '/dashboard', icon: '🏠', label: 'Dashboard', activePaths: ['/dashboard'] },
