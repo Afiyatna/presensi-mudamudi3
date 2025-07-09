@@ -42,7 +42,7 @@ function Dashboard() {
   const [adminDate, setAdminDate] = useState('');
 
   // Opsi filter untuk user (tetap)
-  const jenisOptions = ['Presensi Umum', 'Presensi Daerah', 'Presensi Desa'];
+  const jenisOptions = ['Presensi Daerah', 'Presensi Desa'];
   const statusOptions = ['hadir', 'terlambat'];
   const filterOptions = [
     { label: 'Jenis Presensi', key: 'jenis', values: jenisOptions },
