@@ -189,6 +189,26 @@ export default function QrScannerDesa() {
                 Arahkan kamera ke QR Code untuk memulai presensi desa
               </p>
             </div>
+            {/* Pengaturan Jam Tepat Waktu */}
+            <div className="mb-4 flex items-center gap-2">
+              <label htmlFor="jamTepatWaktu" className="text-sm font-medium text-gray-700">Jam Tepat Waktu:</label>
+              <input
+                id="jamTepatWaktu"
+                type="time"
+                value={jamTepatWaktu}
+                onChange={e => setJamTepatWaktu(e.target.value)}
+                className="border rounded px-2 py-1 text-sm"
+              />
+              <button
+                onClick={async () => {
+                  await supabase.from('settings').upsert({ key: 'jam_tepat_waktu', value: jamTepatWaktu });
+                  toast.success('Jam tepat waktu berhasil diupdate!');
+                }}
+                className="ml-2 px-3 py-1 bg-green-600 text-white rounded text-sm"
+              >
+                Simpan
+              </button>
+            </div>
             {/* QR Scanner Controls */}
             <div className="flex gap-2 justify-center mb-4">
               <button
