@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
-import Footer from '../components/Footer';
 import BottomNavigation from '../components/BottomNavigation';
 import LayoutDashboard from '../layouts/LayoutDashboard';
 
@@ -68,7 +67,6 @@ export default function DataProfileUser() {
             </table>
           </div>
         )}
-        <Footer className="mt-8 mb-20" />
         {role === 'admin' && <BottomNavigation role="admin" />}
       </div>
     </LayoutDashboard>
