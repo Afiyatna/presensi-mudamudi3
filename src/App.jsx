@@ -24,6 +24,7 @@ import AttendanceReportDesa from './pages/AttendanceReportDesa';
 import { RequireAdmin } from './components/RequireAuth';
 import ResetPassword from './pages/ResetPassword';
 import Footer from './components/Footer';
+import DataProfileUser from './pages/DataProfileUser';
 
 function App() {
 
@@ -52,6 +53,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/data-profile-user" element={<RequireAuth><RequireAdmin><DataProfileUser /></RequireAdmin></RequireAuth>} />
       </Routes>
     </>
   );
