@@ -30,13 +30,13 @@ function LayoutDashboard({ children, pageTitle }) {
         <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       </div>
       {/* Content Area */}
-      <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
+      <div className="relative flex flex-col flex-1 min-h-screen overflow-y-auto overflow-x-hidden">
         <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} pageTitle={pageTitle} />
         <main className="grow pb-32 lg:pb-0">
           {children}
         </main>
         {/* Footer di atas Bottom Navigation */}
-        <Footer className="mb-20" />
+        <Footer className="mb-20 lg:mb-0" />
         {/* Bottom Navigation - Mobile Only */}
         {role && <BottomNavigation role={role} />}
       </div>
