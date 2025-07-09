@@ -195,6 +195,23 @@ function Sidebar({
                       </div>
                             </NavLink>
                           </li> */}
+                  {/* Data Profile User */}
+                  <li className="px-3 py-2">
+                    <NavLink
+                      end
+                      to="/data-profile-user"
+                      className={({ isActive }) =>
+                        "block text-gray-800 dark:text-gray-100 truncate transition duration-150 " + (isActive ? "text-blue-700" : "hover:text-gray-900 dark:hover:text-white")
+                      }
+                    >
+                      <div className="flex items-center gap-2">
+                        <svg className={`shrink-0 fill-current ${pathname === "/data-profile-user" ? 'text-blue-700' : 'text-gray-400 dark:text-gray-500'}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 2.08 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                        <span className="text-sm font-medium duration-200">
+                          Data Profile User
+                        </span>
+                      </div>
+                    </NavLink>
+                  </li>
                   {/* Dashboard Dummy */}
                   <li className="px-3 py-2">
                     <NavLink
