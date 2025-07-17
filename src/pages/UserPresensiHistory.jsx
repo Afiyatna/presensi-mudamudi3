@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import LayoutDashboard from '../layouts/LayoutDashboard';
+import DateRangePicker from '../components/DateRangePicker';
 
 export default function UserPresensiHistory() {
   const [presensi, setPresensi] = useState([]);
@@ -8,7 +9,7 @@ export default function UserPresensiHistory() {
   const [loading, setLoading] = useState(true);
   const [namaLengkap, setNamaLengkap] = useState('');
   const [filterJenis, setFilterJenis] = useState('');
-  const [filterTanggal, setFilterTanggal] = useState('');
+  const [filterDateRange, setFilterDateRange] = useState({ from: '', to: '' });
   const [filterStatus, setFilterStatus] = useState('');
 
   useEffect(() => {
@@ -30,17 +31,11 @@ export default function UserPresensiHistory() {
       }
       setNamaLengkap(profile.nama_lengkap);
       // Ambil presensi dari tiga tabel
-      const [presensiUmum, presensiDaerah, presensiDesa] = await Promise.all([
-        supabase.from('presensi').select('*').eq('nama_lengkap', profile.nama_lengkap),
+      const [presensiDaerah, presensiDesa] = await Promise.all([
         supabase.from('presensi_daerah').select('*').eq('nama_lengkap', profile.nama_lengkap),
         supabase.from('presensi_desa').select('*').eq('nama_lengkap', profile.nama_lengkap),
       ]);
       // Mapping dan tambahkan jenis_presensi
-      const dataUmum = (presensiUmum.data || []).map(row => ({
-        ...row,
-        jenis_presensi: 'Presensi Umum',
-        waktu_presensi: row.waktu_presensi,
-      }));
       const dataDaerah = (presensiDaerah.data || []).map(row => ({
         ...row,
         jenis_presensi: 'Presensi Daerah',
@@ -52,7 +47,7 @@ export default function UserPresensiHistory() {
         waktu_presensi: row.waktu_presensi,
       }));
       // Gabungkan dan urutkan berdasarkan waktu_presensi terbaru
-      const allData = [...dataUmum, ...dataDaerah, ...dataDesa].sort((a, b) => new Date(b.waktu_presensi) - new Date(a.waktu_presensi));
+      const allData = [...dataDaerah, ...dataDesa].sort((a, b) => new Date(b.waktu_presensi) - new Date(a.waktu_presensi));
       setPresensi(allData);
       setLoading(false);
     };
@@ -61,36 +56,45 @@ export default function UserPresensiHistory() {
 
   useEffect(() => {
     let filtered = presensi;
+    
+    // Filter jenis presensi
     if (filterJenis) {
       filtered = filtered.filter(row => row.jenis_presensi === filterJenis);
     }
-    if (filterTanggal) {
-      filtered = filtered.filter(row => row.waktu_presensi && row.waktu_presensi.startsWith(filterTanggal));
+    
+    // Filter rentang tanggal
+    if (filterDateRange.from || filterDateRange.to) {
+      filtered = filtered.filter(row => {
+        if (!row.waktu_presensi) return false;
+        const presensiDate = row.waktu_presensi.split('T')[0]; // Ambil tanggal saja
+        
+        if (filterDateRange.from && filterDateRange.to) {
+          // Filter dengan rentang tanggal
+          return presensiDate >= filterDateRange.from && presensiDate <= filterDateRange.to;
+        } else if (filterDateRange.from) {
+          // Filter dari tanggal tertentu
+          return presensiDate >= filterDateRange.from;
+        } else if (filterDateRange.to) {
+          // Filter sampai tanggal tertentu
+          return presensiDate <= filterDateRange.to;
+        }
+        return true;
+      });
     }
+    
+    // Filter status
     if (filterStatus) {
       filtered = filtered.filter(row => row.status === filterStatus);
     }
+    
     setFilteredPresensi(filtered);
-  }, [presensi, filterJenis, filterTanggal, filterStatus]);
+  }, [presensi, filterJenis, filterDateRange, filterStatus]);
 
   // Untuk dropdown Jenis Presensi dan Status
-  const jenisOptions = ['Presensi Umum', 'Presensi Daerah', 'Presensi Desa'];
+  const jenisOptions = ['Presensi Daerah', 'Presensi Desa'];
   const statusOptions = ['hadir', 'terlambat'];
 
   if (loading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
-
-  // if (loading) {
-  //   return (
-  //     <LayoutDashboard pageTitle="Riwayat Presensi">
-  //       <div className="max-w-4xl mx-auto py-8 px-4">
-  //         <div className="flex items-center justify-center py-12">
-  //           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-  //           <span className="ml-3 text-gray-600">Memuat data...</span>
-  //         </div>
-  //       </div>
-  //     </LayoutDashboard>
-  //   );
-  // }
 
   return (
     <LayoutDashboard pageTitle="Riwayat Presensi">
@@ -113,8 +117,12 @@ export default function UserPresensiHistory() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tanggal</label>
-              <input type="date" value={filterTanggal} onChange={e => setFilterTanggal(e.target.value)} className="form-input w-full" />
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rentang Tanggal</label>
+              <DateRangePicker
+                value={filterDateRange}
+                onChange={setFilterDateRange}
+                placeholder="Pilih rentang tanggal"
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
@@ -126,7 +134,16 @@ export default function UserPresensiHistory() {
               </select>
             </div>
             <div className="flex items-end">
-              <button onClick={() => { setFilterJenis(''); setFilterTanggal(''); setFilterStatus(''); }} className="btn bg-gray-500 hover:bg-gray-600 text-white w-full">Reset Filter</button>
+              <button 
+                onClick={() => { 
+                  setFilterJenis(''); 
+                  setFilterDateRange({ from: '', to: '' }); 
+                  setFilterStatus(''); 
+                }} 
+                className="btn bg-gray-500 hover:bg-gray-600 text-white w-full"
+              >
+                Reset Filter
+              </button>
             </div>
           </div>
 
@@ -159,8 +176,8 @@ export default function UserPresensiHistory() {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         Status
                       </th>
-              </tr>
-            </thead>
+                    </tr>
+                  </thead>
                   <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                     {filteredPresensi.map((row) => (
                       <tr key={row.id + row.jenis_presensi} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
@@ -187,13 +204,13 @@ export default function UserPresensiHistory() {
                             {row.status}
                           </span>
                         </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </>
-        )}
+          )}
         </div>
       </div>
     </LayoutDashboard>
