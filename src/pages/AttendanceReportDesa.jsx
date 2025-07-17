@@ -6,6 +6,7 @@ import { supabase } from '../supabaseClient';
 import CountUp from 'react-countup';
 import { useNavigate } from 'react-router-dom';
 import DropdownFilter from '../components/DropdownFilter';
+import DateRangePicker from '../components/DateRangePicker';
 
 function AttendanceReportDesa() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -15,7 +16,7 @@ function AttendanceReportDesa() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGroup, setSelectedGroup] = useState('');
   const [selectedVillage, setSelectedVillage] = useState('');
-  const [dateFilter, setDateFilter] = useState('');
+  const [dateRange, setDateRange] = useState({ from: '', to: '' });
   const [exporting, setExporting] = useState(false);
   const reportRef = useRef(null);
   const tableRef = useRef(null);
@@ -84,14 +85,25 @@ function AttendanceReportDesa() {
     if (filterDropdown.status && filterDropdown.status.length > 0) {
       filtered = filtered.filter(item => filterDropdown.status.includes(item.status.charAt(0).toUpperCase() + item.status.slice(1)));
     }
-    if (dateFilter) {
+    if (dateRange.from || dateRange.to) {
       filtered = filtered.filter(item => {
-        const tgl = item.waktuPresensi ? item.waktuPresensi.split(' ')[0] : '';
-        return tgl === dateFilter;
+        const presensiDate = item.waktuPresensi ? item.waktuPresensi.split(' ')[0] : '';
+        
+        if (dateRange.from && dateRange.to) {
+          // Filter dengan rentang tanggal
+          return presensiDate >= dateRange.from && presensiDate <= dateRange.to;
+        } else if (dateRange.from) {
+          // Filter dari tanggal tertentu
+          return presensiDate >= dateRange.from;
+        } else if (dateRange.to) {
+          // Filter sampai tanggal tertentu
+          return presensiDate <= dateRange.to;
+        }
+        return true;
       });
     }
     setFilteredData(filtered);
-  }, [attendanceData, searchTerm, filterDropdown, dateFilter]);
+  }, [attendanceData, searchTerm, filterDropdown, dateRange]);
 
   const uniqueGroups = [...new Set(attendanceData.map(item => item.namaKelompok))];
   const uniqueVillages = [...new Set(attendanceData.map(item => item.namaDesa))];
@@ -291,7 +303,11 @@ function AttendanceReportDesa() {
               onClear={handleDropdownClear}
               align="left"
             />
-            <input type="date" value={dateFilter} onChange={e => setDateFilter(e.target.value)} className="form-input w-auto min-w-[120px]" />
+            <DateRangePicker
+              value={dateRange}
+              onChange={setDateRange}
+              placeholder="Pilih rentang tanggal"
+            />
           </div>
           {/* Desktop: filter grid */}
           <div className="hidden sm:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
@@ -325,14 +341,18 @@ function AttendanceReportDesa() {
                 {uniqueVillages.map((d, i) => <option key={i} value={d}>{d}</option>)}
               </select>
             </div>
-            {/* Date Filter */}
+            {/* Date Range Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Tanggal</label>
-              <input type="date" value={dateFilter} onChange={e => setDateFilter(e.target.value)} className="form-input w-full" />
+              <label className="block text-sm font-medium text-gray-700 mb-2">Rentang Tanggal</label>
+              <DateRangePicker
+                value={dateRange}
+                onChange={setDateRange}
+                placeholder="Pilih rentang tanggal"
+              />
             </div>
             {/* Clear Filters */}
             <div className="flex items-end">
-              <button onClick={() => { setSearchTerm(''); setFilterDropdown({ kelompok: [], desa: [], jenis_kelamin: [], status: [] }); setDateFilter(''); }} className="btn bg-gray-500 hover:bg-gray-600 text-white w-full">Reset Filter</button>
+              <button onClick={() => { setSearchTerm(''); setFilterDropdown({ kelompok: [], desa: [], jenis_kelamin: [], status: [] }); setDateRange({ from: '', to: '' }); }} className="btn bg-gray-500 hover:bg-gray-600 text-white w-full">Reset Filter</button>
             </div>
           </div>
           {/* Action Buttons - Mobile */}
