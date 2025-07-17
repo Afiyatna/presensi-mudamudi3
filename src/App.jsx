@@ -12,7 +12,6 @@ import Dashboard from './pages/Dashboard';
 import QrScannerMenu from './pages/QrScannerMenu';
 import QrScannerDaerah from './pages/QrScannerDaerah';
 import QrScannerDesa from './pages/QrScannerDesa';
-import AttendanceReport from './pages/AttendanceReport';
 import UserQRCode from './pages/UserQRCode';
 import UserPresensiHistory from './pages/UserPresensiHistory';
 import RequireAuth from './components/RequireAuth';
@@ -44,7 +43,6 @@ function App() {
         <Route path="/qr-scanner" element={<RequireAuth><RequireAdmin><QrScannerMenu /></RequireAdmin></RequireAuth>} />
         <Route path="/qr-scanner/daerah" element={<RequireAuth><RequireAdmin><QrScannerDaerah /></RequireAdmin></RequireAuth>} />
         <Route path="/qr-scanner/desa" element={<RequireAuth><RequireAdmin><QrScannerDesa /></RequireAdmin></RequireAuth>} />
-        <Route path="/attendance-report" element={<RequireAuth><RequireAdmin><AttendanceReport /></RequireAdmin></RequireAuth>} />
         <Route path="/attendance-report-menu" element={<RequireAuth><RequireAdmin><AttendanceReportMenu /></RequireAdmin></RequireAuth>} />
         <Route path="/attendance-report-daerah" element={<RequireAuth><RequireAdmin><AttendanceReportDaerah /></RequireAdmin></RequireAuth>} />
         <Route path="/attendance-report-desa" element={<RequireAuth><RequireAdmin><AttendanceReportDesa /></RequireAdmin></RequireAuth>} />
