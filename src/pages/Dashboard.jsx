@@ -21,6 +21,7 @@ import { supabase } from '../supabaseClient';
 import { useThemeProvider } from '../utils/ThemeContext';
 import DropdownFilter from '../components/DropdownFilter';
 import LayoutDashboard from '../layouts/LayoutDashboard';
+import DateRangePicker from '../components/DateRangePicker';
 
 function Dashboard() {
   // State untuk role dan data presensi user
@@ -34,12 +35,12 @@ function Dashboard() {
   // Filter state untuk user
   const [userChartType, setUserChartType] = useState('bar');
   const [userStatus, setUserStatus] = useState('');
-  const [userDate, setUserDate] = useState('');
+  const [userDateRange, setUserDateRange] = useState({ from: '', to: '' });
   // Tambahan untuk filter panel baru
   const [filterDropdown, setFilterDropdown] = useState({ jenis: [], status: [] });
   // State untuk filter admin
   const [adminFilterDropdown, setAdminFilterDropdown] = useState({ kelompok: [], desa: [], jenis_kelamin: [], status: [] });
-  const [adminDate, setAdminDate] = useState('');
+  const [adminDateRange, setAdminDateRange] = useState({ from: '', to: '' });
 
   // Opsi filter untuk user (tetap)
   const jenisOptions = ['Presensi Daerah', 'Presensi Desa'];
@@ -117,10 +118,16 @@ function Dashboard() {
 
   // Filter data presensi admin sesuai status, tanggal, kelompok, desa, jenis kelamin
   const filteredAllPresensi = allPresensi.filter(d => {
-    // Single date
-    if (adminDate) {
+    // Date range filter
+    if (adminDateRange.from || adminDateRange.to) {
       const tgl = d.waktu_presensi ? d.waktu_presensi.split('T')[0] : '';
-      if (tgl !== adminDate) return false;
+      if (adminDateRange.from && adminDateRange.to) {
+        if (tgl < adminDateRange.from || tgl > adminDateRange.to) return false;
+      } else if (adminDateRange.from) {
+        if (tgl < adminDateRange.from) return false;
+      } else if (adminDateRange.to) {
+        if (tgl > adminDateRange.to) return false;
+      }
     }
     // Status
     if (adminFilterDropdown.status && adminFilterDropdown.status.length > 0) {
@@ -159,10 +166,17 @@ function Dashboard() {
   // --- USER: Grafik Riwayat Presensi Sendiri (dengan filter) ---
   // Ambil tanggal unik dari presensi user
   const userTanggalList = [...new Set(userPresensi.map(d => d.waktu_presensi ? d.waktu_presensi.split('T')[0] : ''))];
-  // Filter tanggal sesuai single date
+  // Filter tanggal sesuai date range
   const filteredTanggalList = userTanggalList.filter(tgl => {
-    if (!userDate) return true;
-    return tgl === userDate;
+    if (!userDateRange.from && !userDateRange.to) return true;
+    if (userDateRange.from && userDateRange.to) {
+      return tgl >= userDateRange.from && tgl <= userDateRange.to;
+    } else if (userDateRange.from) {
+      return tgl >= userDateRange.from;
+    } else if (userDateRange.to) {
+      return tgl <= userDateRange.to;
+    }
+    return true;
   });
   // Filter data presensi sesuai status, tanggal, dan jenis presensi
   const filteredUserPresensi = userPresensi.filter(d => {
@@ -225,9 +239,9 @@ function Dashboard() {
                   </div>
                   {/* Date Range Picker */}
                   <div>
-                    <Datepicker
-                      value={userDate}
-                      onChange={setUserDate}
+                    <DateRangePicker
+                      value={userDateRange}
+                      onChange={setUserDateRange}
                     />
                   </div>
                 </div>
@@ -243,9 +257,9 @@ function Dashboard() {
                     />
           </div>
                   <div className="min-w-[15.5rem]">
-                    <Datepicker
-                      value={userDate}
-                      onChange={setUserDate}
+                    <DateRangePicker
+                      value={userDateRange}
+                      onChange={setUserDateRange}
                     />
           </div>
         </div>
@@ -285,9 +299,9 @@ function Dashboard() {
                     />
                   </div>
                   <div>
-                    <Datepicker
-                      value={adminDate}
-                      onChange={setAdminDate}
+                    <DateRangePicker
+                      value={adminDateRange}
+                      onChange={setAdminDateRange}
                     />
                   </div>
                 </div>
@@ -303,9 +317,9 @@ function Dashboard() {
                     />
                   </div>
                   <div className="min-w-[15.5rem]">
-                    <Datepicker
-                      value={adminDate}
-                      onChange={setAdminDate}
+                    <DateRangePicker
+                      value={adminDateRange}
+                      onChange={setAdminDateRange}
                     />
                   </div>
                 </div>
