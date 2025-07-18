@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import BottomNavigation from '../components/BottomNavigation';
 import LayoutDashboard from '../layouts/LayoutDashboard';
+import DataLoadingSpinner from '../components/DataLoadingSpinner';
 
 export default function DataProfileUser() {
   const [profiles, setProfiles] = useState([]);
@@ -34,7 +35,7 @@ export default function DataProfileUser() {
       <div className="p-4 pb-32 min-h-screen flex flex-col">
         <h1 className="text-2xl font-bold mb-4 text-gray-800">Data Profile User</h1>
         {loading ? (
-          <div>Loading...</div>
+          <DataLoadingSpinner message="Memuat data profile user..." />
         ) : (
           <div className="overflow-x-auto flex-1">
             <table className="min-w-full bg-white border border-gray-200 rounded-lg">
