@@ -22,6 +22,7 @@ import { useThemeProvider } from '../utils/ThemeContext';
 import DropdownFilter from '../components/DropdownFilter';
 import LayoutDashboard from '../layouts/LayoutDashboard';
 import DateRangePicker from '../components/DateRangePicker';
+import DataLoadingSpinner from '../components/DataLoadingSpinner';
 
 function Dashboard() {
   // State untuk role dan data presensi user
@@ -212,7 +213,7 @@ function Dashboard() {
   };
 
   // if (userLoading) return <div>Loading...</div>;
-  if (userLoading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  if (userLoading) return <DataLoadingSpinner message="Memuat data dashboard..." />;
   
 
   return (
