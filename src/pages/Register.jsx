@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
+import DataLoadingSpinner from '../components/DataLoadingSpinner';
 
 // Daftar kota Indonesia (bisa diganti dengan hasil fetch API jika ingin dinamis)
 const kotaIndonesia = [
@@ -159,6 +160,7 @@ export default function Register() {
               </p>
               {error && <div className="mb-2 text-red-500 text-center text-sm">{error}</div>}
               {success && <div className="mb-2 text-green-600 text-center text-sm">Registrasi berhasil! Redirect ke dashboard...</div>}
+              {loading && <DataLoadingSpinner message="Memproses registrasi..." />}
               <form onSubmit={handleRegister} className="w-full flex flex-col gap-4">
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-violet-400">
