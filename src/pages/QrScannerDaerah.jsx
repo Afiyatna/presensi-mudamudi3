@@ -6,6 +6,7 @@ import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
 import LayoutDashboard from '../layouts/LayoutDashboard';
+import DataLoadingSpinner from '../components/DataLoadingSpinner';
 
 const beepUrl = '/beep.mp3'; // letakkan beep.mp3 di public folder project Anda
 
@@ -189,6 +190,7 @@ export default function QrScannerDaerah() {
                 Arahkan kamera ke QR Code untuk memulai presensi daerah
               </p>
             </div>
+            {presensiLoading && <DataLoadingSpinner message="Memproses presensi..." />}
             {/* Pengaturan Jam Tepat Waktu */}
             <div className="mb-4 flex items-center gap-2">
               <label htmlFor="jamTepatWaktu" className="text-sm font-medium text-gray-700">Jam Tepat Waktu:</label>
