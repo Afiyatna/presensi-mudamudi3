@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import BarChart01 from '../charts/BarChart01';
 import LayoutDashboard from '../layouts/LayoutDashboard';
+import DataLoadingSpinner from '../components/DataLoadingSpinner';
 
 // Daftar kelompok dari Register.jsx
 const kelompokList = [
@@ -60,6 +61,7 @@ export default function DashboardDummy() {
   const [selectedYear, setSelectedYear] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('');
   const [selectedDay, setSelectedDay] = useState('');
+  const [loading, setLoading] = useState(false);
 
   // Fungsi filter tanggal
   const filterTanggal = (tgl) => {
@@ -96,6 +98,7 @@ export default function DashboardDummy() {
     <LayoutDashboard pageTitle="Dashboard Dummy">
       <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
         <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Dashboard Dummy Data - Rekap Presensi per Kelompok</h2>
+        {loading && <DataLoadingSpinner message="Memuat data dashboard..." />}
         {/* Filter Section */}
         <div className="flex flex-wrap gap-4 mb-6">
           <div>
