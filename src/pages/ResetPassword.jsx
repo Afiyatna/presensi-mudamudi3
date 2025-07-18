@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
+import DataLoadingSpinner from '../components/DataLoadingSpinner';
 
 export default function ResetPassword() {
   const [password, setPassword] = useState('');
@@ -31,6 +32,7 @@ export default function ResetPassword() {
         <h2 className="text-2xl font-bold mb-6 text-center">Atur Password Baru</h2>
         {error && <div className="mb-4 text-red-500 text-center">{error}</div>}
         {message && <div className="mb-4 text-green-600 text-center">{message}</div>}
+        {loading && <DataLoadingSpinner message="Menyimpan password..." />}
         <div className="relative mb-4">
           <input
             type={showPassword ? 'text' : 'password'}
