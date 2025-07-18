@@ -3,6 +3,7 @@ import { Html5Qrcode } from 'html5-qrcode';
 import Sidebar from '../partials/Sidebar';
 import Header from '../partials/Header';
 import { supabase } from '../supabaseClient';
+import DataLoadingSpinner from '../components/DataLoadingSpinner';
 
 function QRScannerPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -203,6 +204,8 @@ function QRScannerPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* QR Scanner Section */}
               <div className="bg-white dark:bg-gray-800 shadow-xs rounded-xl p-6">
+                {presensiLoading && <DataLoadingSpinner message="Memproses presensi..." />}
+                {jamLoading && <DataLoadingSpinner message="Memuat pengaturan jam..." />}
                 {/* Notifikasi sukses */}
                 {success && (
                   <div className="mb-4 text-green-600 text-center">Jam tepat waktu berhasil disimpan!</div>
