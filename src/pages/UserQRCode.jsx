@@ -3,6 +3,7 @@ import { supabase } from '../supabaseClient';
 import { QRCodeCanvas } from 'qrcode.react';
 import LayoutDashboard from '../layouts/LayoutDashboard';
 import jsPDF from 'jspdf';
+import DataLoadingSpinner from '../components/DataLoadingSpinner';
 
 export default function UserQRCode() {
   const [userId, setUserId] = useState('');
@@ -53,7 +54,7 @@ export default function UserQRCode() {
     pdf.save(getSafeFileName(namaLengkap, 'pdf'));
   };
 
-  if (loading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  if (loading) return <DataLoadingSpinner message="Memuat QR Code..." />;
 
   // if (loading) {
   //   return (
