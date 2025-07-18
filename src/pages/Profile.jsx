@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import LayoutDashboard from '../layouts/LayoutDashboard';
+import DataLoadingSpinner from '../components/DataLoadingSpinner';
 
 // Daftar kota Indonesia (static, bisa diganti API jika mau dinamis)
 const kotaIndonesia = [
@@ -95,7 +96,7 @@ export default function Profile() {
     setSuccess(true);
   };
 
-  if (loading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  if (loading) return <DataLoadingSpinner message="Memuat data profil..." />;
   if (!profile) return <div className="flex justify-center items-center h-screen">Data profile tidak ditemukan.</div>;
 
   return (
