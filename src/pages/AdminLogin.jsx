@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
+import DataLoadingSpinner from '../components/DataLoadingSpinner';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -47,6 +48,7 @@ export default function Login() {
       <form onSubmit={handleLogin} className="bg-white dark:bg-gray-800 p-8 rounded shadow-md w-96">
         <h2 className="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-gray-100">Login</h2>
         {error && <div className="mb-4 text-red-500 text-center">{error}</div>}
+        {loading && <DataLoadingSpinner message="Memproses login..." />}
         <input
           type="email"
           placeholder="Email"
