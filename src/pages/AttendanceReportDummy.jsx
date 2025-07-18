@@ -2,6 +2,7 @@ import React, { useState, useMemo, useRef } from 'react';
 import LayoutDashboard from '../layouts/LayoutDashboard';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import DataLoadingSpinner from '../components/DataLoadingSpinner';
 
 const kelompokList = [
   'BANGUNSARI 1', 'BANGUNSARI 2', 'BRANGSONG', 'BRAYO', 'CAMPUREJO', 'CEPIRING', 
@@ -180,6 +181,7 @@ export default function AttendanceReportDummy() {
         </div>
         {/* Filters and Actions */}
         <div className="bg-white dark:bg-gray-800 shadow-xs rounded-xl p-6 mb-8">
+          {exporting && <DataLoadingSpinner message="Mengekspor data..." />}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
             {/* Search */}
             <div>
