@@ -221,7 +221,7 @@ function Dashboard() {
       <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
         {/* Header dan deskripsi dashboard */}
         <h1 className="text-2xl font-bold mb-1 text-gray-800">Selamat Datang di Aplikasi Presensi</h1>
-        <p className="text-gray-500 mb-6">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque euismod, urna eu tincidunt consectetur, nisi nisl aliquam nunc, eget aliquam massa nisl quis neque.</p>
+        <p className="text-gray-500 mb-6">Sistem ini membantu dalam pencatatan kehadiran secara akurat dan real-time untuk setiap kegiatan pengajian.</p>
         {/* Filter Panel (mirip gambar) */}
             {/* Filter Panel (mirip gambar) */}
             {role === 'user' && (
