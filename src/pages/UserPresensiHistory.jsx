@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import LayoutDashboard from '../layouts/LayoutDashboard';
 import DateRangePicker from '../components/DateRangePicker';
+import DataLoadingSpinner from '../components/DataLoadingSpinner';
 
 export default function UserPresensiHistory() {
   const [presensi, setPresensi] = useState([]);
@@ -94,7 +95,7 @@ export default function UserPresensiHistory() {
   const jenisOptions = ['Presensi Daerah', 'Presensi Desa'];
   const statusOptions = ['hadir', 'terlambat'];
 
-  if (loading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  if (loading) return <DataLoadingSpinner message="Memuat riwayat presensi..." />;
 
   return (
     <LayoutDashboard pageTitle="Riwayat Presensi">
