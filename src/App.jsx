@@ -24,6 +24,7 @@ import { RequireAdmin } from './components/RequireAuth';
 import ResetPassword from './pages/ResetPassword';
 import Footer from './components/Footer';
 import DataProfileUser from './pages/DataProfileUser';
+import PageTransition from './components/PageTransition';
 
 function App() {
 
@@ -36,7 +37,7 @@ function App() {
   }, [location.pathname]); // triggered on route change
 
   return (
-    <>
+    <PageTransition>
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
@@ -53,7 +54,7 @@ function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/data-profile-user" element={<RequireAuth><RequireAdmin><DataProfileUser /></RequireAdmin></RequireAuth>} />
       </Routes>
-    </>
+    </PageTransition>
   );
 }
 
