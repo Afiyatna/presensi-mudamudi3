@@ -287,7 +287,7 @@ export default function Register() {
           </div>
         </div>
       </div>
-      <Footer />
+      <Footer variant="minimal" />
     </div>
   );
 } 

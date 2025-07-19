@@ -1,6 +1,47 @@
 import React from "react";
 
-export default function Footer({ className = "" }) {
+export default function Footer({ className = "", variant = "full" }) {
+  // Minimal footer for landing pages (login/register)
+  if (variant === "minimal") {
+    return (
+      <footer className={`bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700/60 ${className}`}>
+        <div className="mx-auto w-full max-w-screen-xl px-4 py-6">
+          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                © 2025 Generus Muda Kendal. All rights reserved.
+              </p>
+              <div className="flex space-x-4 text-sm">
+                <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors font-medium">
+                  Privacy Policy
+                </a>
+                <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors font-medium">
+                  Terms of Service
+                </a>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Powered by PPG Daerah Kendal</span>
+            </div>
+            <div className="flex flex-col items-center space-y-1 mt-2">
+              <span className="text-xs text-gray-500 dark:text-gray-500 font-medium">Partner</span>
+              <div className="flex items-center space-x-3">
+                <a href="https://afiyatna.vercel.app" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium text-xs transition-colors">
+                  Afiyatna
+                </a>
+                <span className="text-gray-400 dark:text-gray-600 text-xs">•</span>
+                <a href="https://www.abuabdirohman.com/" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium text-xs transition-colors">
+                  Abu Abdirohman
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
+    );
+  }
+
+  // Full footer for authenticated pages
   return (
     <footer className={`bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700/60 ${className}`}>
       <div className="mx-auto w-full max-w-screen-xl px-4 py-8 lg:py-12">
