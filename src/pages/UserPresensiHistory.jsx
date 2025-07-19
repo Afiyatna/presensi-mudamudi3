@@ -102,49 +102,60 @@ export default function UserPresensiHistory() {
       <div className="max-w-4xl mx-auto py-8 px-4">
         <div className="bg-white dark:bg-gray-800 shadow-xs rounded-xl p-6">
           <h2 className="text-2xl font-bold mb-2 text-gray-800 dark:text-gray-100">Riwayat Presensi Anda</h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-4">
+            Halaman ini menampilkan riwayat lengkap presensi Anda untuk semua kegiatan pengajian. 
+            Anda dapat melihat detail waktu presensi, jenis kegiatan (Daerah/Desa), kelompok, dan status kehadiran. 
+            Gunakan filter di bawah untuk mencari data presensi tertentu.
+          </p>
           <div className="mb-6 text-gray-600 dark:text-gray-300 text-lg font-medium">
             Nama: <span className="font-bold text-gray-900 dark:text-white">{namaLengkap}</span>
           </div>
 
           {/* Filter Section */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Jenis Presensi</label>
-              <select value={filterJenis} onChange={e => setFilterJenis(e.target.value)} className="form-select w-full">
-                <option value="">Semua</option>
-                {jenisOptions.map(jenis => (
-                  <option key={jenis} value={jenis}>{jenis}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rentang Tanggal</label>
-              <DateRangePicker
-                value={filterDateRange}
-                onChange={setFilterDateRange}
-                placeholder="Pilih rentang tanggal"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
-              <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="form-select w-full">
-                <option value="">Semua</option>
-                {statusOptions.map(status => (
-                  <option key={status} value={status}>{status.charAt(0).toUpperCase() + status.slice(1)}</option>
-                ))}
-              </select>
-            </div>
-            <div className="flex items-end">
-              <button 
-                onClick={() => { 
-                  setFilterJenis(''); 
-                  setFilterDateRange({ from: '', to: '' }); 
-                  setFilterStatus(''); 
-                }} 
-                className="btn bg-gray-500 hover:bg-gray-600 text-white w-full"
-              >
-                Reset Filter
-              </button>
+          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
+            <h3 className="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-2">Filter Riwayat Presensi</h3>
+            <p className="text-sm text-blue-700 dark:text-blue-300 mb-3">
+              Gunakan filter di bawah untuk mencari data presensi Anda:
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Jenis Presensi</label>
+                <select value={filterJenis} onChange={e => setFilterJenis(e.target.value)} className="form-select w-full">
+                  <option value="">Semua</option>
+                  {jenisOptions.map(jenis => (
+                    <option key={jenis} value={jenis}>{jenis}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rentang Tanggal</label>
+                <DateRangePicker
+                  value={filterDateRange}
+                  onChange={setFilterDateRange}
+                  placeholder="Pilih rentang tanggal"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
+                <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="form-select w-full">
+                  <option value="">Semua</option>
+                  {statusOptions.map(status => (
+                    <option key={status} value={status}>{status.charAt(0).toUpperCase() + status.slice(1)}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex items-end">
+                <button 
+                  onClick={() => { 
+                    setFilterJenis(''); 
+                    setFilterDateRange({ from: '', to: '' }); 
+                    setFilterStatus(''); 
+                  }} 
+                  className="btn bg-gray-500 hover:bg-gray-600 text-white w-full"
+                >
+                  Reset Filter
+                </button>
+              </div>
             </div>
           </div>
 
