@@ -14,7 +14,7 @@ export default function QrScannerMenu() {
         {/* Deskripsi halaman */}
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold mb-4 text-gray-800">Menu QR Scanner</h1>
-          <p className="text-gray-600 max-w-2xl mx-auto">
+          <p className="text-gray-600 max-w-2xl mx-auto text-justify">
             Pilih jenis kegiatan pengajian yang akan Anda scan QR Code-nya. 
             Setiap jenis kegiatan memiliki sistem presensi terpisah untuk memudahkan pengelolaan data.
           </p>

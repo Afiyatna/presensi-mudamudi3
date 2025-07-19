@@ -14,7 +14,7 @@ export default function AttendanceReportMenu() {
         {/* Deskripsi halaman */}
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold mb-4 text-gray-800">Menu Rekap Presensi</h1>
-          <p className="text-gray-600 max-w-2xl mx-auto">
+          <p className="text-gray-600 max-w-2xl mx-auto text-justify">
             Pilih jenis rekap presensi yang ingin Anda lihat. Setiap jenis kegiatan memiliki data presensi terpisah 
             yang dapat difilter dan diekspor dalam berbagai format (Excel, PDF, JPG).
           </p>

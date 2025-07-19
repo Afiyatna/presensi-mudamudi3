@@ -223,7 +223,7 @@ function Dashboard() {
         {role === 'admin' ? (
           <>
             <h1 className="text-2xl font-bold mb-1 text-gray-800">Dashboard Administrator</h1>
-            <p className="text-gray-500 mb-6">
+            <p className="text-gray-500 mb-6 text-justify">
               Selamat datang, Admin! Anda dapat mengelola data presensi, melihat rekap kehadiran per kelompok, 
               dan memantau statistik kehadiran secara real-time. Gunakan filter di bawah untuk melihat data 
               berdasarkan kelompok, desa, jenis kelamin, dan rentang tanggal.
@@ -232,7 +232,7 @@ function Dashboard() {
         ) : (
           <>
             <h1 className="text-2xl font-bold mb-1 text-gray-800">Dashboard Peserta</h1>
-            <p className="text-gray-500 mb-6">
+            <p className="text-gray-500 mb-6 text-justify">
               Selamat datang, {userName}! Di sini Anda dapat melihat riwayat presensi pribadi Anda, 
               memantau kehadiran dan keterlambatan, serta mengakses QR Code untuk melakukan presensi. 
               Gunakan filter untuk melihat data berdasarkan jenis presensi dan status kehadiran.
@@ -367,7 +367,7 @@ function Dashboard() {
                   </ul>
                 </div>
             <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Rekap Presensi per Kelompok</h2>
-            <p className="text-gray-600 mb-4 text-sm">
+            <p className="text-gray-600 mb-4 text-sm text-justify">
               Grafik di bawah menunjukkan statistik kehadiran untuk setiap kelompok. Data dapat difilter berdasarkan 
               kelompok, desa, jenis kelamin, status kehadiran, dan rentang tanggal. Klik pada grafik untuk melihat detail lebih lanjut.
             </p>

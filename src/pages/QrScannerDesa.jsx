@@ -183,7 +183,7 @@ export default function QrScannerDesa() {
         {/* Deskripsi halaman */}
         <div className="mb-6 p-4 bg-green-50 rounded-lg border border-green-200">
           <h1 className="text-xl font-bold text-green-800 mb-2">QR Scanner Presensi Desa</h1>
-          <p className="text-green-700 text-sm">
+          <p className="text-green-700 text-sm text-justify">
             Halaman ini memungkinkan admin untuk memindai QR Code peserta untuk mencatat presensi kegiatan pengajian desa. 
             Sistem akan otomatis menentukan status kehadiran berdasarkan waktu presensi dan batas waktu yang ditentukan. 
             Pastikan kamera berfungsi dengan baik dan peserta menampilkan QR Code dengan jelas.

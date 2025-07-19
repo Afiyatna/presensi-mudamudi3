@@ -155,15 +155,10 @@ export default function Register() {
           <div className="rounded-3xl shadow-xl bg-gradient-to-br from-violet-600 via-fuchsia-500 to-pink-400 p-1">
             <div className="bg-white rounded-xl p-8 md:p-10 flex flex-col items-center">
               <h2 className="text-3xl font-extrabold text-center text-gray-900 mb-2 tracking-wide">Register User Baru</h2>
-              <p className="text-justify text-center text-gray-500 mb-4 text-sm md:text-base max-w-md">
+              <p className="text-justify text-gray-500 mb-4 text-sm md:text-base max-w-md">
                 Silakan isi data diri Anda untuk membuat akun baru di <b>Presensi Muda Mudi Daerah Kendal</b>.
               </p>
-              <div className="mb-6 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-sm text-blue-700 text-center">
-                  <strong>Informasi Penting:</strong> Data yang Anda masukkan akan digunakan untuk sistem presensi. 
-                  Pastikan informasi yang Anda berikan akurat dan lengkap.
-                </p>
-              </div>
+              
               {error && <div className="mb-2 text-red-500 text-center text-sm">{error}</div>}
               {success && <div className="mb-2 text-green-600 text-center text-sm">Registrasi berhasil! Redirect ke dashboard...</div>}
               {loading && <DataLoadingSpinner message="Memproses registrasi..." />}
@@ -283,6 +278,12 @@ export default function Register() {
                 Sudah punya akun? Login
               </button>
             </div>
+              <div className="mb-6 p-3 bg-blue-50 rounded-lg border border-blue-200 mt-4">
+                <p className="text-sm text-blue-700 text-justify">
+                  <strong>Informasi Penting:</strong> Data yang Anda masukkan akan digunakan untuk sistem presensi. 
+                  Pastikan informasi yang Anda berikan akurat dan lengkap.
+                </p>
+              </div>
           </div>
         </div>
       </div>
