@@ -34,10 +34,20 @@ export default function DataProfileUser() {
     <LayoutDashboard pageTitle="Data Profile User">
       <div className="p-4 pb-32 min-h-screen flex flex-col">
         <h1 className="text-2xl font-bold mb-4 text-gray-800">Data Profile User</h1>
+        <p className="text-gray-600 mb-6">
+          Halaman ini menampilkan data lengkap semua pengguna yang terdaftar dalam sistem presensi. 
+          Sebagai administrator, Anda dapat melihat informasi detail setiap peserta termasuk data pribadi, 
+          kelompok pengajian, dan desa asal. Data ini berguna untuk monitoring dan pengelolaan peserta.
+        </p>
         {loading ? (
           <DataLoadingSpinner message="Memuat data profile user..." />
         ) : (
           <div className="overflow-x-auto flex-1">
+            <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+              <p className="text-sm text-blue-700">
+                <strong>Total Pengguna:</strong> {profiles.length} orang terdaftar
+              </p>
+            </div>
             <table className="min-w-full bg-white border border-gray-200 rounded-lg">
               <thead>
                 <tr className="bg-gray-100 text-gray-700">
