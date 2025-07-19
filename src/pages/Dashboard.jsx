@@ -222,8 +222,8 @@ function Dashboard() {
         {/* Header dan deskripsi dashboard yang berbeda untuk admin dan user */}
         {role === 'admin' ? (
           <>
-            <h1 className="text-2xl font-bold mb-1 text-gray-800">Dashboard Administrator</h1>
-            <p className="text-gray-500 mb-6 text-justify">
+            <h1 className="text-2xl font-bold mb-1 text-gray-800 dark:text-gray-100">Dashboard Administrator</h1>
+            <p className="text-gray-500 dark:text-gray-400 mb-6 text-justify">
               Selamat datang, Admin! Anda dapat mengelola data presensi, melihat rekap kehadiran per kelompok, 
               dan memantau statistik kehadiran secara real-time. Gunakan filter di bawah untuk melihat data 
               berdasarkan kelompok, desa, jenis kelamin, dan rentang tanggal.
@@ -231,8 +231,8 @@ function Dashboard() {
           </>
         ) : (
           <>
-            <h1 className="text-2xl font-bold mb-1 text-gray-800">Dashboard Peserta</h1>
-            <p className="text-gray-500 mb-6 text-justify">
+            <h1 className="text-2xl font-bold mb-1 text-gray-800 dark:text-gray-100">Dashboard Peserta</h1>
+            <p className="text-gray-500 dark:text-gray-400 mb-6 text-justify">
               Selamat datang, {userName}! Di sini Anda dapat melihat riwayat presensi pribadi Anda, 
               memantau kehadiran dan keterlambatan, serta mengakses QR Code untuk melakukan presensi. 
               Gunakan filter untuk melihat data berdasarkan jenis presensi dan status kehadiran.
@@ -281,12 +281,12 @@ function Dashboard() {
           </div>
         </div>
                 {/* Deskripsi filter untuk user */}
-                <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <h3 className="text-sm font-semibold text-blue-800 mb-2">Filter Data Presensi</h3>
-                  <p className="text-sm text-blue-700">
+                <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700/60">
+                  <h3 className="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-2">Filter Data Presensi</h3>
+                  <p className="text-sm text-blue-700 dark:text-blue-300">
                     Gunakan filter di atas untuk melihat data presensi Anda berdasarkan:
                   </p>
-                  <ul className="text-sm text-blue-700 mt-2 ml-4 list-disc">
+                  <ul className="text-sm text-blue-700 dark:text-blue-300 mt-2 ml-4 list-disc">
                     <li><strong>Jenis Presensi:</strong> Pilih antara Presensi Daerah atau Presensi Desa</li>
                     <li><strong>Status:</strong> Filter berdasarkan status Hadir atau Terlambat</li>
                     <li><strong>Rentang Tanggal:</strong> Pilih periode waktu tertentu untuk melihat data</li>
@@ -352,13 +352,13 @@ function Dashboard() {
                     />
                   </div>
                 </div>
-                {/* Deskripsi filter untuk admin */}
-                <div className="mb-6 p-4 bg-green-50 rounded-lg border border-green-200">
-                  <h3 className="text-sm font-semibold text-green-800 mb-2">Filter Data Administrasi</h3>
-                  <p className="text-sm text-green-700">
+                {/* Deskripsi filter untuk admin - Fixed dark mode colors */}
+                <div className="mb-6 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-200 dark:border-emerald-700/60">
+                  <h3 className="text-sm font-semibold text-emerald-800 dark:text-emerald-200 mb-2">Filter Data Administrasi</h3>
+                  <p className="text-sm text-emerald-700 dark:text-emerald-300">
                     Gunakan filter di atas untuk mengelola dan menganalisis data presensi berdasarkan:
                   </p>
-                  <ul className="text-sm text-green-700 mt-2 ml-4 list-disc">
+                  <ul className="text-sm text-emerald-700 dark:text-emerald-300 mt-2 ml-4 list-disc">
                     <li><strong>Kelompok:</strong> Filter berdasarkan kelompok pengajian tertentu</li>
                     <li><strong>Desa:</strong> Lihat data berdasarkan lokasi desa</li>
                     <li><strong>Jenis Kelamin:</strong> Analisis berdasarkan gender peserta</li>
@@ -367,13 +367,13 @@ function Dashboard() {
                   </ul>
                 </div>
             <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Rekap Presensi per Kelompok</h2>
-            <p className="text-gray-600 mb-4 text-sm text-justify">
+            <p className="text-gray-600 dark:text-gray-400 mb-4 text-sm text-justify">
               Grafik di bawah menunjukkan statistik kehadiran untuk setiap kelompok. Data dapat difilter berdasarkan 
               kelompok, desa, jenis kelamin, status kehadiran, dan rentang tanggal. Klik pada grafik untuk melihat detail lebih lanjut.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredKelompokList.map(kelompok => (
-                <div key={kelompok} className="bg-white dark:bg-gray-800 rounded-xl shadow-xs p-4">
+                <div key={kelompok} className="bg-white dark:bg-gray-800 rounded-xl shadow-xs border border-gray-200 dark:border-gray-700/60 p-4">
                   <h3 className="font-semibold text-gray-700 dark:text-gray-200 mb-2">{kelompok}</h3>
                       <BarChart01 key={currentTheme + kelompok} data={getFilteredBarChartData(kelompok)} width={320} height={180} />
                 </div>
@@ -385,19 +385,19 @@ function Dashboard() {
         {role === 'user' && (
           <div className="mb-8">
             <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Grafik Riwayat Presensi Anda</h2>
-            <p className="text-gray-600 mb-4 text-sm">
+            <p className="text-gray-600 dark:text-gray-400 mb-4 text-sm">
               Grafik ini menampilkan riwayat presensi pribadi Anda. Anda dapat melihat pola kehadiran, 
               keterlambatan, dan membandingkan performa kehadiran dari waktu ke waktu. Gunakan filter di atas 
               untuk melihat data berdasarkan jenis presensi (Daerah/Desa) dan status kehadiran.
             </p>
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xs p-4 max-w-xl">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xs border border-gray-200 dark:border-gray-700/60 p-4 max-w-xl">
                   {userChartType === 'bar' ? (
                     <BarChart01 key={currentTheme + '-user'} data={userBarChartData} width={400} height={220} />
                   ) : (
                     <LineChart01 key={currentTheme + '-user'} data={userLineChartData} width={400} height={220} />
                   )}
               {userBarChartData.labels.length === 0 && (
-                <div className="text-gray-500 text-center mt-4">Belum ada data presensi.</div>
+                <div className="text-gray-500 dark:text-gray-400 text-center mt-4">Belum ada data presensi.</div>
               )}
             </div>
           </div>

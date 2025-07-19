@@ -15,11 +15,11 @@ export default function ThemeToggle() {
         onChange={() => changeCurrentTheme(currentTheme === "light" ? "dark" : "light")}
       />
       <label
-        className="flex items-center justify-center cursor-pointer w-8 h-8 hover:bg-gray-100 lg:hover:bg-gray-200 dark:hover:bg-gray-700/50 dark:lg:hover:bg-gray-800 rounded-full"
+        className="flex items-center justify-center cursor-pointer w-8 h-8 hover:bg-gray-100 lg:hover:bg-gray-200 dark:hover:bg-gray-700/50 dark:lg:hover:bg-gray-800 rounded-full transition-colors"
         htmlFor="light-switch"
       >
         <svg
-          className="dark:hidden fill-current text-gray-500/80 dark:text-gray-400/80"
+          className="dark:hidden fill-current text-gray-600 dark:text-gray-400"
           width={16}
           height={16}
           viewBox="0 0 16 16"
@@ -30,7 +30,7 @@ export default function ThemeToggle() {
           <path d="M13.657 3.757a1 1 0 0 0-1.414-1.414l-.354.354a1 1 0 0 0 1.414 1.414l.354-.354ZM13.5 8a1 1 0 0 1 1-1h.5a1 1 0 1 1 0 2h-.5a1 1 0 0 1-1-1ZM13.303 11.889a1 1 0 0 0-1.414 1.414l.354.354a1 1 0 0 0 1.414-1.414l-.354-.354ZM8 13.5a1 1 0 0 1 1 1v.5a1 1 0 1 1-2 0v-.5a1 1 0 0 1 1-1ZM4.111 13.303a1 1 0 1 0-1.414-1.414l-.354.354a1 1 0 1 0 1.414 1.414l.354-.354ZM0 8a1 1 0 0 1 1-1h.5a1 1 0 0 1 0 2H1a1 1 0 0 1-1-1ZM3.757 2.343a1 1 0 1 0-1.414 1.414l.354.354A1 1 0 1 0 4.11 2.697l-.354-.354Z" />
         </svg>
         <svg
-          className="hidden dark:block fill-current text-gray-500/80 dark:text-gray-400/80"
+          className="hidden dark:block fill-current text-gray-400 dark:text-gray-300"
           width={16}
           height={16}
           viewBox="0 0 16 16"

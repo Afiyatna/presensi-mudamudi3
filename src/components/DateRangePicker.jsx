@@ -118,7 +118,7 @@ export default function DateRangePicker({
                   prevMonth.setMonth(prevMonth.getMonth() - 1);
                   setDateRange(prev => ({ ...prev, from: prevMonth }));
                 }}
-                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
               >
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                   <path d="M10.5 12.5L6 8l4.5-4.5L10 2.5l-6 5.5 6 5.5z"/>
@@ -130,7 +130,7 @@ export default function DateRangePicker({
                   nextMonth.setMonth(nextMonth.getMonth() + 1);
                   setDateRange(prev => ({ ...prev, from: nextMonth }));
                 }}
-                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
               >
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                   <path d="M5.5 3.5L10 8l-4.5 4.5L6 13.5l6-5.5-6-5.5z"/>
@@ -159,10 +159,10 @@ export default function DateRangePicker({
               day_disabled: "text-gray-400 dark:text-gray-500 opacity-50",
               day_hidden: "invisible",
               caption: "flex justify-center pt-1 relative items-center",
-              caption_label: "text-sm font-medium",
+              caption_label: "text-sm font-medium text-gray-900 dark:text-gray-100",
               nav: "space-x-1 flex items-center",
               nav_button: cn(
-                "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
+                "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
               ),
               nav_button_previous: "absolute left-1",
               nav_button_next: "absolute right-1",
@@ -175,17 +175,17 @@ export default function DateRangePicker({
           />
         </div>
         
-        <div className="flex justify-between px-4 py-2 border-t bg-white dark:bg-gray-800 text-sm">
+        <div className="flex justify-between px-4 py-2 border-t border-gray-200 dark:border-gray-700/60 bg-white dark:bg-gray-800 text-sm">
           <button
             type="button"
-            className="text-blue-600 hover:underline"
+            className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline"
             onClick={handleClear}
           >
             Clear
           </button>
           <button
             type="button"
-            className="text-blue-600 hover:underline"
+            className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline"
             onClick={handleApply}
           >
             Apply

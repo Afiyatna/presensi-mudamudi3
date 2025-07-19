@@ -20,7 +20,7 @@ function BottomNavigation({ role }) {
   const items = role === 'admin' ? adminItems : userItems;
   const isActive = (activePaths) => activePaths.some(path => pathname === path);
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 lg:hidden z-50 pb-safe">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700/60 lg:hidden z-50 pb-safe shadow-lg">
       <div className="flex justify-around items-center h-16">
         {items.map((item, index) => (
           <NavLink

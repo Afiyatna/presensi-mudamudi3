@@ -162,10 +162,10 @@ export default function LandingPage() {
         )}
       </header>
       {/* Main Content */}
-      <div className="relative flex-1 flex flex-col lg:flex-row items-center justify-center px-4 py-8 min-h-[calc(100vh-200px)]">
+      <div className="relative flex-1 flex flex-col lg:flex-row items-center justify-center px-4 py-8 min-h-[calc(100vh-200px)] bg-gray-50 dark:bg-gray-900">
         {/* Background transparan */}
         <div className="absolute inset-0 z-0 flex justify-center items-center pointer-events-none">
-          <img src="/bg-landing.jpg" alt="Background" className="w-full h-full object-cover opacity-30" />
+          <img src="/bg-landing.jpg" alt="Background" className="w-full h-full object-cover opacity-30 dark:opacity-20" />
         </div>
         
         {/* Desktop Layout: Slider di kiri, Login di kanan */}
@@ -236,9 +236,9 @@ export default function LandingPage() {
           
           {/* Login Form - Right Side */}
           <div className="w-1/2 max-w-md">
-            <div className="bg-gradient-to-br from-white/95 to-white/85 backdrop-blur-md rounded-3xl p-8 shadow-xl border border-white/20">
-              <h1 className="text-3xl font-extrabold text-center text-gray-900 mb-2 tracking-wide">WELCOME</h1>
-              <p className="text-justify text-gray-500 mb-4 text-sm max-w-md">
+            <div className="bg-gradient-to-br from-white/95 to-white/85 dark:from-gray-800/95 dark:to-gray-800/85 backdrop-blur-md rounded-3xl p-8 shadow-xl border border-white/20 dark:border-gray-700/60">
+              <h1 className="text-3xl font-extrabold text-center text-gray-900 dark:text-gray-100 mb-2 tracking-wide">WELCOME</h1>
+              <p className="text-justify text-gray-500 dark:text-gray-400 mb-4 text-sm max-w-md">
                 Selamat datang di <b>Presensi Muda Mudi Daerah Kendal</b>. Silakan login untuk melanjutkan. Jika belum punya akun, klik Create Account.
               </p>
               
@@ -246,7 +246,7 @@ export default function LandingPage() {
               {/* Login Form */}
               {!showReset && (
                 <form onSubmit={handleLogin} className="w-full flex flex-col gap-4">
-                  {error && <div className="mb-2 text-red-500 text-center text-sm">{error}</div>}
+                  {error && <div className="mb-2 text-red-500 dark:text-red-400 text-center text-sm">{error}</div>}
                   {loading && <DataLoadingSpinner message="Memproses login..." />}
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-violet-400">
@@ -255,7 +255,7 @@ export default function LandingPage() {
                     <input
                       type="email"
                       placeholder="Email"
-                      className="w-full pl-10 pr-3 py-2 border-2 border-violet-200 rounded-full bg-gray-50 focus:outline-none focus:border-violet-500 text-gray-800"
+                      className="w-full pl-10 pr-3 py-2 border-2 border-violet-200 dark:border-violet-700/60 rounded-full bg-gray-50 dark:bg-gray-700/50 focus:outline-none focus:border-violet-500 dark:focus:border-violet-400 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                       value={email}
                       onChange={e => setEmail(e.target.value)}
                       required
@@ -268,14 +268,14 @@ export default function LandingPage() {
                     <input
                       type={showPassword ? 'text' : 'password'}
                       placeholder="Password"
-                      className="w-full pl-10 pr-10 py-2 border-2 border-violet-200 rounded-full bg-gray-50 focus:outline-none focus:border-violet-500 text-gray-800"
+                      className="w-full pl-10 pr-10 py-2 border-2 border-violet-200 dark:border-violet-700/60 rounded-full bg-gray-50 dark:bg-gray-700/50 focus:outline-none focus:border-violet-500 dark:focus:border-violet-400 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                       value={password}
                       onChange={e => setPassword(e.target.value)}
                       required
                     />
                     <button
                       type="button"
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
                       tabIndex={-1}
                       onClick={() => setShowPassword(v => !v)}
                     >
@@ -290,10 +290,10 @@ export default function LandingPage() {
                     {loading ? 'Loading...' : 'LOGIN'}
                   </button>
                   <div className="flex items-center justify-between text-xs mt-2">
-                    <label className="flex items-center gap-1">
+                    <label className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
                       <input type="checkbox" className="accent-violet-500" /> Remember
                     </label>
-                    <button type="button" className="text-pink-600 hover:underline" onClick={() => setShowReset(true)}>
+                    <button type="button" className="text-pink-600 dark:text-pink-400 hover:underline" onClick={() => setShowReset(true)}>
                       Forgot Password?
                     </button>
                   </div>
@@ -303,13 +303,13 @@ export default function LandingPage() {
               {/* Reset Password Form */}
               {showReset && (
                 <form onSubmit={handleResetPassword} className="w-full flex flex-col gap-4">
-                  {resetError && <div className="mb-2 text-red-500 text-center text-sm">{resetError}</div>}
-                  {resetMessage && <div className="mb-2 text-green-600 text-center text-sm">{resetMessage}</div>}
+                  {resetError && <div className="mb-2 text-red-500 dark:text-red-400 text-center text-sm">{resetError}</div>}
+                  {resetMessage && <div className="mb-2 text-green-600 dark:text-green-400 text-center text-sm">{resetMessage}</div>}
                   {resetLoading && <DataLoadingSpinner message="Mengirim link reset..." />}
                   <input
                     type="email"
                     placeholder="Masukkan email anda"
-                    className="w-full pl-4 pr-3 py-2 border-2 border-violet-200 rounded-full bg-gray-50 focus:outline-none focus:border-violet-500 text-gray-800"
+                    className="w-full pl-4 pr-3 py-2 border-2 border-violet-200 dark:border-violet-700/60 rounded-full bg-gray-50 dark:bg-gray-700/50 focus:outline-none focus:border-violet-500 dark:focus:border-violet-400 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                     value={resetEmail}
                     onChange={e => setResetEmail(e.target.value)}
                     required
@@ -317,7 +317,7 @@ export default function LandingPage() {
                   <button type="submit" className="w-full bg-gradient-to-r from-violet-600 to-pink-500 text-white font-bold py-2 rounded-full mt-2 shadow-md hover:from-violet-700 hover:to-pink-600 transition" disabled={resetLoading}>
                     {resetLoading ? 'Mengirim...' : 'Kirim Link Reset'}
                   </button>
-                  <button type="button" className="text-violet-600 hover:underline text-xs mt-2" onClick={() => setShowReset(false)}>
+                  <button type="button" className="text-violet-600 dark:text-violet-400 hover:underline text-xs mt-2" onClick={() => setShowReset(false)}>
                     Kembali ke Login
                   </button>
                 </form>
@@ -325,13 +325,13 @@ export default function LandingPage() {
               
               <button
                 onClick={() => navigate('/register')}
-                className="w-full mt-6 bg-white border border-violet-600 text-violet-600 font-semibold py-2 rounded-full shadow hover:bg-violet-50 transition"
+                className="w-full mt-6 bg-white dark:bg-gray-700 border border-violet-600 dark:border-violet-400 text-violet-600 dark:text-violet-400 font-semibold py-2 rounded-full shadow hover:bg-violet-50 dark:hover:bg-gray-600 transition"
               >
                 Create Account
               </button>
             </div>
-              <div className="mb-6 p-3 bg-blue-50 rounded-lg border border-blue-200 mt-4">
-                <p className="text-sm text-blue-700 text-justify">
+              <div className="mb-6 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700/60 mt-4">
+                <p className="text-sm text-blue-700 dark:text-blue-300 text-justify">
                   <strong>Sistem Presensi Digital:</strong> Platform untuk mencatat kehadiran kegiatan pengajian 
                   dengan teknologi QR Code yang aman dan akurat.
                 </p>
@@ -407,9 +407,9 @@ export default function LandingPage() {
           
           {/* Login Form - Bottom */}
           <div className="w-full max-w-sm">
-            <div className="bg-gradient-to-br from-white/95 to-white/85 backdrop-blur-md rounded-2xl p-6 shadow-xl border border-white/20">
-              <h1 className="text-2xl font-extrabold text-center text-gray-900 mb-2 tracking-wide">WELCOME</h1>
-              <p className="text-justify text-gray-500 mb-4 text-sm">
+            <div className="bg-gradient-to-br from-white/95 to-white/85 dark:from-gray-800/95 dark:to-gray-800/85 backdrop-blur-md rounded-2xl p-6 shadow-xl border border-white/20 dark:border-gray-700/60">
+              <h1 className="text-2xl font-extrabold text-center text-gray-900 dark:text-gray-100 mb-2 tracking-wide">WELCOME</h1>
+              <p className="text-justify text-gray-500 dark:text-gray-400 mb-4 text-sm">
               Selamat datang di <b>Presensi Muda Mudi Daerah Kendal</b>. Silakan login untuk melanjutkan. Jika belum punya akun, klik Create Account.
               </p>
           
@@ -417,7 +417,7 @@ export default function LandingPage() {
               {/* Login Form - Mobile */}
               {!showReset && (
                 <form onSubmit={handleLogin} className="w-full flex flex-col gap-3">
-                  {error && <div className="mb-2 text-red-500 text-center text-xs">{error}</div>}
+                  {error && <div className="mb-2 text-red-500 dark:text-red-400 text-center text-xs">{error}</div>}
                   {loading && <DataLoadingSpinner message="Memproses login..." />}
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-violet-400">
@@ -426,7 +426,7 @@ export default function LandingPage() {
                     <input
                       type="email"
                       placeholder="Email"
-                      className="w-full pl-9 pr-3 py-2 border-2 border-violet-200 rounded-full bg-gray-50 focus:outline-none focus:border-violet-500 text-gray-800 text-sm"
+                      className="w-full pl-9 pr-3 py-2 border-2 border-violet-200 dark:border-violet-700/60 rounded-full bg-gray-50 dark:bg-gray-700/50 focus:outline-none focus:border-violet-500 dark:focus:border-violet-400 text-gray-800 dark:text-gray-100 text-sm placeholder-gray-500 dark:placeholder-gray-400"
                       value={email}
                       onChange={e => setEmail(e.target.value)}
                       required
@@ -439,14 +439,14 @@ export default function LandingPage() {
                     <input
                       type={showPassword ? 'text' : 'password'}
                       placeholder="Password"
-                      className="w-full pl-9 pr-9 py-2 border-2 border-violet-200 rounded-full bg-gray-50 focus:outline-none focus:border-violet-500 text-gray-800 text-sm"
+                      className="w-full pl-9 pr-9 py-2 border-2 border-violet-200 dark:border-violet-700/60 rounded-full bg-gray-50 dark:bg-gray-700/50 focus:outline-none focus:border-violet-500 dark:focus:border-violet-400 text-gray-800 dark:text-gray-100 text-sm placeholder-gray-500 dark:placeholder-gray-400"
                       value={password}
                       onChange={e => setPassword(e.target.value)}
                       required
                     />
                     <button
                       type="button"
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
                       tabIndex={-1}
                       onClick={() => setShowPassword(v => !v)}
                     >
@@ -461,10 +461,10 @@ export default function LandingPage() {
                     {loading ? 'Loading...' : 'LOGIN'}
                   </button>
                   <div className="flex items-center justify-between text-xs mt-2">
-                    <label className="flex items-center gap-1">
+                    <label className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
                       <input type="checkbox" className="accent-violet-500" /> Remember
                     </label>
-                    <button type="button" className="text-pink-600 hover:underline" onClick={() => setShowReset(true)}>
+                    <button type="button" className="text-pink-600 dark:text-pink-400 hover:underline" onClick={() => setShowReset(true)}>
                       Forgot Password?
                     </button>
                   </div>
@@ -474,13 +474,13 @@ export default function LandingPage() {
               {/* Reset Password Form - Mobile */}
               {showReset && (
                 <form onSubmit={handleResetPassword} className="w-full flex flex-col gap-3">
-                  {resetError && <div className="mb-2 text-red-500 text-center text-xs">{resetError}</div>}
-                  {resetMessage && <div className="mb-2 text-green-600 text-center text-xs">{resetMessage}</div>}
+                  {resetError && <div className="mb-2 text-red-500 dark:text-red-400 text-center text-xs">{resetError}</div>}
+                  {resetMessage && <div className="mb-2 text-green-600 dark:text-green-400 text-center text-xs">{resetMessage}</div>}
                   {resetLoading && <DataLoadingSpinner message="Mengirim link reset..." />}
                   <input
                     type="email"
                     placeholder="Masukkan email anda"
-                    className="w-full pl-4 pr-3 py-2 border-2 border-violet-200 rounded-full bg-gray-50 focus:outline-none focus:border-violet-500 text-gray-800 text-sm"
+                    className="w-full pl-4 pr-3 py-2 border-2 border-violet-200 dark:border-violet-700/60 rounded-full bg-gray-50 dark:bg-gray-700/50 focus:outline-none focus:border-violet-500 dark:focus:border-violet-400 text-gray-800 dark:text-gray-100 text-sm placeholder-gray-500 dark:placeholder-gray-400"
                     value={resetEmail}
                     onChange={e => setResetEmail(e.target.value)}
                     required
@@ -488,7 +488,7 @@ export default function LandingPage() {
                   <button type="submit" className="w-full bg-gradient-to-r from-violet-600 to-pink-500 text-white font-bold py-2 rounded-full mt-2 shadow-md hover:from-violet-700 hover:to-pink-600 transition text-sm" disabled={resetLoading}>
                     {resetLoading ? 'Mengirim...' : 'Kirim Link Reset'}
                   </button>
-                  <button type="button" className="text-violet-600 hover:underline text-xs mt-2" onClick={() => setShowReset(false)}>
+                  <button type="button" className="text-violet-600 dark:text-violet-400 hover:underline text-xs mt-2" onClick={() => setShowReset(false)}>
                     Kembali ke Login
                   </button>
                 </form>
@@ -496,13 +496,13 @@ export default function LandingPage() {
               
               <button
                 onClick={() => navigate('/register')}
-                className="w-full mt-4 bg-white border border-violet-600 text-violet-600 font-semibold py-2 rounded-full shadow hover:bg-violet-50 transition text-sm"
+                className="w-full mt-4 bg-white dark:bg-gray-700 border border-violet-600 dark:border-violet-400 text-violet-600 dark:text-violet-400 font-semibold py-2 rounded-full shadow hover:bg-violet-50 dark:hover:bg-gray-600 transition text-sm"
               >
                 Create Account
               </button>
             </div>
-              <div className="mb-4 p-2 bg-blue-50 rounded-lg border border-blue-200 mt-4">
-                <p className="text-xs text-blue-700 text-justify">
+              <div className="mb-4 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700/60 mt-4">
+                <p className="text-xs text-blue-700 dark:text-blue-300 text-justify">
                 <strong>Sistem Presensi Digital:</strong> Platform untuk mencatat kehadiran kegiatan pengajian 
                 dengan teknologi QR Code yang aman dan akurat.
                 </p>

@@ -67,7 +67,7 @@ function DropdownFilter({ align, options = [], selected = {}, onChange, onApply,
     <div className="relative inline-flex">
       <button
         ref={trigger}
-        className="btn px-2.5 bg-white dark:bg-gray-800 border-gray-200 hover:border-gray-300 dark:border-gray-700/60 dark:hover:border-gray-600 text-gray-400 dark:text-gray-500 shadow"
+        className="btn px-2.5 bg-white dark:bg-gray-800 border-gray-200 hover:border-gray-300 dark:border-gray-700/60 dark:hover:border-gray-600 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 shadow"
         aria-haspopup="true"
         onClick={() => setDropdownOpen(!dropdownOpen)}
         aria-expanded={dropdownOpen}
@@ -99,7 +99,7 @@ function DropdownFilter({ align, options = [], selected = {}, onChange, onApply,
         leaveEnd="opacity-0"
       >
         <div ref={dropdown}>
-          <div className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase pt-1.5 pb-2 px-3">
+          <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase pt-1.5 pb-2 px-3">
             Filters
           </div>
           <ul className="mb-4">
@@ -114,7 +114,7 @@ function DropdownFilter({ align, options = [], selected = {}, onChange, onApply,
                       checked={localSelected[group.key]?.includes(val) || false}
                       onChange={() => handleCheckbox(group.key, val)}
                 />
-                    <span className="text-sm font-medium ml-2">{val}</span>
+                    <span className="text-sm font-medium ml-2 text-gray-700 dark:text-gray-300">{val}</span>
               </label>
                 ))}
             </li>
@@ -125,7 +125,7 @@ function DropdownFilter({ align, options = [], selected = {}, onChange, onApply,
               <li>
                 <button
                   onClick={handleClear}
-                  className="btn-xs bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700/60 hover:border-gray-300 dark:hover:border-gray-600 text-red-500"
+                  className="btn-xs bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700/60 hover:border-gray-300 dark:hover:border-gray-600 text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300"
                   type="button"
                 >
                   Clear
@@ -133,7 +133,7 @@ function DropdownFilter({ align, options = [], selected = {}, onChange, onApply,
               </li>
               <li>
                 <button
-                  className="btn-xs bg-gray-900 text-gray-100 hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-800 dark:hover:bg-white"
+                  className="btn-xs bg-gray-900 dark:bg-gray-100 text-gray-100 dark:text-gray-800 hover:bg-gray-800 dark:hover:bg-white"
                   onClick={handleApply}
                   type="button"
                 >

@@ -55,25 +55,22 @@ function Header({
 
           {/* Header: Right side */}
           <div className="flex items-center space-x-3">
-            {/* UserMenu hanya di desktop */}
-            <div className="hidden lg:block">
-              <UserMenu align="right" />
-            </div>
-            {/* Hamburger button di kanan, hanya mobile */}
+            {/* Mobile hamburger */}
             <button
-              className="text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 lg:hidden ml-2"
-              aria-controls="mobile-menu"
-              aria-expanded={mobileMenuOpen}
-              onClick={() => setMobileMenuOpen(true)}
+              className="lg:hidden w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700/50 rounded-full"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              aria-controls="sidebar"
+              aria-expanded={sidebarOpen}
             >
-              <span className="sr-only">Open menu</span>
-              <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <span className="sr-only">Open sidebar</span>
+              <svg className="w-6 h-6 fill-current text-gray-600 dark:text-gray-400" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <rect x="4" y="5" width="16" height="2" />
                 <rect x="4" y="11" width="16" height="2" />
                 <rect x="4" y="17" width="16" height="2" />
               </svg>
             </button>
-            {/* 4 menu hanya di desktop */}
+
+            {/* Desktop buttons */}
             <div className="hidden lg:flex items-center space-x-3">
               <button
                 className={`w-8 h-8 flex items-center justify-center hover:bg-gray-100 lg:hover:bg-gray-200 dark:hover:bg-gray-700/50 dark:lg:hover:bg-gray-800 rounded-full ml-3 ${searchModalOpen && 'bg-gray-200 dark:bg-gray-800'}`}
@@ -102,18 +99,8 @@ function Header({
       </div>
       {/* Sidebar Mobile (User info + 4 menu) */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 flex">
-          {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/40" onClick={() => setMobileMenuOpen(false)} />
-          {/* Sidebar */}
-          <div className="ml-auto w-64 max-w-full h-full bg-white dark:bg-gray-900 shadow-lg p-6 flex flex-col pb-24 animate-slide-in-right relative">
-            <button onClick={() => setMobileMenuOpen(false)} className="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
-              <span className="sr-only">Close menu</span>
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            {/* User info di sidebar mobile */}
+        <div className="lg:hidden">
+          <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-700/60 bg-white dark:bg-gray-800">
             <div className="mb-8 flex flex-col items-center">
               <img className="w-14 h-14 rounded-full mb-2" src={UserAvatar} alt="User" />
               <div className="font-medium text-gray-800 dark:text-gray-100 text-lg">{profile ? profile.nama_lengkap : '...'}</div>
@@ -151,7 +138,7 @@ function Header({
             <div className="mt-auto w-full">
               <hr className="mb-2 border-t border-gray-200 dark:border-gray-700 w-full" />
               <button
-                className="w-full text-left font-medium text-sm text-red-500 hover:text-red-600 flex items-center py-3 px-3 bg-white dark:bg-gray-900"
+                className="w-full text-left font-medium text-sm text-red-500 hover:text-red-600 dark:hover:text-red-400 flex items-center py-3 px-3 bg-white dark:bg-gray-800"
                 onClick={handleLogout}
               >
                 Logout

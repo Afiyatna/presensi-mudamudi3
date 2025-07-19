@@ -18,28 +18,28 @@ function Calendar({
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-y-0",
         month_caption: "flex justify-center pt-1 pb-3 relative items-center",
-        caption_label: "text-sm font-medium",
+        caption_label: "text-sm font-medium text-gray-900 dark:text-gray-100",
         nav: "absolute flex items-center justify-between gap-1 inset-x-3 top-3",
-        button_previous: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none size-7 bg-transparent p-0 opacity-50 hover:opacity-100 z-50",
-        button_next: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none size-7 bg-transparent p-0 opacity-50 hover:opacity-100 z-50",
+        button_previous: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none size-7 bg-transparent p-0 opacity-50 hover:opacity-100 z-50 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100",
+        button_next: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none size-7 bg-transparent p-0 opacity-50 hover:opacity-100 z-50 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100",
         month_grid: "w-full border-collapse space-y-1",
         weekdays: "flex",
         weekday:
-          "text-gray-400 dark:text-gray-500 font-medium rounded-md w-9 text-[0.8rem]",
+          "text-gray-500 dark:text-gray-400 font-medium rounded-md w-9 text-[0.8rem]",
         week: "flex w-full mt-2",
-        day: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-green-500/50 [&:has([aria-selected])]:bg-violet-500 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-        day_button: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-violet-500 hover:text-white h-9 w-9 p-0 aria-selected:opacity-100",
+        day: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-blue-500/50 [&:has([aria-selected])]:bg-blue-500 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+        day_button: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-blue-500 hover:text-white h-9 w-9 p-0 aria-selected:opacity-100 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100",
         range_start:
           "rounded-l-lg",
         range_end: "day-range-end rounded-r-lg",
         selected:
-          "bg-violet-500 text-white hover:bg-violet-500 hover:text-white focus:bg-violet-500 focus:text-white",
-        today: "bg-violet-500 text-white",
+          "bg-blue-600 text-white hover:bg-blue-600 hover:text-white focus:bg-blue-600 focus:text-white",
+        today: "bg-blue-600 text-white",
         outside:
-          "day-outside text-gray-400 dark:text-gray-500 aria-selected:bg-violet-500/50 aria-selected:text-gray-400 dark:text-gray-500",
+          "day-outside text-gray-400 dark:text-gray-500 aria-selected:bg-blue-500/50 aria-selected:text-gray-400 dark:text-gray-500",
         disabled: "text-gray-400 dark:text-gray-500 opacity-50",
         range_middle:
-          "aria-selected:bg-violet-500/70 aria-selected:text-white",
+          "aria-selected:bg-blue-500/70 aria-selected:text-white",
         hidden: "invisible",
         ...classNames,
       }}

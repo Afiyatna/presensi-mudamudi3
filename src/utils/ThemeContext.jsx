@@ -10,8 +10,16 @@ export default function ThemeProvider({children}) {
   const [theme, setTheme] = useState(persistedTheme || 'light');
 
   const changeCurrentTheme = (newTheme) => {
+    // Add transition class to prevent flickering
+    document.documentElement.classList.add('theme-transitioning');
+    
     setTheme(newTheme);
     localStorage.setItem('theme', newTheme);
+    
+    // Remove transition class after a short delay
+    setTimeout(() => {
+      document.documentElement.classList.remove('theme-transitioning');
+    }, 100);
   };
 
   useEffect(() => {
