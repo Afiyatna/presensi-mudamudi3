@@ -47,20 +47,6 @@ function Header({
         <div className={`flex items-center justify-between h-16 ${variant === 'v2' || variant === 'v3' ? '' : 'lg:border-b border-gray-200 dark:border-gray-700/60'}`}>
           {/* Header: Left side */}
           <div className="flex items-center gap-4">
-            {/* Sidebar hamburger - untuk mobile */}
-            <button
-              className="lg:hidden w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700/50 rounded-full"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              aria-controls="sidebar"
-              aria-expanded={sidebarOpen}
-            >
-              <span className="sr-only">Open sidebar</span>
-              <svg className="w-6 h-6 fill-current text-gray-600 dark:text-gray-400" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <rect x="4" y="5" width="16" height="2" />
-                <rect x="4" y="11" width="16" height="2" />
-                <rect x="4" y="17" width="16" height="2" />
-              </svg>
-            </button>
             
             {/* Page Title */}
             {pageTitle && (
