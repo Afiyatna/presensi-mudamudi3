@@ -136,3 +136,54 @@
     border-color: var(--color-gray-200, currentColor);
   }
 }
+
+/* Add slider animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.slider-fade-in {
+  animation: fadeIn 1s ease-in-out;
+}
+
+.slider-fade-out {
+  animation: fadeOut 1s ease-in-out;
+}
+
+/* Smooth transitions for slider */
+.slider-transition {
+  transition: opacity 1s ease-in-out;
+}
+
+/* Hover effects for slider navigation */
+.slider-nav-btn:hover {
+  transform: scale(1.1);
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Responsive slider adjustments */
+@media (max-width: 1024px) {
+  .slider-container {
+    height: 12rem; /* 192px for mobile */
+  }
+}
+
+@media (min-width: 1025px) {
+  .slider-container {
+    height: 24rem; /* 384px for desktop */
+  }
+}
