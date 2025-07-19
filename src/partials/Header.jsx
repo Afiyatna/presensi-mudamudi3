@@ -47,15 +47,7 @@ function Header({
         <div className={`flex items-center justify-between h-16 ${variant === 'v2' || variant === 'v3' ? '' : 'lg:border-b border-gray-200 dark:border-gray-700/60'}`}>
           {/* Header: Left side */}
           <div className="flex items-center gap-4">
-            {/* Page Title */}
-            {pageTitle && (
-              <span className="text-lg md:text-xl font-bold text-gray-800 dark:text-gray-100 truncate max-w-xs md:max-w-md lg:max-w-lg" title={pageTitle}>{pageTitle}</span>
-            )}
-          </div>
-
-          {/* Header: Right side */}
-          <div className="flex items-center space-x-3">
-            {/* Mobile hamburger */}
+            {/* Sidebar hamburger - untuk mobile */}
             <button
               className="lg:hidden w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700/50 rounded-full"
               onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -67,6 +59,27 @@ function Header({
                 <rect x="4" y="5" width="16" height="2" />
                 <rect x="4" y="11" width="16" height="2" />
                 <rect x="4" y="17" width="16" height="2" />
+              </svg>
+            </button>
+            
+            {/* Page Title */}
+            {pageTitle && (
+              <span className="text-lg md:text-xl font-bold text-gray-800 dark:text-gray-100 truncate max-w-xs md:max-w-md lg:max-w-lg" title={pageTitle}>{pageTitle}</span>
+            )}
+          </div>
+
+          {/* Header: Right side */}
+          <div className="flex items-center space-x-3">
+            {/* Mobile menu hamburger - untuk mobile menu */}
+            <button
+              className="lg:hidden w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700/50 rounded-full"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-controls="mobile-menu"
+              aria-expanded={mobileMenuOpen}
+            >
+              <span className="sr-only">Open mobile menu</span>
+              <svg className="w-6 h-6 fill-current text-gray-600 dark:text-gray-400" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
               </svg>
             </button>
 
@@ -90,57 +103,74 @@ function Header({
                 </svg>
               </button>
               <SearchModal id="search-modal" searchId="search" modalOpen={searchModalOpen} setModalOpen={setSearchModalOpen} />
-            <Notifications align="right" />
-            <Help align="right" />
-            <ThemeToggle />
+              <Notifications align="right" />
+              <Help align="right" />
+              <ThemeToggle />
+              <UserMenu align="right" />
             </div>
           </div>
         </div>
       </div>
-      {/* Sidebar Mobile (User info + 4 menu) */}
+      
+      {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="lg:hidden">
           <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-700/60 bg-white dark:bg-gray-800">
-            <div className="mb-8 flex flex-col items-center">
+            <div className="mb-6 flex flex-col items-center">
               <img className="w-14 h-14 rounded-full mb-2" src={UserAvatar} alt="User" />
               <div className="font-medium text-gray-800 dark:text-gray-100 text-lg">{profile ? profile.nama_lengkap : '...'}</div>
-              <div className="text-xs text-gray-500 dark:text-gray-400 italic mb-2">{profile ? profile.role : ''}</div>
-              <button
-                className="w-full text-left font-medium text-sm text-violet-500 hover:text-violet-600 dark:hover:text-violet-400 flex items-center py-1.5 px-3"
-                onClick={() => { setMobileMenuOpen(false); navigate('/settings'); }}
-              >
-                {/* Icon Settings */}
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M11.25 2.25c.38-1.13 2.12-1.13 2.5 0a1.5 1.5 0 0 0 2.12.88c1.06-.61 2.31.64 1.7 1.7a1.5 1.5 0 0 0 .88 2.12c1.13.38 1.13 2.12 0 2.5a1.5 1.5 0 0 0-.88 2.12c.61 1.06-.64 2.31-1.7 1.7a1.5 1.5 0 0 0-2.12.88c-.38 1.13-2.12 1.13-2.5 0a1.5 1.5 0 0 0-2.12-.88c-1.06.61-2.31-.64-1.7-1.7a1.5 1.5 0 0 0-.88-2.12c-1.13-.38-1.13-2.12 0-2.5a1.5 1.5 0 0 0 .88-2.12c-.61-1.06.64-2.31 1.7-1.7a1.5 1.5 0 0 0 2.12-.88Z" /><circle cx="12" cy="12" r="3" /></svg>
-                Settings
-              </button>
-              <button
-                className="w-full text-left font-medium text-sm text-violet-500 hover:text-violet-600 dark:hover:text-violet-400 flex items-center py-1.5 px-3"
-                onClick={() => { setMobileMenuOpen(false); navigate('/profile'); }}
-              >
-                {/* Icon Profile */}
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M4 20c0-2.21 3.58-4 8-4s8 1.79 8 4" /></svg>
-                Profile
-              </button>
-              {/* Tombol Light/Dark Mode */}
-              <button
-                className="w-full text-left font-medium text-sm text-violet-500 hover:text-violet-600 dark:hover:text-violet-400 flex items-center py-1.5 px-3"
-                onClick={() => changeCurrentTheme(currentTheme === 'light' ? 'dark' : 'light')}
-              >
-                {currentTheme === 'light' ? (
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m8.66-13.66l-.71.71M4.05 19.95l-.71.71M21 12h-1M4 12H3m16.66 5.66l-.71-.71M4.05 4.05l-.71-.71M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" /></svg>
-                ) : (
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79Z" /></svg>
-                )}
-                Light/Dark Mode
-              </button>
+              <div className="text-xs text-gray-500 dark:text-gray-400 italic mb-4">{profile ? profile.role : ''}</div>
+              
+              {/* Menu Items */}
+              <div className="w-full space-y-2">
+                <button
+                  className="w-full text-left font-medium text-sm text-violet-500 hover:text-violet-600 dark:hover:text-violet-400 flex items-center py-2 px-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                  onClick={() => { setMobileMenuOpen(false); navigate('/settings'); }}
+                >
+                  <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 2.25c.38-1.13 2.12-1.13 2.5 0a1.5 1.5 0 0 0 2.12.88c1.06-.61 2.31.64 1.7 1.7a1.5 1.5 0 0 0 .88 2.12c1.13.38 1.13 2.12 0 2.5a1.5 1.5 0 0 0-.88 2.12c.61 1.06-.64 2.31-1.7 1.7a1.5 1.5 0 0 0-2.12.88c-.38 1.13-2.12 1.13-2.5 0a1.5 1.5 0 0 0-2.12-.88c-1.06.61-2.31-.64-1.7-1.7a1.5 1.5 0 0 0-.88-2.12c-1.13-.38-1.13-2.12 0-2.5a1.5 1.5 0 0 0 .88-2.12c-.61-1.06.64-2.31 1.7-1.7a1.5 1.5 0 0 0 2.12-.88Z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                  Settings
+                </button>
+                <button
+                  className="w-full text-left font-medium text-sm text-violet-500 hover:text-violet-600 dark:hover:text-violet-400 flex items-center py-2 px-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                  onClick={() => { setMobileMenuOpen(false); navigate('/profile'); }}
+                >
+                  <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <circle cx="12" cy="8" r="4" />
+                    <path d="M4 20c0-2.21 3.58-4 8-4s8 1.79 8 4" />
+                  </svg>
+                  Profile
+                </button>
+                <button
+                  className="w-full text-left font-medium text-sm text-violet-500 hover:text-violet-600 dark:hover:text-violet-400 flex items-center py-2 px-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                  onClick={() => changeCurrentTheme(currentTheme === 'light' ? 'dark' : 'light')}
+                >
+                  {currentTheme === 'light' ? (
+                    <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m8.66-13.66l-.71.71M4.05 19.95l-.71.71M21 12h-1M4 12H3m16.66 5.66l-.71-.71M4.05 4.05l-.71-.71M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79Z" />
+                    </svg>
+                  )}
+                  {currentTheme === 'light' ? 'Dark Mode' : 'Light Mode'}
+                </button>
+              </div>
             </div>
-            {/* Divider tepat di atas tombol Logout */}
-            <div className="mt-auto w-full">
-              <hr className="mb-2 border-t border-gray-200 dark:border-gray-700 w-full" />
+            
+            {/* Divider */}
+            <div className="w-full">
+              <hr className="mb-4 border-t border-gray-200 dark:border-gray-700 w-full" />
               <button
-                className="w-full text-left font-medium text-sm text-red-500 hover:text-red-600 dark:hover:text-red-400 flex items-center py-3 px-3 bg-white dark:bg-gray-800"
+                className="w-full text-left font-medium text-sm text-red-500 hover:text-red-600 dark:hover:text-red-400 flex items-center py-3 px-3 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                 onClick={handleLogout}
               >
+                <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+                </svg>
                 Logout
               </button>
             </div>

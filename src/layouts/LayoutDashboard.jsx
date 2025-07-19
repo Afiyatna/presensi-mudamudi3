@@ -25,10 +25,9 @@ function LayoutDashboard({ children, pageTitle }) {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Sidebar - Desktop Only */}
-      <div className="hidden lg:block">
-        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-      </div>
+      {/* Sidebar - Desktop & Mobile */}
+      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+      
       {/* Content Area */}
       <div className="relative flex flex-col flex-1 min-h-screen overflow-y-auto overflow-x-hidden">
         <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} pageTitle={pageTitle} />
