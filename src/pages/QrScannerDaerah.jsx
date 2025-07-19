@@ -179,6 +179,17 @@ export default function QrScannerDaerah() {
         <div className="flex items-center gap-4 mb-6">
           <button onClick={() => navigate('/qr-scanner')} className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-gray-700 font-semibold transition-all">← Kembali</button>
         </div>
+        
+        {/* Deskripsi halaman */}
+        <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <h1 className="text-xl font-bold text-blue-800 mb-2">QR Scanner Presensi Daerah</h1>
+          <p className="text-blue-700 text-sm">
+            Halaman ini memungkinkan admin untuk memindai QR Code peserta untuk mencatat presensi kegiatan pengajian daerah. 
+            Sistem akan otomatis menentukan status kehadiran berdasarkan waktu presensi dan batas waktu yang ditentukan. 
+            Pastikan kamera berfungsi dengan baik dan peserta menampilkan QR Code dengan jelas.
+          </p>
+        </div>
+        
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* QR Scanner Section */}
           <div className="bg-white shadow-xs rounded-xl p-6">
