@@ -29,7 +29,10 @@ export default function ResetPassword() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
       <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">Atur Password Baru</h2>
+        <h2 className="text-2xl font-bold mb-2 text-center">Atur Password Baru</h2>
+        <p className="text-gray-600 mb-6 text-center text-sm">
+          Masukkan password baru untuk akun Anda. Password harus kuat dan mudah diingat.
+        </p>
         {error && <div className="mb-4 text-red-500 text-center">{error}</div>}
         {message && <div className="mb-4 text-green-600 text-center">{message}</div>}
         {loading && <DataLoadingSpinner message="Menyimpan password..." />}
