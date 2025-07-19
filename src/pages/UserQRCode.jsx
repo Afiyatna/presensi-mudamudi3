@@ -73,7 +73,12 @@ export default function UserQRCode() {
   return (
     <LayoutDashboard pageTitle="QR Code">
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
-        <h2 className="text-2xl font-bold mb-4">QR Code Presensi Anda</h2>
+        <h2 className="text-2xl font-bold mb-2">QR Code Presensi Anda</h2>
+        <p className="text-gray-600 mb-6 text-center max-w-md">
+          QR Code ini adalah identitas digital Anda untuk melakukan presensi. 
+          Tunjukkan QR Code ini kepada admin saat kegiatan pengajian untuk mencatat kehadiran Anda. 
+          Anda dapat mengunduh QR Code dalam format JPG atau PDF untuk digunakan offline.
+        </p>
         <div ref={qrRef}>
           <QRCodeCanvas value={userId} size={256} />
         </div>
@@ -81,7 +86,11 @@ export default function UserQRCode() {
           <button onClick={handleDownloadJPG} className="bg-violet-600 text-white px-4 py-2 rounded hover:bg-violet-700">Download JPG</button>
           <button onClick={handleExportPDF} className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Export PDF</button>
         </div>
-        <p className="mt-4 text-gray-600">Tunjukkan QR ini ke admin untuk presensi.</p>
+        <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+          <p className="text-sm text-blue-700 text-center">
+            <strong>Petunjuk:</strong> Tunjukkan QR Code ini ke admin untuk melakukan presensi
+          </p>
+        </div>
       </div>
     </LayoutDashboard>
   );
