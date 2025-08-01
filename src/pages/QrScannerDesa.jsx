@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
 import LayoutDashboard from '../layouts/LayoutDashboard';
 import DataLoadingSpinner from '../components/DataLoadingSpinner';
+import ScanSuccessModal from '../components/ScanSuccessModal';
 
 const beepUrl = '/beep.mp3';
 
@@ -35,7 +36,7 @@ export default function QrScannerDesa() {
   const [lastScannedId, setLastScannedId] = useState('');
   const [lastScanTime, setLastScanTime] = useState(0);
   const [scannerError, setScannerError] = useState('');
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successStatus, setSuccessStatus] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const qrId = 'qr-reader-desa';
@@ -130,13 +131,14 @@ export default function QrScannerDesa() {
             };
             setScanHistory((prev) => [scanData, ...prev.slice(0, 9)]);
             if (beepAudio.current) beepAudio.current.play();
+            
+            // Stop scanning immediately when QR is detected
+            setScanning(false);
+            
             const status = await handleScanPresensi(decodedText);
             setSuccessStatus(status);
-            setSuccessMessage(`Presensi telah berhasil: ${status}`);
-            setShowSuccess(true);
-            setTimeout(() => {
-              setShowSuccess(false);
-            }, 2000);
+            setSuccessMessage(`Presensi telah berhasil disimpan dengan status: ${status === 'hadir' ? 'Hadir' : 'Terlambat'}`);
+            setShowSuccessModal(true);
           } catch (e) {
             console.error('Scan callback error:', e);
           }
@@ -159,14 +161,20 @@ export default function QrScannerDesa() {
     if (qrRef.current) qrRef.current.innerHTML = '';
   };
 
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false);
+    setSuccessStatus('');
+    setSuccessMessage('');
+  };
+
   useEffect(() => {
-    if (scanning && !showSuccess) {
+    if (scanning && !showSuccessModal) {
       startScanner();
-    } else if (!scanning && !showSuccess) {
+    } else if (!scanning && !showSuccessModal) {
       stopScanner();
     }
     // eslint-disable-next-line
-  }, [scanning, cameraFacing, showSuccess]);
+  }, [scanning, cameraFacing, showSuccessModal]);
 
   const clearHistory = () => {
     setScanHistory([]);
@@ -175,6 +183,15 @@ export default function QrScannerDesa() {
   return (
     <LayoutDashboard pageTitle="QR Scanner Presensi Desa">
       <Toaster position="top-right" />
+      
+      {/* Scan Success Modal */}
+      <ScanSuccessModal
+        isVisible={showSuccessModal}
+        status={successStatus}
+        message={successMessage}
+        onClose={handleCloseSuccessModal}
+      />
+      
       <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto animate-fade-in">
         <div className="flex items-center gap-4 mb-6">
           <button onClick={() => navigate('/qr-scanner')} className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-gray-700 font-semibold transition-all">← Kembali</button>
@@ -194,7 +211,7 @@ export default function QrScannerDesa() {
           {/* QR Scanner Section */}
           <div className="bg-white shadow-xs rounded-xl p-6">
             <div className="mb-6">
-              <h2 className="text-lg font-semibold text-green-700 mb-2">
+              <h2 className="text-lg font-semibold text-blue-700 mb-2">
                 Scanner QR Code
               </h2>
               <p className="text-sm text-gray-600">
@@ -217,7 +234,7 @@ export default function QrScannerDesa() {
                   await supabase.from('settings').upsert({ key: 'jam_tepat_waktu', value: jamTepatWaktu });
                   toast.success('Jam tepat waktu berhasil diupdate!');
                 }}
-                className="ml-2 px-3 py-1 bg-green-600 text-white rounded text-sm"
+                className="ml-2 px-3 py-1 bg-blue-600 text-white rounded text-sm"
               >
                 Simpan
               </button>
@@ -225,14 +242,14 @@ export default function QrScannerDesa() {
             {/* QR Scanner Controls */}
             <div className="flex gap-2 justify-center mb-4">
               <button
-                className={`btn ${cameraFacing === 'environment' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}
+                className={`btn ${cameraFacing === 'environment' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
                 onClick={() => setCameraFacing('environment')}
                 type="button"
               >
                 Kamera Belakang
               </button>
               <button
-                className={`btn ${cameraFacing === 'user' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}
+                className={`btn ${cameraFacing === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
                 onClick={() => setCameraFacing('user')}
                 type="button"
               >
@@ -240,21 +257,12 @@ export default function QrScannerDesa() {
               </button>
             </div>
             <div className="flex justify-center mb-6">
-              {!showSuccess && (
-                <div
-                  ref={qrRef}
-                  id={qrId}
-                  className="w-full max-w-md rounded-xl border-2 border-green-200 shadow-lg flex items-center justify-center min-h-[300px] bg-white"
-                  style={{ minHeight: '300px' }}
-                />
-              )}
-              {showSuccess && (
-                <div className="w-full max-w-md rounded-xl border-2 border-green-200 shadow-lg flex flex-col items-center justify-center min-h-[300px] bg-white animate-fade-in">
-                  <div className={`text-5xl mb-2 ${successStatus === 'hadir' ? 'text-green-500' : 'text-red-500'} animate-bounce`}>{successStatus === 'hadir' ? '✅' : '⏰'}</div>
-                  <div className={`text-xl font-bold ${successStatus === 'hadir' ? 'text-green-600' : 'text-red-600'} mb-1`}>{successMessage}</div>
-                  <div className="text-gray-500 animate-pulse">Menyiapkan scanner berikutnya...</div>
-                </div>
-              )}
+              <div
+                ref={qrRef}
+                id={qrId}
+                className="w-full max-w-md rounded-xl border-2 border-blue-200 shadow-lg flex items-center justify-center min-h-[300px] bg-white"
+                style={{ minHeight: '300px' }}
+              />
             </div>
             {/* Scanner Controls */}
             <div className="flex gap-3 justify-center">
@@ -271,7 +279,7 @@ export default function QrScannerDesa() {
                   </button>
                   <button
                     onClick={startScanner}
-                    className="btn bg-green-200 hover:bg-green-300 text-green-700"
+                    className="btn bg-blue-200 hover:bg-blue-300 text-blue-700"
                   >
                     Restart Scanner
                   </button>
@@ -279,7 +287,7 @@ export default function QrScannerDesa() {
               ) : (
                 <button
                   onClick={() => setScanning(true)}
-                  className="btn bg-green-600 hover:bg-green-700 text-white"
+                  className="btn bg-blue-600 hover:bg-blue-700 text-white"
                 >
                   <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -297,17 +305,17 @@ export default function QrScannerDesa() {
             {/* Loading Spinner */}
             {presensiLoading && (
               <div className="flex justify-center items-center mt-4">
-                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-500"></div>
-                <span className="ml-2 text-green-600">Menyimpan presensi...</span>
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+                <span className="ml-2 text-blue-600">Menyimpan presensi...</span>
               </div>
             )}
             {/* Last Scan Result */}
             {scanResult && (
-              <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <h3 className="text-sm font-medium text-green-800 mb-2">
+              <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <h3 className="text-sm font-medium text-blue-800 mb-2">
                   Hasil Scan Terakhir:
                 </h3>
-                <p className="text-sm text-green-700 break-all">
+                <p className="text-sm text-blue-700 break-all">
                   {scanResult}
                 </p>
               </div>
@@ -316,7 +324,7 @@ export default function QrScannerDesa() {
           {/* Scan History Section */}
           <div className="bg-white shadow-xs rounded-xl p-6">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-semibold text-green-700">
+              <h2 className="text-lg font-semibold text-blue-700">
                 Riwayat Scan
               </h2>
               <button
@@ -350,7 +358,7 @@ export default function QrScannerDesa() {
                         </p>
                       </div>
                       <div className="ml-2 flex-shrink-0">
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                           Berhasil
                         </span>
                       </div>
@@ -362,25 +370,25 @@ export default function QrScannerDesa() {
           </div>
         </div>
         {/* Instructions */}
-        <div className="mt-8 bg-green-50 border border-green-200 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-green-800 mb-3">
+        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-blue-800 mb-3">
             Cara Menggunakan QR Scanner
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-green-700">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-blue-700">
             <div className="flex items-start">
-              <span className="flex-shrink-0 w-6 h-6 bg-green-200 rounded-full flex items-center justify-center text-green-800 font-medium mr-3 mt-0.5">
+              <span className="flex-shrink-0 w-6 h-6 bg-blue-200 rounded-full flex items-center justify-center text-blue-800 font-medium mr-3 mt-0.5">
                 1
               </span>
               <p>Pastikan QR Code terlihat jelas dan tidak terhalang</p>
             </div>
             <div className="flex items-start">
-              <span className="flex-shrink-0 w-6 h-6 bg-green-200 rounded-full flex items-center justify-center text-green-800 font-medium mr-3 mt-0.5">
+              <span className="flex-shrink-0 w-6 h-6 bg-blue-200 rounded-full flex items-center justify-center text-blue-800 font-medium mr-3 mt-0.5">
                 2
               </span>
               <p>Arahkan kamera ke QR Code dan tunggu hingga terdeteksi</p>
             </div>
             <div className="flex items-start">
-              <span className="flex-shrink-0 w-6 h-6 bg-green-200 rounded-full flex items-center justify-center text-green-800 font-medium mr-3 mt-0.5">
+              <span className="flex-shrink-0 w-6 h-6 bg-blue-200 rounded-full flex items-center justify-center text-blue-800 font-medium mr-3 mt-0.5">
                 3
               </span>
               <p>Sistem akan otomatis memproses presensi setelah QR Code terdeteksi</p>

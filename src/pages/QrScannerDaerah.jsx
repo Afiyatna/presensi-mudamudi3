@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
 import LayoutDashboard from '../layouts/LayoutDashboard';
 import DataLoadingSpinner from '../components/DataLoadingSpinner';
+import ScanSuccessModal from '../components/ScanSuccessModal';
 
 const beepUrl = '/beep.mp3'; // letakkan beep.mp3 di public folder project Anda
 
@@ -35,7 +36,7 @@ export default function QrScannerDaerah() {
   const [lastScannedId, setLastScannedId] = useState('');
   const [lastScanTime, setLastScanTime] = useState(0);
   const [scannerError, setScannerError] = useState('');
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successStatus, setSuccessStatus] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const qrId = 'qr-reader-daerah';
@@ -130,13 +131,14 @@ export default function QrScannerDaerah() {
             };
             setScanHistory((prev) => [scanData, ...prev.slice(0, 9)]);
             if (beepAudio.current) beepAudio.current.play();
+            
+            // Stop scanning immediately when QR is detected
+            setScanning(false);
+            
             const status = await handleScanPresensi(decodedText);
             setSuccessStatus(status);
-            setSuccessMessage(`Presensi telah berhasil: ${status}`);
-            setShowSuccess(true);
-            setTimeout(() => {
-              setShowSuccess(false);
-            }, 2000);
+            setSuccessMessage(`Presensi telah berhasil disimpan dengan status: ${status === 'hadir' ? 'Hadir' : 'Terlambat'}`);
+            setShowSuccessModal(true);
           } catch (e) {
             console.error('Scan callback error:', e);
           }
@@ -159,14 +161,20 @@ export default function QrScannerDaerah() {
     if (qrRef.current) qrRef.current.innerHTML = '';
   };
 
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false);
+    setSuccessStatus('');
+    setSuccessMessage('');
+  };
+
   useEffect(() => {
-    if (scanning && !showSuccess) {
+    if (scanning && !showSuccessModal) {
       startScanner();
-    } else if (!scanning && !showSuccess) {
+    } else if (!scanning && !showSuccessModal) {
       stopScanner();
     }
     // eslint-disable-next-line
-  }, [scanning, cameraFacing, showSuccess]);
+  }, [scanning, cameraFacing, showSuccessModal]);
 
   const clearHistory = () => {
     setScanHistory([]);
@@ -175,6 +183,15 @@ export default function QrScannerDaerah() {
   return (
     <LayoutDashboard pageTitle="QR Scanner Presensi Daerah">
       <Toaster position="top-right" />
+      
+      {/* Scan Success Modal */}
+      <ScanSuccessModal
+        isVisible={showSuccessModal}
+        status={successStatus}
+        message={successMessage}
+        onClose={handleCloseSuccessModal}
+      />
+      
       <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto animate-fade-in">
         <div className="flex items-center gap-4 mb-6">
           <button onClick={() => navigate('/qr-scanner')} className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-gray-700 font-semibold transition-all">← Kembali</button>
@@ -240,21 +257,12 @@ export default function QrScannerDaerah() {
               </button>
             </div>
             <div className="flex justify-center mb-6">
-              {!showSuccess && (
-                <div
-                  ref={qrRef}
-                  id={qrId}
-                  className="w-full max-w-md rounded-xl border-2 border-blue-200 shadow-lg flex items-center justify-center min-h-[300px] bg-white"
-                  style={{ minHeight: '300px' }}
-                />
-              )}
-              {showSuccess && (
-                <div className="w-full max-w-md rounded-xl border-2 border-blue-200 shadow-lg flex flex-col items-center justify-center min-h-[300px] bg-white animate-fade-in">
-                  <div className={`text-5xl mb-2 ${successStatus === 'hadir' ? 'text-green-500' : 'text-red-500'} animate-bounce`}>{successStatus === 'hadir' ? '✅' : '⏰'}</div>
-                  <div className={`text-xl font-bold ${successStatus === 'hadir' ? 'text-green-600' : 'text-red-600'} mb-1`}>{successMessage}</div>
-                  <div className="text-gray-500 animate-pulse">Menyiapkan scanner berikutnya...</div>
-                </div>
-              )}
+              <div
+                ref={qrRef}
+                id={qrId}
+                className="w-full max-w-md rounded-xl border-2 border-blue-200 shadow-lg flex items-center justify-center min-h-[300px] bg-white"
+                style={{ minHeight: '300px' }}
+              />
             </div>
             {/* Scanner Controls */}
             <div className="flex gap-3 justify-center">
