@@ -59,66 +59,97 @@ export default function QrScannerDaerah() {
 
   const handleScanPresensi = async (userId) => {
     setPresensiLoading(true);
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('nama_lengkap, kelompok, desa, jenis_kelamin')
-      .eq('id', userId)
-      .single();
-    if (!profile) {
-      toast.error('Data user tidak ditemukan!');
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('nama_lengkap, kelompok, desa, jenis_kelamin')
+        .eq('id', userId)
+        .single();
+      
+      if (!profile) {
+        toast.error('Data user tidak ditemukan!');
+        setPresensiLoading(false);
+        return '';
+      }
+      
+      const now = new Date();
+      const pad = n => n.toString().padStart(2, '0');
+      const waktuPresensi = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}+07:00`;
+      const [batasJam, batasMenit] = jamTepatWaktu.split(':').map(Number);
+      const status = (now.getHours() < batasJam || (now.getHours() === batasJam && now.getMinutes() <= batasMenit))
+        ? 'hadir'
+        : 'terlambat';
+      
+      const { error: presensiError } = await supabase.from('presensi_daerah').insert([{
+        nama_lengkap: profile.nama_lengkap,
+        kelompok: profile.kelompok,
+        desa: profile.desa,
+        jenis_kelamin: profile.jenis_kelamin,
+        status: status,
+        waktu_presensi: waktuPresensi,
+      }]);
+      
+      if (presensiError) {
+        console.error('Presensi error:', presensiError);
+        toast.error('Gagal menyimpan presensi daerah!');
+        setPresensiLoading(false);
+        return '';
+      } else {
+        toast.success(`Presensi daerah berhasil! Status: ${status}`);
+        setPresensiLoading(false);
+        return status;
+      }
+    } catch (error) {
+      console.error('Error in handleScanPresensi:', error);
+      toast.error('Terjadi kesalahan saat memproses presensi!');
       setPresensiLoading(false);
       return '';
     }
-    const now = new Date();
-    const pad = n => n.toString().padStart(2, '0');
-    const waktuPresensi = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}+07:00`;
-    const [batasJam, batasMenit] = jamTepatWaktu.split(':').map(Number);
-    const status = (now.getHours() < batasJam || (now.getHours() === batasJam && now.getMinutes() <= batasMenit))
-      ? 'hadir'
-      : 'terlambat';
-    const { error: presensiError } = await supabase.from('presensi_daerah').insert([{
-      nama_lengkap: profile.nama_lengkap,
-      kelompok: profile.kelompok,
-      desa: profile.desa,
-      jenis_kelamin: profile.jenis_kelamin,
-      status: status,
-      waktu_presensi: waktuPresensi,
-    }]);
-    setPresensiLoading(false);
-    if (presensiError) {
-      toast.error('Gagal menyimpan presensi daerah!');
-    } else {
-      toast.success(`Presensi daerah berhasil! Status: ${status}`);
-    }
-    return status;
   };
 
   const startScanner = async () => {
     setScanResult('');
     setScannerError('');
+    setPresensiLoading(false); // Reset loading state
+    
     if (html5QrInstance.current) {
-      try { await html5QrInstance.current.stop(); } catch (e) {}
-      try { await html5QrInstance.current.clear(); } catch (e) {}
+      try { 
+        await html5QrInstance.current.stop(); 
+      } catch (e) {
+        console.log('Error stopping previous scanner:', e);
+      }
+      try { 
+        await html5QrInstance.current.clear(); 
+      } catch (e) {
+        console.log('Error clearing previous scanner:', e);
+      }
     }
+    
     if (qrRef.current) qrRef.current.innerHTML = '';
+    
     const qr = new Html5Qrcode(qrId);
     html5QrInstance.current = qr;
+    
     try {
       await qr.start(
         { facingMode: cameraFacing },
         { fps: 10, qrbox: 250, rememberLastUsedCamera: true },
         async (decodedText) => {
           try {
+            console.log('QR Code detected:', decodedText);
+            
             const now = Date.now();
             const lastScanTimes = getLastScanTimesDaerah();
             if (lastScanTimes[decodedText] && now - lastScanTimes[decodedText] < 3600_000) {
               toast('QR sudah di-scan, tunggu 1 jam sebelum scan lagi.', { icon: '⏳' });
               return false;
             }
+            
             setLastScanTimeDaerah(decodedText, now);
             setLastScannedId(decodedText);
             setLastScanTime(now);
             setScanResult(decodedText);
+            
             const scanData = {
               id: Date.now(),
               text: decodedText,
@@ -126,23 +157,35 @@ export default function QrScannerDaerah() {
               type: 'success',
             };
             setScanHistory((prev) => [scanData, ...prev.slice(0, 9)]);
-            if (beepAudio.current) beepAudio.current.play();
+            
+            if (beepAudio.current) {
+              try {
+                beepAudio.current.play();
+              } catch (e) {
+                console.log('Error playing beep:', e);
+              }
+            }
             
             // Stop scanning immediately when QR is detected
             setScanning(false);
             
             const status = await handleScanPresensi(decodedText);
-            // Notifikasi akan muncul di layar user melalui real-time subscription
-            toast.success(`QR Code berhasil di-scan! Status: ${status === 'hadir' ? 'Hadir' : 'Terlambat'}`);
+            if (status) {
+              toast.success(`QR Code berhasil di-scan! Status: ${status === 'hadir' ? 'Hadir' : 'Terlambat'}`);
+            }
           } catch (e) {
             console.error('Scan callback error:', e);
+            toast.error('Terjadi kesalahan saat memproses scan!');
+            setPresensiLoading(false);
           }
         },
         (error) => {
+          console.error('Scanner error:', error);
           setScannerError('Gagal mengakses kamera atau scanner error. Coba restart scanner.');
         }
       );
     } catch (e) {
+      console.error('Scanner start error:', e);
       setScannerError('Gagal mengakses kamera. Pastikan izin kamera sudah diberikan.');
     }
   };

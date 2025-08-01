@@ -6,6 +6,7 @@ import jsPDF from 'jspdf';
 import DataLoadingSpinner from '../components/DataLoadingSpinner';
 import ScanSuccessModal from '../components/ScanSuccessModal';
 import RealtimeStatus from '../components/RealtimeStatus';
+import RealtimeTest from '../components/RealtimeTest';
 
 export default function UserQRCode() {
   const [userId, setUserId] = useState('');
@@ -36,7 +37,12 @@ export default function UserQRCode() {
 
   // Real-time subscription untuk presensi daerah
   useEffect(() => {
-    if (!userId || !namaLengkap) return;
+    if (!userId || !namaLengkap) {
+      console.log('UserQRCode: Waiting for userId and namaLengkap', { userId, namaLengkap });
+      return;
+    }
+
+    console.log('UserQRCode: Setting up real-time subscriptions for', namaLengkap);
 
     const presensiDaerahSubscription = supabase
       .channel('presensi_daerah_changes')
@@ -48,14 +54,21 @@ export default function UserQRCode() {
           table: 'presensi_daerah'
         },
         (payload) => {
-          console.log('Presensi daerah baru:', payload.new);
+          console.log('UserQRCode: Received presensi daerah event:', payload.new);
+          console.log('UserQRCode: Comparing', payload.new.nama_lengkap, 'with', namaLengkap);
+          
           // Filter berdasarkan nama_lengkap
           if (payload.new.nama_lengkap === namaLengkap) {
+            console.log('UserQRCode: Match found! Showing notification for daerah');
             showPresensiSuccess(payload.new.status, 'daerah');
+          } else {
+            console.log('UserQRCode: No match for daerah notification');
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('UserQRCode: Daerah subscription status:', status);
+      });
 
     // Real-time subscription untuk presensi desa
     const presensiDesaSubscription = supabase
@@ -68,22 +81,31 @@ export default function UserQRCode() {
           table: 'presensi_desa'
         },
         (payload) => {
-          console.log('Presensi desa baru:', payload.new);
+          console.log('UserQRCode: Received presensi desa event:', payload.new);
+          console.log('UserQRCode: Comparing', payload.new.nama_lengkap, 'with', namaLengkap);
+          
           // Filter berdasarkan nama_lengkap
           if (payload.new.nama_lengkap === namaLengkap) {
+            console.log('UserQRCode: Match found! Showing notification for desa');
             showPresensiSuccess(payload.new.status, 'desa');
+          } else {
+            console.log('UserQRCode: No match for desa notification');
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('UserQRCode: Desa subscription status:', status);
+      });
 
     return () => {
+      console.log('UserQRCode: Cleaning up subscriptions');
       presensiDaerahSubscription.unsubscribe();
       presensiDesaSubscription.unsubscribe();
     };
   }, [userId, namaLengkap]);
 
   const showPresensiSuccess = (status, jenis) => {
+    console.log('UserQRCode: showPresensiSuccess called with', { status, jenis });
     setSuccessStatus(status);
     setSuccessMessage(`Presensi ${jenis} Anda telah berhasil dicatat dengan status: ${status === 'hadir' ? 'Hadir' : 'Terlambat'}`);
     setShowSuccessModal(true);
@@ -137,6 +159,9 @@ export default function UserQRCode() {
       {/* Realtime Status Indicator */}
       <RealtimeStatus />
       
+      {/* Realtime Test Component (for debugging) */}
+      <RealtimeTest namaLengkap={namaLengkap} />
+      
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
         <h2 className="text-2xl font-bold mb-2">QR Code Presensi Anda</h2>
         <p className="text-gray-600 mb-6 text-center max-w-md">
@@ -159,6 +184,11 @@ export default function UserQRCode() {
         <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
           <p className="text-sm text-green-700 text-center">
             <strong>Notifikasi Aktif:</strong> Anda akan menerima notifikasi langsung ketika QR Code di-scan
+          </p>
+        </div>
+        <div className="mt-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+          <p className="text-sm text-yellow-700 text-center">
+            <strong>Debug Info:</strong> Nama: {namaLengkap} | User ID: {userId}
           </p>
         </div>
       </div>

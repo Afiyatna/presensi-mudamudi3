@@ -239,7 +239,7 @@ function Dashboard() {
             </p>
           </>
         )}
-        {/* Filter Panel (mirip gambar) */}
+            {/* Filter Panel (mirip gambar) */}
             {role === 'user' && (
               <>
                 {/* Mobile: horizontal, tombol kanan ikon + */}
@@ -291,7 +291,7 @@ function Dashboard() {
                     <li><strong>Status:</strong> Filter berdasarkan status Hadir atau Terlambat</li>
                     <li><strong>Rentang Tanggal:</strong> Pilih periode waktu tertentu untuk melihat data</li>
                   </ul>
-                </div>
+        </div>
               </>
             )}
         {/* Cards */}
