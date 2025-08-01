@@ -10,20 +10,6 @@ import DataLoadingSpinner from '../components/DataLoadingSpinner';
 
 const beepUrl = '/beep.mp3';
 
-// Fungsi util localStorage untuk anti double scan 1 jam (letakkan di luar komponen)
-const getLastScanTimesDesa = () => {
-  try {
-    return JSON.parse(localStorage.getItem('lastScanTimesDesa') || '{}');
-  } catch {
-    return {};
-  }
-};
-const setLastScanTimeDesa = (userId, timestamp) => {
-  const data = getLastScanTimesDesa();
-  data[userId] = timestamp;
-  localStorage.setItem('lastScanTimesDesa', JSON.stringify(data));
-};
-
 export default function QrScannerDesa() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [scanResult, setScanResult] = useState('');
@@ -35,6 +21,9 @@ export default function QrScannerDesa() {
   const [lastScannedId, setLastScannedId] = useState('');
   const [lastScanTime, setLastScanTime] = useState(0);
   const [scannerError, setScannerError] = useState('');
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [successStatus, setSuccessStatus] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const qrId = 'qr-reader-desa';
   const qrRef = useRef();
   const html5QrInstance = useRef(null);
@@ -59,97 +48,59 @@ export default function QrScannerDesa() {
 
   const handleScanPresensi = async (userId) => {
     setPresensiLoading(true);
-    try {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('nama_lengkap, kelompok, desa, jenis_kelamin')
-        .eq('id', userId)
-        .single();
-      
-      if (!profile) {
-        toast.error('Data user tidak ditemukan!');
-        setPresensiLoading(false);
-        return '';
-      }
-      
-      const now = new Date();
-      const pad = n => n.toString().padStart(2, '0');
-      const waktuPresensi = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}+07:00`;
-      const [batasJam, batasMenit] = jamTepatWaktu.split(':').map(Number);
-      const status = (now.getHours() < batasJam || (now.getHours() === batasJam && now.getMinutes() <= batasMenit))
-        ? 'hadir'
-        : 'terlambat';
-      
-      const { error: presensiError } = await supabase.from('presensi_desa').insert([{
-        nama_lengkap: profile.nama_lengkap,
-        kelompok: profile.kelompok,
-        desa: profile.desa,
-        jenis_kelamin: profile.jenis_kelamin,
-        status: status,
-        waktu_presensi: waktuPresensi,
-      }]);
-      
-      if (presensiError) {
-        console.error('Presensi error:', presensiError);
-        toast.error('Gagal menyimpan presensi desa!');
-        setPresensiLoading(false);
-        return '';
-      } else {
-        toast.success(`Presensi desa berhasil! Status: ${status}`);
-        setPresensiLoading(false);
-        return status;
-      }
-    } catch (error) {
-      console.error('Error in handleScanPresensi:', error);
-      toast.error('Terjadi kesalahan saat memproses presensi!');
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('nama_lengkap, kelompok, desa, jenis_kelamin')
+      .eq('id', userId)
+      .single();
+    if (!profile) {
+      toast.error('Data user tidak ditemukan!');
       setPresensiLoading(false);
       return '';
     }
+    const now = new Date();
+    const pad = n => n.toString().padStart(2, '0');
+    const waktuPresensi = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}+07:00`;
+    const [batasJam, batasMenit] = jamTepatWaktu.split(':').map(Number);
+    const status = (now.getHours() < batasJam || (now.getHours() === batasJam && now.getMinutes() <= batasMenit))
+      ? 'hadir'
+      : 'terlambat';
+    const { error: presensiError } = await supabase.from('presensi_desa').insert([{
+      nama_lengkap: profile.nama_lengkap,
+      kelompok: profile.kelompok,
+      desa: profile.desa,
+      jenis_kelamin: profile.jenis_kelamin,
+      status: status,
+      waktu_presensi: waktuPresensi,
+    }]);
+    setPresensiLoading(false);
+    if (presensiError) {
+      toast.error('Gagal menyimpan presensi desa!');
+    } else {
+      toast.success(`Presensi berhasil! ${profile.nama_lengkap} - Status: ${status}`);
+    }
+    return status;
   };
 
   const startScanner = async () => {
     setScanResult('');
     setScannerError('');
-    setPresensiLoading(false); // Reset loading state
-    
     if (html5QrInstance.current) {
-      try { 
-        await html5QrInstance.current.stop(); 
-      } catch (e) {
-        console.log('Error stopping previous scanner:', e);
-      }
-      try { 
-        await html5QrInstance.current.clear(); 
-      } catch (e) {
-        console.log('Error clearing previous scanner:', e);
-      }
+      try { await html5QrInstance.current.stop(); } catch (e) {}
+      try { await html5QrInstance.current.clear(); } catch (e) {}
     }
-    
     if (qrRef.current) qrRef.current.innerHTML = '';
-    
     const qr = new Html5Qrcode(qrId);
     html5QrInstance.current = qr;
-    
     try {
       await qr.start(
         { facingMode: cameraFacing },
         { fps: 10, qrbox: 250, rememberLastUsedCamera: true },
         async (decodedText) => {
           try {
-            console.log('QR Code detected:', decodedText);
-            
-            const now = Date.now();
-            const lastScanTimes = getLastScanTimesDesa();
-            if (lastScanTimes[decodedText] && now - lastScanTimes[decodedText] < 3600_000) {
-              toast('QR sudah di-scan, tunggu 1 jam sebelum scan lagi.', { icon: '⏳' });
-              return false;
-            }
-            
-            setLastScanTimeDesa(decodedText, now);
             setLastScannedId(decodedText);
-            setLastScanTime(now);
+            setLastScanTime(Date.now());
             setScanResult(decodedText);
-            
             const scanData = {
               id: Date.now(),
               text: decodedText,
@@ -157,35 +108,30 @@ export default function QrScannerDesa() {
               type: 'success',
             };
             setScanHistory((prev) => [scanData, ...prev.slice(0, 9)]);
+            if (beepAudio.current) beepAudio.current.play();
             
-            if (beepAudio.current) {
-              try {
-                beepAudio.current.play();
-              } catch (e) {
-                console.log('Error playing beep:', e);
-              }
-            }
-            
-            // Stop scanning immediately when QR is detected
-            setScanning(false);
+            // Stop scanner immediately after successful scan
+            await stopScanner();
             
             const status = await handleScanPresensi(decodedText);
-            if (status) {
-              toast.success(`QR Code berhasil di-scan! Status: ${status === 'hadir' ? 'Hadir' : 'Terlambat'}`);
-            }
+            setSuccessStatus(status);
+            setSuccessMessage(`Presensi berhasil! Status: ${status}`);
+            setShowSuccess(true);
+            
+            // Auto restart scanner after 3 seconds
+            setTimeout(() => {
+              setShowSuccess(false);
+              setScanning(true);
+            }, 3000);
           } catch (e) {
             console.error('Scan callback error:', e);
-            toast.error('Terjadi kesalahan saat memproses scan!');
-            setPresensiLoading(false);
           }
         },
         (error) => {
-          console.error('Scanner error:', error);
           setScannerError('Gagal mengakses kamera atau scanner error. Coba restart scanner.');
         }
       );
     } catch (e) {
-      console.error('Scanner start error:', e);
       setScannerError('Gagal mengakses kamera. Pastikan izin kamera sudah diberikan.');
     }
   };
@@ -200,13 +146,13 @@ export default function QrScannerDesa() {
   };
 
   useEffect(() => {
-    if (scanning) {
+    if (scanning && !showSuccess) {
       startScanner();
-    } else {
+    } else if (!scanning && !showSuccess) {
       stopScanner();
     }
     // eslint-disable-next-line
-  }, [scanning, cameraFacing]);
+  }, [scanning, cameraFacing, showSuccess]);
 
   const clearHistory = () => {
     setScanHistory([]);
@@ -215,19 +161,18 @@ export default function QrScannerDesa() {
   return (
     <LayoutDashboard pageTitle="QR Scanner Presensi Desa">
       <Toaster position="top-right" />
-      
       <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto animate-fade-in">
         <div className="flex items-center gap-4 mb-6">
           <button onClick={() => navigate('/qr-scanner')} className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-gray-700 font-semibold transition-all">← Kembali</button>
         </div>
         
         {/* Deskripsi halaman */}
-        <div className="mb-6 p-4 bg-green-50 rounded-lg border border-green-200">
-          <h1 className="text-xl font-bold text-green-800 mb-2">QR Scanner Presensi Desa</h1>
-          <p className="text-green-700 text-sm text-justify">
+        <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <h1 className="text-xl font-bold text-blue-800 mb-2">QR Scanner Presensi Desa</h1>
+          <p className="text-blue-700 text-sm text-justify">
             Halaman ini memungkinkan admin untuk memindai QR Code peserta untuk mencatat presensi kegiatan pengajian desa. 
             Sistem akan otomatis menentukan status kehadiran berdasarkan waktu presensi dan batas waktu yang ditentukan. 
-            Pastikan kamera berfungsi dengan baik dan peserta menampilkan QR Code dengan jelas.
+            Kamera akan otomatis mati setelah scan berhasil untuk menghindari scan berulang.
           </p>
         </div>
         
@@ -281,12 +226,21 @@ export default function QrScannerDesa() {
               </button>
             </div>
             <div className="flex justify-center mb-6">
-              <div
-                ref={qrRef}
-                id={qrId}
-                className="w-full max-w-md rounded-xl border-2 border-blue-200 shadow-lg flex items-center justify-center min-h-[300px] bg-white"
-                style={{ minHeight: '300px' }}
-              />
+              {!showSuccess && (
+                <div
+                  ref={qrRef}
+                  id={qrId}
+                  className="w-full max-w-md rounded-xl border-2 border-blue-200 shadow-lg flex items-center justify-center min-h-[300px] bg-white"
+                  style={{ minHeight: '300px' }}
+                />
+              )}
+              {showSuccess && (
+                <div className="w-full max-w-md rounded-xl border-2 border-blue-200 shadow-lg flex flex-col items-center justify-center min-h-[300px] bg-white animate-fade-in">
+                  <div className={`text-5xl mb-2 ${successStatus === 'hadir' ? 'text-green-500' : 'text-red-500'} animate-bounce`}>{successStatus === 'hadir' ? '✅' : '⏰'}</div>
+                  <div className={`text-xl font-bold ${successStatus === 'hadir' ? 'text-green-600' : 'text-red-600'} mb-1`}>{successMessage}</div>
+                  <div className="text-gray-500 animate-pulse">Menyiapkan scanner berikutnya...</div>
+                </div>
+              )}
             </div>
             {/* Scanner Controls */}
             <div className="flex gap-3 justify-center">
@@ -415,7 +369,7 @@ export default function QrScannerDesa() {
               <span className="flex-shrink-0 w-6 h-6 bg-blue-200 rounded-full flex items-center justify-center text-blue-800 font-medium mr-3 mt-0.5">
                 3
               </span>
-              <p>Sistem akan otomatis memproses presensi setelah QR Code terdeteksi</p>
+              <p>Kamera akan otomatis mati setelah scan berhasil dan akan restart dalam 3 detik</p>
             </div>
           </div>
         </div>

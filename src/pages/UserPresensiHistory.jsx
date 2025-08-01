@@ -118,43 +118,43 @@ export default function UserPresensiHistory() {
               Gunakan filter di bawah untuk mencari data presensi Anda:
             </p>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Jenis Presensi</label>
-                <select value={filterJenis} onChange={e => setFilterJenis(e.target.value)} className="form-select w-full">
-                  <option value="">Semua</option>
-                  {jenisOptions.map(jenis => (
-                    <option key={jenis} value={jenis}>{jenis}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rentang Tanggal</label>
-                <DateRangePicker
-                  value={filterDateRange}
-                  onChange={setFilterDateRange}
-                  placeholder="Pilih rentang tanggal"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
-                <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="form-select w-full">
-                  <option value="">Semua</option>
-                  {statusOptions.map(status => (
-                    <option key={status} value={status}>{status.charAt(0).toUpperCase() + status.slice(1)}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex items-end">
-                <button 
-                  onClick={() => { 
-                    setFilterJenis(''); 
-                    setFilterDateRange({ from: '', to: '' }); 
-                    setFilterStatus(''); 
-                  }} 
-                  className="btn bg-gray-500 hover:bg-gray-600 text-white w-full"
-                >
-                  Reset Filter
-                </button>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Jenis Presensi</label>
+              <select value={filterJenis} onChange={e => setFilterJenis(e.target.value)} className="form-select w-full">
+                <option value="">Semua</option>
+                {jenisOptions.map(jenis => (
+                  <option key={jenis} value={jenis}>{jenis}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rentang Tanggal</label>
+              <DateRangePicker
+                value={filterDateRange}
+                onChange={setFilterDateRange}
+                placeholder="Pilih rentang tanggal"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
+              <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="form-select w-full">
+                <option value="">Semua</option>
+                {statusOptions.map(status => (
+                  <option key={status} value={status}>{status.charAt(0).toUpperCase() + status.slice(1)}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-end">
+              <button 
+                onClick={() => { 
+                  setFilterJenis(''); 
+                  setFilterDateRange({ from: '', to: '' }); 
+                  setFilterStatus(''); 
+                }} 
+                className="btn bg-gray-500 hover:bg-gray-600 text-white w-full"
+              >
+                Reset Filter
+              </button>
               </div>
             </div>
           </div>
