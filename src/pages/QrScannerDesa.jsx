@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
 import LayoutDashboard from '../layouts/LayoutDashboard';
 import DataLoadingSpinner from '../components/DataLoadingSpinner';
-import ScanSuccessModal from '../components/ScanSuccessModal';
 
 const beepUrl = '/beep.mp3';
 
@@ -36,9 +35,6 @@ export default function QrScannerDesa() {
   const [lastScannedId, setLastScannedId] = useState('');
   const [lastScanTime, setLastScanTime] = useState(0);
   const [scannerError, setScannerError] = useState('');
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [successStatus, setSuccessStatus] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
   const qrId = 'qr-reader-desa';
   const qrRef = useRef();
   const html5QrInstance = useRef(null);
@@ -136,9 +132,8 @@ export default function QrScannerDesa() {
             setScanning(false);
             
             const status = await handleScanPresensi(decodedText);
-            setSuccessStatus(status);
-            setSuccessMessage(`Presensi telah berhasil disimpan dengan status: ${status === 'hadir' ? 'Hadir' : 'Terlambat'}`);
-            setShowSuccessModal(true);
+            // Notifikasi akan muncul di layar user melalui real-time subscription
+            toast.success(`QR Code berhasil di-scan! Status: ${status === 'hadir' ? 'Hadir' : 'Terlambat'}`);
           } catch (e) {
             console.error('Scan callback error:', e);
           }
@@ -161,20 +156,14 @@ export default function QrScannerDesa() {
     if (qrRef.current) qrRef.current.innerHTML = '';
   };
 
-  const handleCloseSuccessModal = () => {
-    setShowSuccessModal(false);
-    setSuccessStatus('');
-    setSuccessMessage('');
-  };
-
   useEffect(() => {
-    if (scanning && !showSuccessModal) {
+    if (scanning) {
       startScanner();
-    } else if (!scanning && !showSuccessModal) {
+    } else {
       stopScanner();
     }
     // eslint-disable-next-line
-  }, [scanning, cameraFacing, showSuccessModal]);
+  }, [scanning, cameraFacing]);
 
   const clearHistory = () => {
     setScanHistory([]);
@@ -183,14 +172,6 @@ export default function QrScannerDesa() {
   return (
     <LayoutDashboard pageTitle="QR Scanner Presensi Desa">
       <Toaster position="top-right" />
-      
-      {/* Scan Success Modal */}
-      <ScanSuccessModal
-        isVisible={showSuccessModal}
-        status={successStatus}
-        message={successMessage}
-        onClose={handleCloseSuccessModal}
-      />
       
       <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto animate-fade-in">
         <div className="flex items-center gap-4 mb-6">
