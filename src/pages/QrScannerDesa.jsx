@@ -36,15 +36,88 @@ export default function QrScannerDesa() {
 
   useEffect(() => {
     const fetchJamTepatWaktu = async () => {
-      const { data } = await supabase
-        .from('settings')
-        .select('value')
-        .eq('key', 'jam_tepat_waktu')
-        .single();
-      if (data) setJamTepatWaktu(data.value);
+      try {
+        const { data, error } = await supabase
+          .from('settings')
+          .select('value')
+          .eq('key', 'jam_tepat_waktu')
+          .single();
+        
+        if (error && error.code === 'PGRST116') {
+          // Data tidak ditemukan, buat data default
+          const { error: insertError } = await supabase
+            .from('settings')
+            .insert({ key: 'jam_tepat_waktu', value: '07:00' });
+          
+          if (!insertError) {
+            setJamTepatWaktu('07:00');
+          }
+        } else if (data) {
+          setJamTepatWaktu(data.value);
+        }
+      } catch (error) {
+        console.error('Error fetching jam tepat waktu:', error);
+        setJamTepatWaktu('07:00'); // Fallback default
+      }
     };
     fetchJamTepatWaktu();
   }, []);
+
+  const handleSaveJamTepatWaktu = async () => {
+    try {
+      console.log('Attempting to save jam tepat waktu:', jamTepatWaktu);
+      
+      // Cek apakah data sudah ada
+      const { data: existingData, error: checkError } = await supabase
+        .from('settings')
+        .select('*')
+        .eq('key', 'jam_tepat_waktu')
+        .single();
+      
+      console.log('Existing data check:', { existingData, checkError });
+      
+      let result;
+      if (checkError && checkError.code === 'PGRST116') {
+        // Data tidak ada, insert baru
+        console.log('Inserting new jam tepat waktu');
+        result = await supabase
+          .from('settings')
+          .insert({ key: 'jam_tepat_waktu', value: jamTepatWaktu });
+      } else {
+        // Data sudah ada, update
+        console.log('Updating existing jam tepat waktu');
+        result = await supabase
+          .from('settings')
+          .update({ value: jamTepatWaktu })
+          .eq('key', 'jam_tepat_waktu');
+      }
+      
+      console.log('Save result:', result);
+      
+      if (result.error) {
+        console.error('Error saving jam tepat waktu:', result.error);
+        toast.error(`Gagal menyimpan jam tepat waktu: ${result.error.message}`);
+      } else {
+        toast.success('Jam tepat waktu berhasil diupdate!');
+        // Refresh data dari database untuk memastikan konsistensi
+        const { data, error: fetchError } = await supabase
+          .from('settings')
+          .select('value')
+          .eq('key', 'jam_tepat_waktu')
+          .single();
+        
+        if (fetchError) {
+          console.error('Error fetching updated jam tepat waktu:', fetchError);
+        } else if (data) {
+          setJamTepatWaktu(data.value);
+          console.log('Updated jam tepat waktu state:', data.value);
+        }
+      }
+    } catch (error) {
+      console.error('Unexpected error in handleSaveJamTepatWaktu:', error);
+      toast.error(`Terjadi kesalahan saat menyimpan jam tepat waktu: ${error.message}`);
+    }
+  };
 
   const handleScanPresensi = async (userId) => {
     setPresensiLoading(true);
@@ -199,10 +272,7 @@ export default function QrScannerDesa() {
                 className="border rounded px-2 py-1 text-sm"
               />
               <button
-                onClick={async () => {
-                  await supabase.from('settings').upsert({ key: 'jam_tepat_waktu', value: jamTepatWaktu });
-                  toast.success('Jam tepat waktu berhasil diupdate!');
-                }}
+                onClick={handleSaveJamTepatWaktu}
                 className="ml-2 px-3 py-1 bg-blue-600 text-white rounded text-sm"
               >
                 Simpan
