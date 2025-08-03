@@ -41,6 +41,11 @@ export default function Register() {
     kelompok: '',
     desa: '',
   });
+  const [tanggalLahir, setTanggalLahir] = useState({
+    tanggal: '',
+    bulan: '',
+    tahun: ''
+  });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -49,12 +54,37 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
 
+  // Generate arrays for dropdown options
+  const tanggalOptions = Array.from({ length: 31 }, (_, i) => i + 1);
+  const bulanOptions = [
+    { value: 1, label: 'Januari' },
+    { value: 2, label: 'Februari' },
+    { value: 3, label: 'Maret' },
+    { value: 4, label: 'April' },
+    { value: 5, label: 'Mei' },
+    { value: 6, label: 'Juni' },
+    { value: 7, label: 'Juli' },
+    { value: 8, label: 'Agustus' },
+    { value: 9, label: 'September' },
+    { value: 10, label: 'Oktober' },
+    { value: 11, label: 'November' },
+    { value: 12, label: 'Desember' }
+  ];
+  const tahunOptions = Array.from({ length: 50 }, (_, i) => new Date().getFullYear() - i);
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     if (e.target.name === 'tempat_lahir') {
       const val = e.target.value.toLowerCase();
       setKotaSuggestions(val.length > 0 ? kotaIndonesia.filter(k => k.toLowerCase().includes(val)).slice(0, 8) : []);
     }
+  };
+
+  const handleTanggalLahirChange = (field, value) => {
+    setTanggalLahir(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   const handleSuggestionClick = (kota) => {
@@ -67,6 +97,17 @@ export default function Register() {
     setError('');
     setLoading(true);
     setSuccess(false);
+
+    // Validasi tanggal lahir
+    if (!tanggalLahir.tanggal || !tanggalLahir.bulan || !tanggalLahir.tahun) {
+      setError('Tanggal lahir harus diisi lengkap');
+      setLoading(false);
+      return;
+    }
+
+    // Format tanggal lahir ke format YYYY-MM-DD
+    const tanggalLahirFormatted = `${tanggalLahir.tahun}-${tanggalLahir.bulan.toString().padStart(2, '0')}-${tanggalLahir.tanggal.toString().padStart(2, '0')}`;
+
     // 1. Register ke Supabase Auth
     const { data, error: regError } = await supabase.auth.signUp({
       email: form.email,
@@ -90,7 +131,7 @@ export default function Register() {
         nama_lengkap: form.nama_lengkap,
         jenis_kelamin: form.jenis_kelamin,
         tempat_lahir: form.tempat_lahir,
-        tanggal_lahir: form.tanggal_lahir,
+        tanggal_lahir: tanggalLahirFormatted,
         kelompok: form.kelompok,
         desa: form.desa,
         role: 'user',
@@ -163,11 +204,17 @@ export default function Register() {
               {success && <div className="mb-2 text-green-600 text-center text-sm">Registrasi berhasil! Redirect ke dashboard...</div>}
               {loading && <DataLoadingSpinner message="Memproses registrasi..." />}
               <form onSubmit={handleRegister} className="w-full flex flex-col gap-4">
+                <div className="flex gap-2">
+                  <label className="text-sm font-medium text-gray-700 mb-1 w-full">Email:</label>
+                </div>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-violet-400">
                     <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z"/><path d="M12 14c-4.418 0-8 1.79-8 4v2h16v-2c0-2.21-3.582-4-8-4Z"/></svg>
                   </span>
                   <input type="email" name="email" placeholder="Email" className="w-full pl-10 pr-3 py-2 border-2 border-violet-200 rounded-full bg-gray-50 focus:outline-none focus:border-violet-500 text-gray-800" value={form.email} onChange={handleChange} required />
+                </div>
+                <div className="flex gap-2">
+                  <label className="text-sm font-medium text-gray-700 mb-1 w-full">Password:</label>
                 </div>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-violet-400">
@@ -189,18 +236,27 @@ export default function Register() {
                     onClick={() => setShowPassword(v => !v)}
                   >
                     {showPassword ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 0-1.657.403-3.22 1.125-4.575m2.13-2.13A9.956 9.956 0 0112 3c5.523 0 10 4.477 10 10 0 1.657-.403 3.22-1.125 4.575m-2.13 2.13A9.956 9.956 0 0112 21c-5.523 0-10-4.477-10-10 0-1.657.403-3.22 1.125-4.575" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 0-1.657.403-3.22 1.125-4.575m2.13-2.13A9.956 9.956 0 0112 3c5.523 0 10 4.477 10 10 0 1.657-.403 3.22-1.125-4.575m-2.13 2.13A9.956 9.956 0 0112 21c-5.523 0-10-4.477-10-10 0-1.657.403-3.22 1.125-4.575" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                     ) : (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 0-1.657.403-3.22 1.125-4.575m2.13-2.13A9.956 9.956 0 0112 3c5.523 0 10 4.477 10 10 0-1.657-.403-3.22-1.125-4.575m-2.13 2.13A9.956 9.956 0 0112 21c-5.523 0-10-4.477-10-10 0-1.657.403-3.22 1.125-4.575" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 0-1.657.403-3.22 1.125-4.575m2.13-2.13A9.956 9.956 0 0112 3c5.523 0 10 4.477 10 10 0 1.657-.403 3.22-1.125-4.575" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                     )}
                   </button>
                 </div>
+                <div className="flex gap-2">
+                  <label className="text-sm font-medium text-gray-700 mb-1 w-full">Nama Lengkap:</label>
+                </div>
                 <input type="text" name="nama_lengkap" placeholder="Nama Lengkap" className="w-full pl-4 pr-3 py-2 border-2 border-violet-200 rounded-full bg-gray-50 focus:outline-none focus:border-violet-500 text-gray-800" value={form.nama_lengkap} onChange={handleChange} required />
+                <div className="flex gap-2">
+                  <label className="text-sm font-medium text-gray-700 mb-1 w-full">Jenis Kelamin:</label>
+                </div>
                 <select name="jenis_kelamin" className="w-full pl-4 pr-3 py-2 border-2 border-violet-200 rounded-full bg-gray-50 focus:outline-none focus:border-violet-500 text-gray-800" value={form.jenis_kelamin} onChange={handleChange} required>
                   <option value="">Pilih Jenis Kelamin</option>
                   <option value="Laki-laki">Laki-laki</option>
                   <option value="Perempuan">Perempuan</option>
                 </select>
+                <div className="flex gap-2">
+                  <label className="text-sm font-medium text-gray-700 mb-1 w-full">Tempat Lahir:</label>
+                </div>
                 <div className="relative">
                   <input
                     type="text"
@@ -226,14 +282,56 @@ export default function Register() {
                     </ul>
                   )}
                 </div>
-                <input
-                  type="date"
-                  name="tanggal_lahir"
-                  className="w-full pl-4 pr-3 py-2 border-2 border-violet-200 rounded-full bg-gray-50 focus:outline-none focus:border-violet-500 text-gray-800"
-                  value={form.tanggal_lahir}
-                  onChange={handleChange}
+                <div className="flex gap-2">
+                  <label className="text-sm font-medium text-gray-700 mb-1 w-full">Tanggal Lahir:</label>
+                </div>
+                <div className="flex gap-2">
+                  <select
+                    name="tanggal"
+                    className="w-1/3 pl-4 pr-3 py-2 border-2 border-violet-200 rounded-full bg-gray-50 focus:outline-none focus:border-violet-500 text-gray-800"
+                    value={tanggalLahir.tanggal}
+                    onChange={(e) => handleTanggalLahirChange('tanggal', e.target.value)}
+                    required
+                  >
+                    <option value="">Tanggal</option>
+                    {tanggalOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    name="bulan"
+                    className="w-1/3 pl-4 pr-3 py-2 border-2 border-violet-200 rounded-full bg-gray-50 focus:outline-none focus:border-violet-500 text-gray-800"
+                    value={tanggalLahir.bulan}
+                    onChange={(e) => handleTanggalLahirChange('bulan', e.target.value)}
+                    required
+                  >
+                    <option value="">Bulan</option>
+                    {bulanOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    name="tahun"
+                    className="w-1/3 pl-4 pr-3 py-2 border-2 border-violet-200 rounded-full bg-gray-50 focus:outline-none focus:border-violet-500 text-gray-800"
+                    value={tanggalLahir.tahun}
+                    onChange={(e) => handleTanggalLahirChange('tahun', e.target.value)}
                   required
-                />
+                  >
+                    <option value="">Tahun</option>
+                    {tahunOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex gap-2">
+                  <label className="text-sm font-medium text-gray-700 mb-1 w-full">Kelompok:</label>
+                </div>
                 <select name="kelompok" className="w-full pl-4 pr-3 py-2 border-2 border-violet-200 rounded-full bg-gray-50 focus:outline-none focus:border-violet-500 text-gray-800" value={form.kelompok} onChange={handleChange} required>
                   <option value="">Pilih Kelompok</option>
                   <option value="BANGUNSARI 1">BANGUNSARI 1</option>
@@ -259,6 +357,9 @@ export default function Register() {
                   <option value="SIROTO">SIROTO</option>
                   <option value="WELERI">WELERI</option>
                 </select>
+                <div className="flex gap-2">
+                  <label className="text-sm font-medium text-gray-700 mb-1 w-full">Desa:</label>
+                </div>
                 <select name="desa" className="w-full pl-4 pr-3 py-2 border-2 border-violet-200 rounded-full bg-gray-50 focus:outline-none focus:border-violet-500 text-gray-800 mb-2" value={form.desa} onChange={handleChange} required>
                   <option value="">Pilih Desa</option>
                   <option value="PATEAN">PATEAN</option>
@@ -283,7 +384,7 @@ export default function Register() {
                   <strong>Informasi Penting:</strong> Data yang Anda masukkan akan digunakan untuk sistem presensi. 
                   Pastikan informasi yang Anda berikan akurat dan lengkap.
                 </p>
-              </div>
+            </div>
           </div>
         </div>
       </div>
