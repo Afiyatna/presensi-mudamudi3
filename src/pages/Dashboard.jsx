@@ -42,6 +42,7 @@ function Dashboard() {
   // State untuk filter admin
   const [adminFilterDropdown, setAdminFilterDropdown] = useState({ kelompok: [], desa: [], jenis_kelamin: [], status: [] });
   const [adminDateRange, setAdminDateRange] = useState({ from: '', to: '' });
+  const [adminJenisPresensi, setAdminJenisPresensi] = useState('Presensi Daerah'); // Default: Daerah saja
 
   // Opsi filter untuk user (tetap)
   const jenisOptions = ['Presensi Daerah', 'Presensi Desa'];
@@ -95,30 +96,99 @@ function Dashboard() {
         .single();
       if (profile?.role) setRole(profile.role);
       if (profile?.nama_lengkap) setUserName(profile.nama_lengkap);
-      // Jika user, ambil data presensi user
+      
+      // Jika user, ambil data presensi user dari tabel terpisah
       if (profile?.role === 'user' && profile?.nama_lengkap) {
-        const { data } = await supabase
-          .from('presensi')
-          .select('*')
-          .eq('nama_lengkap', profile.nama_lengkap)
-          .order('waktu_presensi', { ascending: true });
-        setUserPresensi(data || []);
+        const [presensiDaerah, presensiDesa] = await Promise.all([
+          supabase.from('presensi_daerah').select('*').eq('nama_lengkap', profile.nama_lengkap),
+          supabase.from('presensi_desa').select('*').eq('nama_lengkap', profile.nama_lengkap),
+        ]);
+        
+        // Mapping dan tambahkan jenis_presensi
+        const dataDaerah = (presensiDaerah.data || []).map(row => ({
+          ...row,
+          jenis_presensi: 'Presensi Daerah',
+          tabel: 'presensi_daerah',
+          waktu_presensi: row.waktu_presensi,
+        }));
+        const dataDesa = (presensiDesa.data || []).map(row => ({
+          ...row,
+          jenis_presensi: 'Presensi Desa',
+          tabel: 'presensi_desa',
+          waktu_presensi: row.waktu_presensi,
+        }));
+        
+        // Gabungkan dan urutkan berdasarkan waktu_presensi
+        const allUserData = [...dataDaerah, ...dataDesa].sort((a, b) => new Date(a.waktu_presensi) - new Date(b.waktu_presensi));
+        setUserPresensi(allUserData);
       }
-      // Jika admin, ambil semua data presensi
+      
+      // Jika admin, ambil semua data presensi dari tabel terpisah
       if (profile?.role === 'admin') {
-        const { data } = await supabase
-          .from('presensi')
-          .select('*')
-          .order('waktu_presensi', { ascending: true });
-        setAllPresensi(data || []);
+        const [presensiDaerah, presensiDesa] = await Promise.all([
+          supabase.from('presensi_daerah').select('*'),
+          supabase.from('presensi_desa').select('*'),
+        ]);
+        
+        // Mapping dan tambahkan jenis_presensi
+        const dataDaerah = (presensiDaerah.data || []).map(row => ({
+          ...row,
+          jenis_presensi: 'Presensi Daerah',
+          tabel: 'presensi_daerah',
+          waktu_presensi: row.waktu_presensi,
+        }));
+        const dataDesa = (presensiDesa.data || []).map(row => ({
+          ...row,
+          jenis_presensi: 'Presensi Desa',
+          tabel: 'presensi_desa',
+          waktu_presensi: row.waktu_presensi,
+        }));
+        
+        // Gabungkan dan urutkan berdasarkan waktu_presensi
+        const allAdminData = [...dataDaerah, ...dataDesa].sort((a, b) => new Date(a.waktu_presensi) - new Date(b.waktu_presensi));
+        setAllPresensi(allAdminData);
       }
       setUserLoading(false);
     };
     fetchRoleAndPresensi();
+
+    // Real-time subscription untuk update otomatis
+    const subscriptionDaerah = supabase
+      .channel('presensi_daerah_changes')
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'presensi_daerah' 
+      }, () => {
+        // Refresh data ketika ada perubahan
+        fetchRoleAndPresensi();
+      })
+      .subscribe();
+
+    const subscriptionDesa = supabase
+      .channel('presensi_desa_changes')
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'presensi_desa' 
+      }, () => {
+        // Refresh data ketika ada perubahan
+        fetchRoleAndPresensi();
+      })
+      .subscribe();
+
+    // Cleanup subscriptions
+    return () => {
+      subscriptionDaerah.unsubscribe();
+      subscriptionDesa.unsubscribe();
+    };
   }, []);
 
   // Filter data presensi admin sesuai status, tanggal, kelompok, desa, jenis kelamin
   const filteredAllPresensi = allPresensi.filter(d => {
+    // Filter jenis presensi (default: Daerah saja)
+    if (adminJenisPresensi && d.jenis_presensi !== adminJenisPresensi) return false;
+    
     // Date range filter
     if (adminDateRange.from || adminDateRange.to) {
       const tgl = d.waktu_presensi ? d.waktu_presensi.split('T')[0] : '';
@@ -150,39 +220,71 @@ function Dashboard() {
   });
   // Kelompok list dari data yang sudah difilter
   const filteredKelompokList = [...new Set(filteredAllPresensi.map(d => d.kelompok))];
+  
+  // Helper function untuk mendapatkan nama bulan
+  const getMonthName = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'short' });
+  };
+
   const getFilteredBarChartData = (kelompok) => {
     const dataKelompok = filteredAllPresensi.filter(d => d.kelompok === kelompok);
-    const tanggalList = [...new Set(dataKelompok.map(d => d.waktu_presensi ? d.waktu_presensi.split('T')[0] : ''))];
-    const hadirData = tanggalList.map(tgl => dataKelompok.filter(d => d.waktu_presensi && d.waktu_presensi.startsWith(tgl) && d.status && d.status.toLowerCase() === 'hadir').length);
-    const terlambatData = tanggalList.map(tgl => dataKelompok.filter(d => d.waktu_presensi && d.waktu_presensi.startsWith(tgl) && d.status && d.status.toLowerCase() === 'terlambat').length);
+    
+    // Group data by month
+    const monthlyData = {};
+    
+    dataKelompok.forEach(d => {
+      if (d.waktu_presensi) {
+        const date = new Date(d.waktu_presensi);
+        const monthKey = date.toLocaleDateString('en-US', { month: 'short' });
+        
+        if (!monthlyData[monthKey]) {
+          monthlyData[monthKey] = { hadir: 0, terlambat: 0 };
+        }
+        
+        if (d.status && d.status.toLowerCase() === 'hadir') {
+          monthlyData[monthKey].hadir++;
+        } else if (d.status && d.status.toLowerCase() === 'terlambat') {
+          monthlyData[monthKey].terlambat++;
+        }
+      }
+    });
+    
+    // Sort months in chronological order
+    const monthOrder = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const sortedMonths = Object.keys(monthlyData).sort((a, b) => 
+      monthOrder.indexOf(a) - monthOrder.indexOf(b)
+    );
+    
+    const hadirData = sortedMonths.map(month => monthlyData[month].hadir);
+    const terlambatData = sortedMonths.map(month => monthlyData[month].terlambat);
+    
     return {
-      labels: tanggalList,
+      labels: sortedMonths,
       datasets: [
-        { label: 'Hadir', data: hadirData, backgroundColor: '#4ade80' },
-        { label: 'Terlambat', data: terlambatData, backgroundColor: '#facc15' },
+        { label: 'Hadir', data: hadirData, backgroundColor: '#10b981' },
+        { label: 'Terlambat', data: terlambatData, backgroundColor: '#f59e0b' },
       ],
     };
   };
 
   // --- USER: Grafik Riwayat Presensi Sendiri (dengan filter) ---
-  // Ambil tanggal unik dari presensi user
-  const userTanggalList = [...new Set(userPresensi.map(d => d.waktu_presensi ? d.waktu_presensi.split('T')[0] : ''))];
-  // Filter tanggal sesuai date range
-  const filteredTanggalList = userTanggalList.filter(tgl => {
-    if (!userDateRange.from && !userDateRange.to) return true;
-    if (userDateRange.from && userDateRange.to) {
-      return tgl >= userDateRange.from && tgl <= userDateRange.to;
-    } else if (userDateRange.from) {
-      return tgl >= userDateRange.from;
-    } else if (userDateRange.to) {
-      return tgl <= userDateRange.to;
-    }
-    return true;
-  });
   // Filter data presensi sesuai status, tanggal, dan jenis presensi
   const filteredUserPresensi = userPresensi.filter(d => {
     const tgl = d.waktu_presensi ? d.waktu_presensi.split('T')[0] : '';
-    let match = filteredTanggalList.includes(tgl);
+    let match = true;
+    
+    // Date range filter
+    if (userDateRange.from || userDateRange.to) {
+      if (userDateRange.from && userDateRange.to) {
+        match = tgl >= userDateRange.from && tgl <= userDateRange.to;
+      } else if (userDateRange.from) {
+        match = tgl >= userDateRange.from;
+      } else if (userDateRange.to) {
+        match = tgl <= userDateRange.to;
+      }
+    }
+    
     if (userStatus) match = match && d.status && d.status.toLowerCase() === userStatus;
     if (filterDropdown.jenis && filterDropdown.jenis.length > 0) {
       // Mapping jenis presensi dari tabel (default: 'Presensi Umum')
@@ -193,22 +295,48 @@ function Dashboard() {
     }
     return match;
   });
-  // Tanggal unik setelah filter
-  const filteredUserTanggalList = [...new Set(filteredUserPresensi.map(d => d.waktu_presensi ? d.waktu_presensi.split('T')[0] : ''))];
-  const userHadirData = filteredUserTanggalList.map(tgl => filteredUserPresensi.filter(d => d.waktu_presensi && d.waktu_presensi.startsWith(tgl) && d.status && d.status.toLowerCase() === 'hadir').length);
-  const userTerlambatData = filteredUserTanggalList.map(tgl => filteredUserPresensi.filter(d => d.waktu_presensi && d.waktu_presensi.startsWith(tgl) && d.status && d.status.toLowerCase() === 'terlambat').length);
+
+  // Group user data by month
+  const userMonthlyData = {};
+  
+  filteredUserPresensi.forEach(d => {
+    if (d.waktu_presensi) {
+      const date = new Date(d.waktu_presensi);
+      const monthKey = date.toLocaleDateString('en-US', { month: 'short' });
+      
+      if (!userMonthlyData[monthKey]) {
+        userMonthlyData[monthKey] = { hadir: 0, terlambat: 0 };
+      }
+      
+      if (d.status && d.status.toLowerCase() === 'hadir') {
+        userMonthlyData[monthKey].hadir++;
+      } else if (d.status && d.status.toLowerCase() === 'terlambat') {
+        userMonthlyData[monthKey].terlambat++;
+      }
+    }
+  });
+  
+  // Sort months in chronological order
+  const monthOrder = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const sortedUserMonths = Object.keys(userMonthlyData).sort((a, b) => 
+    monthOrder.indexOf(a) - monthOrder.indexOf(b)
+  );
+  
+  const userHadirData = sortedUserMonths.map(month => userMonthlyData[month].hadir);
+  const userTerlambatData = sortedUserMonths.map(month => userMonthlyData[month].terlambat);
+  
   const userBarChartData = {
-    labels: filteredUserTanggalList,
+    labels: sortedUserMonths,
     datasets: [
-      { label: 'Hadir', data: userHadirData, backgroundColor: '#4ade80' },
-      { label: 'Terlambat', data: userTerlambatData, backgroundColor: '#facc15' },
+      { label: 'Hadir', data: userHadirData, backgroundColor: '#10b981' },
+      { label: 'Terlambat', data: userTerlambatData, backgroundColor: '#f59e0b' },
     ],
   };
   const userLineChartData = {
-    labels: filteredUserTanggalList,
+    labels: sortedUserMonths,
     datasets: [
-      { label: 'Hadir', data: userHadirData, borderColor: '#4ade80', backgroundColor: 'rgba(74,222,128,0.2)', fill: false },
-      { label: 'Terlambat', data: userTerlambatData, borderColor: '#facc15', backgroundColor: 'rgba(250,204,21,0.2)', fill: false },
+      { label: 'Hadir', data: userHadirData, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.2)', fill: false },
+      { label: 'Terlambat', data: userTerlambatData, borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.2)', fill: false },
     ],
   };
 
@@ -352,6 +480,49 @@ function Dashboard() {
                     />
                   </div>
                 </div>
+                
+                {/* Filter Jenis Presensi */}
+                <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700/60">
+                  <h3 className="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-3">Filter Jenis Presensi</h3>
+                  <div className="flex flex-wrap gap-4">
+                    <label className="flex items-center space-x-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="jenisPresensi"
+                        value="Presensi Daerah"
+                        checked={adminJenisPresensi === 'Presensi Daerah'}
+                        onChange={(e) => setAdminJenisPresensi(e.target.value)}
+                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                      />
+                      <span className="text-sm font-medium text-blue-700 dark:text-blue-300">Presensi Daerah</span>
+                    </label>
+                    <label className="flex items-center space-x-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="jenisPresensi"
+                        value="Presensi Desa"
+                        checked={adminJenisPresensi === 'Presensi Desa'}
+                        onChange={(e) => setAdminJenisPresensi(e.target.value)}
+                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                      />
+                      <span className="text-sm font-medium text-blue-700 dark:text-blue-300">Presensi Desa</span>
+                    </label>
+                    <label className="flex items-center space-x-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="jenisPresensi"
+                        value=""
+                        checked={adminJenisPresensi === ''}
+                        onChange={(e) => setAdminJenisPresensi(e.target.value)}
+                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                      />
+                      <span className="text-sm font-medium text-blue-700 dark:text-blue-300">Semua</span>
+                    </label>
+                  </div>
+                  <p className="text-xs text-blue-600 dark:text-blue-400 mt-2">
+                    Saat ini menampilkan: <strong>{adminJenisPresensi || 'Semua Jenis Presensi'}</strong>
+                  </p>
+                </div>
                 {/* Deskripsi filter untuk admin - Fixed dark mode colors */}
                 <div className="mb-6 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-200 dark:border-emerald-700/60">
                   <h3 className="text-sm font-semibold text-emerald-800 dark:text-emerald-200 mb-2">Filter Data Administrasi</h3>
@@ -359,6 +530,7 @@ function Dashboard() {
                     Gunakan filter di atas untuk mengelola dan menganalisis data presensi berdasarkan:
                   </p>
                   <ul className="text-sm text-emerald-700 dark:text-emerald-300 mt-2 ml-4 list-disc">
+                    <li><strong>Jenis Presensi:</strong> Pilih antara Presensi Daerah, Presensi Desa, atau Semua</li>
                     <li><strong>Kelompok:</strong> Filter berdasarkan kelompok pengajian tertentu</li>
                     <li><strong>Desa:</strong> Lihat data berdasarkan lokasi desa</li>
                     <li><strong>Jenis Kelamin:</strong> Analisis berdasarkan gender peserta</li>
@@ -366,18 +538,52 @@ function Dashboard() {
                     <li><strong>Rentang Tanggal:</strong> Pilih periode waktu untuk analisis</li>
                   </ul>
                 </div>
-            <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Rekap Presensi per Kelompok</h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-4 text-sm text-justify">
-              Grafik di bawah menunjukkan statistik kehadiran untuk setiap kelompok. Data dapat difilter berdasarkan 
-              kelompok, desa, jenis kelamin, status kehadiran, dan rentang tanggal. Klik pada grafik untuk melihat detail lebih lanjut.
+            <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">
+              Rekap Presensi per Kelompok - {adminJenisPresensi || 'Semua Jenis Presensi'}
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-6 text-sm text-justify">
+              Grafik di bawah menunjukkan statistik kehadiran untuk setiap kelompok berdasarkan jenis presensi yang dipilih. 
+              Data dapat difilter berdasarkan kelompok, desa, jenis kelamin, status kehadiran, dan rentang tanggal. 
+              Klik pada grafik untuk melihat detail lebih lanjut.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredKelompokList.map(kelompok => (
-                <div key={kelompok} className="bg-white dark:bg-gray-800 rounded-xl shadow-xs border border-gray-200 dark:border-gray-700/60 p-4">
-                  <h3 className="font-semibold text-gray-700 dark:text-gray-200 mb-2">{kelompok}</h3>
-                      <BarChart01 key={currentTheme + kelompok} data={getFilteredBarChartData(kelompok)} width={320} height={180} />
-                </div>
-              ))}
+                  {filteredKelompokList.map(kelompok => {
+                    const kelompokData = getFilteredBarChartData(kelompok);
+                    const totalHadir = kelompokData.datasets[0]?.data.reduce((a, b) => a + b, 0) || 0;
+                    const totalTerlambat = kelompokData.datasets[1]?.data.reduce((a, b) => a + b, 0) || 0;
+                    const totalPresensi = totalHadir + totalTerlambat;
+                    
+                    return (
+                      <div key={kelompok} className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700/60 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                        {/* Header dengan statistik */}
+                        <div className="p-4 border-b border-gray-100 dark:border-gray-700/60">
+                          <h3 className="font-bold text-lg text-gray-800 dark:text-gray-100 mb-3">{kelompok}</h3>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-4">
+                              <div className="flex items-center space-x-2">
+                                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                                <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Hadir</span>
+                                <span className="text-sm font-bold text-gray-800 dark:text-gray-100">{totalHadir}</span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                                <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Terlambat</span>
+                                <span className="text-sm font-bold text-gray-800 dark:text-gray-100">{totalTerlambat}</span>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-xs text-gray-500 dark:text-gray-400">Total</div>
+                              <div className="text-lg font-bold text-gray-800 dark:text-gray-100">{totalPresensi}</div>
+                            </div>
+                          </div>
+                        </div>
+                        {/* Chart */}
+                        <div className="p-4">
+                          <BarChart01 key={currentTheme + kelompok} data={kelompokData} width={320} height={180} />
+                        </div>
+                      </div>
+                    );
+                  })}
             </div>
           </div>
         )}
@@ -385,20 +591,77 @@ function Dashboard() {
         {role === 'user' && (
           <div className="mb-8">
             <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Grafik Riwayat Presensi Anda</h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-4 text-sm">
+            <p className="text-gray-600 dark:text-gray-400 mb-6 text-sm">
               Grafik ini menampilkan riwayat presensi pribadi Anda. Anda dapat melihat pola kehadiran, 
               keterlambatan, dan membandingkan performa kehadiran dari waktu ke waktu. Gunakan filter di atas 
               untuk melihat data berdasarkan jenis presensi (Daerah/Desa) dan status kehadiran.
             </p>
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xs border border-gray-200 dark:border-gray-700/60 p-4 max-w-xl">
-                  {userChartType === 'bar' ? (
-                    <BarChart01 key={currentTheme + '-user'} data={userBarChartData} width={400} height={220} />
-                  ) : (
-                    <LineChart01 key={currentTheme + '-user'} data={userLineChartData} width={400} height={220} />
-                  )}
-              {userBarChartData.labels.length === 0 && (
-                <div className="text-gray-500 dark:text-gray-400 text-center mt-4">Belum ada data presensi.</div>
-              )}
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700/60 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+              {/* Header dengan statistik */}
+              <div className="p-4 border-b border-gray-100 dark:border-gray-700/60">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-bold text-lg text-gray-800 dark:text-gray-100">Statistik Presensi Pribadi</h3>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => setUserChartType('bar')}
+                      className={`px-3 py-1 text-xs font-medium rounded-lg transition-colors ${
+                        userChartType === 'bar'
+                          ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                          : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
+                      }`}
+                    >
+                      Bar
+                    </button>
+                    <button
+                      onClick={() => setUserChartType('line')}
+                      className={`px-3 py-1 text-xs font-medium rounded-lg transition-colors ${
+                        userChartType === 'line'
+                          ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                          : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
+                      }`}
+                    >
+                      Line
+                    </button>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-6">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Hadir</span>
+                    <span className="text-sm font-bold text-gray-800 dark:text-gray-100">
+                      {userHadirData.reduce((a, b) => a + b, 0)}
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                    <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Terlambat</span>
+                    <span className="text-sm font-bold text-gray-800 dark:text-gray-100">
+                      {userTerlambatData.reduce((a, b) => a + b, 0)}
+                    </span>
+                  </div>
+                  <div className="text-right ml-auto">
+                    <div className="text-xs text-gray-500 dark:text-gray-400">Total Presensi</div>
+                    <div className="text-lg font-bold text-gray-800 dark:text-gray-100">
+                      {userHadirData.reduce((a, b) => a + b, 0) + userTerlambatData.reduce((a, b) => a + b, 0)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {/* Chart */}
+              <div className="p-4">
+                {userChartType === 'bar' ? (
+                  <BarChart01 key={currentTheme + '-user'} data={userBarChartData} width={400} height={220} />
+                ) : (
+                  <LineChart01 key={currentTheme + '-user'} data={userLineChartData} width={400} height={220} />
+                )}
+                {userBarChartData.labels.length === 0 && (
+                  <div className="text-center py-8">
+                    <div className="text-gray-400 dark:text-gray-500 text-6xl mb-4">📊</div>
+                    <div className="text-gray-500 dark:text-gray-400 text-sm">Belum ada data presensi.</div>
+                    <div className="text-gray-400 dark:text-gray-500 text-xs mt-1">Lakukan presensi untuk melihat grafik di sini.</div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
