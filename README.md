@@ -1,82 +1,205 @@
-# Free Tailwind admin dashboard template
+# Sistem Presensi Digital - Presensi Mudamudi
 
-![Mosaic Tailwind admin template preview](https://github.com/cruip/tailwind-dashboard-template/assets/2683512/ef306423-3b89-4d0c-be80-9c5c682478d1)
+![Sistem Presensi Digital Preview](https://github.com/cruip/tailwind-dashboard-template/assets/2683512/ef306423-3b89-4d0c-be80-9c5c682478d1)
 
-**Mosaic Lite** is a responsive admin dashboard template built on top of Tailwind CSS and fully coded in React. It comes with several pre-coded charts (built with Chart.js 3) and widgets, and it's a great starting for anyone who wants to create a user interface for SaaS products, administrator dashboards, modern web apps, and more.
+**Sistem Presensi Digital** adalah aplikasi presensi modern yang dibangun dengan React dan Tailwind CSS v4. Aplikasi ini menggunakan teknologi QR Code untuk sistem presensi yang efisien dan terintegrasi dengan Supabase sebagai backend database.
 
-**UPDATE 2025-02-02** Added Tailwind v4 support!
+## 🚀 Fitur Utama
 
-Use it for whatever you want, and be sure to reach us out on [Twitter](https://twitter.com/Cruip_com) if you build anything cool/useful with it.
+- **Dashboard Interaktif** - Tampilan data presensi real-time dengan grafik dan statistik
+- **QR Code Scanner** - Scanner QR Code untuk presensi masuk dan keluar
+- **QR Code Generator** - Generate QR Code personal untuk setiap user
+- **Laporan Kehadiran** - Laporan detail kehadiran dengan filter berdasarkan daerah/desa
+- **Manajemen User** - Sistem registrasi dan profile management
+- **Role-based Access** - Pembedaan akses Admin dan User
+- **Responsive Design** - Tampilan optimal di desktop dan mobile
+- **Real-time Updates** - Data presensi terupdate secara real-time
 
-Created and maintained with ❤️ by [Cruip.com](https://cruip.com/).
+## 🛠️ Tech Stack
 
-## Live demo
+- **Frontend**: React 19, Vite 6
+- **Styling**: Tailwind CSS v4
+- **Backend**: Supabase (PostgreSQL + Real-time)
+- **QR Code**: html5-qrcode, qrcode.react
+- **Charts**: Chart.js 4
+- **Routing**: React Router DOM 7
+- **UI Components**: Radix UI
+- **Notifications**: React Hot Toast
 
-Check the live demo here 👉️ [https://mosaic.cruip.com/](https://mosaic.cruip.com/)
+## 📋 Prerequisites
 
-## Mosaic Pro
+Sebelum menjalankan project ini, pastikan Anda memiliki:
 
-[![Mosaic Tailwind Admin Template](https://github.com/cruip/tailwind-dashboard-template/assets/2683512/2b4d0fae-bb07-4229-8a8a-48005f2f33cb)](https://cruip.com/mosaic/)
+- Node.js (versi 18 atau lebih baru)
+- npm atau yarn
+- Akun Supabase (untuk database)
 
-## Design files
+## 🚀 Installation & Setup
 
-If you need the design files, you can download them from Figma's Community 👉 https://bit.ly/3sigqHe
-
-## Table of contents
-
-* [Usage](#usage)
-  * [Project setup](#project-setup)
-  * [Compiles and hot-reloads for development](#compiles-and-hot-reloads-for-development)
-  * [Compiles and minifies for production](#compiles-and-minifies-for-production)
-  * [Customize configuration](#customize-configuration)
-* [Support notes](#support-notes)            
-* [Credits](#credits)
-* [Terms and License](#terms-and-license)
-* [About Us](#about-us)
-* [Stay in the loop](#stay-in-the-loop)
-
-## Usage
-
-This project was bootstrapped with [Vite](https://vitejs.dev/).
-
-### Project setup
+### 1. Clone Repository
+```bash
+git clone <repository-url>
+cd presensi-mudamudi3
 ```
+
+### 2. Install Dependencies
+```bash
 npm install
 ```
 
-#### Compiles and hot-reloads for development
-```
-npm run dev
+### 3. Setup Supabase
+1. Buat project baru di [Supabase](https://supabase.com)
+2. Salin URL dan Anon Key dari project Anda
+3. Update file `src/supabaseClient.js` dengan kredensial Anda:
+
+```javascript
+const supabaseUrl = 'YOUR_SUPABASE_URL';
+const supabaseAnonKey = 'YOUR_SUPABASE_ANON_KEY';
 ```
 
-#### Compiles and minifies for production
+### 4. Setup Database Schema
+Jalankan query SQL berikut di Supabase SQL Editor:
+
+```sql
+-- Buat tabel users
+CREATE TABLE users (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  email VARCHAR UNIQUE NOT NULL,
+  full_name VARCHAR NOT NULL,
+  role VARCHAR DEFAULT 'user',
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Buat tabel attendance
+CREATE TABLE attendance (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES users(id),
+  check_in TIMESTAMP,
+  check_out TIMESTAMP,
+  location VARCHAR,
+  created_at TIMESTAMP DEFAULT NOW()
+);
 ```
+
+## 🏃‍♂️ Running the Application
+
+### Development Mode
+```bash
+npm run dev
+```
+Aplikasi akan berjalan di `http://localhost:5173`
+
+### Production Build
+```bash
 npm run build
 ```
 
-#### Customize configuration
-See [Configuration Reference](https://vitejs.dev/guide/).
+### Preview Production Build
+```bash
+npm run preview
+```
 
-### Support notes
-We are shipping our templates with a very basic React configuration to let you quickly get into the development process, but we don't discourage you from using any other configuration or framework built on the top of React. So, please note that any request dealing with React (e.g. extra features, customisations, et cetera) is to be considered out of the support scope.
+## 📱 Fitur Aplikasi
 
-For more information about what support covers, please see our (FAQs)[https://cruip.com/faq/].
+### 👤 User Features
+- **Dashboard Personal** - Melihat statistik presensi pribadi
+- **QR Code Personal** - Generate dan tampilkan QR Code untuk presensi
+- **Riwayat Presensi** - Melihat history presensi pribadi
+- **Profile Management** - Update informasi profile
 
-## Credits
+### 👨‍💼 Admin Features
+- **QR Scanner** - Scan QR Code untuk presensi user
+- **Laporan Kehadiran** - Generate laporan kehadiran berdasarkan daerah/desa
+- **Data Profile User** - Kelola data semua user
+- **Dashboard Admin** - Overview sistem secara keseluruhan
 
-- [Nucleo](https://nucleoapp.com/)
+## 🗂️ Project Structure
 
-## Terms and License
+```
+src/
+├── components/          # Reusable components
+├── pages/              # Page components
+│   ├── Dashboard.jsx
+│   ├── QrScannerMenu.jsx
+│   ├── UserQRCode.jsx
+│   ├── UserPresensiHistory.jsx
+│   └── ...
+├── layouts/            # Layout components
+├── charts/             # Chart configurations
+├── hooks/              # Custom React hooks
+├── utils/              # Utility functions
+├── css/                # Stylesheets
+├── supabaseClient.js   # Supabase configuration
+└── App.jsx             # Main app component
+```
 
-- Released under the [GPL](https://www.gnu.org/licenses/gpl-3.0.html).
-- Copyright 2020 [Cruip](https://cruip.com/).
-- Use it for personal and commercial projects, but please don’t republish, redistribute, or resell the template.
-- Attribution is not required, although it is really appreciated.
+## 🔧 Configuration
 
-## About Us
+### Environment Variables
+Buat file `.env` di root project:
 
-We're an Italian developer/designer duo creating high-quality design/code resources for developers, makers, and startups.
+```env
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
 
-## Stay in the loop
+### Tailwind Configuration
+Project menggunakan Tailwind CSS v4 dengan konfigurasi custom di `tailwind.config.js`.
 
-If you would like to know when we release new resources, you can follow [@pacovitiello](https://x.com/pacovitiello) and [@DavidePacilio](https://x.com/DavidePacilio) on X, or you can subscribe to our [newsletter](https://cruip.com/newsletter/).
+## 📊 Database Schema
+
+### Users Table
+- `id` - UUID Primary Key
+- `email` - Email user (unique)
+- `full_name` - Nama lengkap
+- `role` - Role user (admin/user)
+- `created_at` - Timestamp pembuatan
+
+### Attendance Table
+- `id` - UUID Primary Key
+- `user_id` - Foreign key ke users
+- `check_in` - Waktu check-in
+- `check_out` - Waktu check-out
+- `location` - Lokasi presensi
+- `created_at` - Timestamp pembuatan
+
+## 🚀 Deployment
+
+### Vercel (Recommended)
+1. Push code ke GitHub
+2. Connect repository ke Vercel
+3. Set environment variables di Vercel dashboard
+4. Deploy
+
+### Netlify
+1. Build project: `npm run build`
+2. Upload folder `dist` ke Netlify
+3. Set environment variables
+
+## 🤝 Contributing
+
+1. Fork project
+2. Buat feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push ke branch (`git push origin feature/AmazingFeature`)
+5. Buat Pull Request
+
+## 📝 License
+
+Project ini menggunakan license GPL v3.0. Lihat file `LICENSE` untuk detail lebih lanjut.
+
+## 🆘 Support
+
+Jika Anda mengalami masalah atau memiliki pertanyaan:
+
+1. Cek [Issues](../../issues) untuk solusi yang sudah ada
+2. Buat issue baru jika masalah belum ada
+3. Hubungi tim development untuk bantuan lebih lanjut
+
+## 🔄 Changelog
+
+Lihat [CHANGELOG.md](CHANGELOG.md) untuk melihat history perubahan project.
+
+---
+
+**Dibuat dengan ❤️ untuk sistem presensi digital yang lebih efisien**
