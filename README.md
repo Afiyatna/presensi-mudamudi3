@@ -1,8 +1,26 @@
 # Sistem Presensi Digital - Presensi Mudamudi
 
-![Sistem Presensi Digital Preview](https://github.com/cruip/tailwind-dashboard-template/assets/2683512/ef306423-3b89-4d0c-be80-9c5c682478d1)
+![Sistem Presensi Digital - Landing Page](images/landing-page.png)
 
 **Sistem Presensi Digital** adalah aplikasi presensi modern yang dibangun dengan React dan Tailwind CSS v4. Aplikasi ini menggunakan teknologi QR Code untuk sistem presensi yang efisien dan terintegrasi dengan Supabase sebagai backend database.
+
+## 🖼️ Preview Aplikasi
+
+### Landing Page & Login
+![Landing Page](images/landing-page.png)
+*Halaman utama dengan form login dan carousel gambar Masjid Baitul Munir Kendal*
+
+### QR Scanner Admin
+![QR Scanner](images/qr-scanner.png)
+*Interface scanner QR Code untuk admin mencatat presensi peserta*
+
+### Laporan Kehadiran
+![Rekap Presensi](images/rekap-presensi.png)
+*Dashboard laporan kehadiran dengan filter dan export data*
+
+### QR Code User
+![QR Code User](images/qr-code-user.png)
+*QR Code personal user untuk presensi dengan opsi download*
 
 ## 🚀 Fitur Utama
 
