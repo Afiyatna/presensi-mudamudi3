@@ -139,12 +139,11 @@
 
 /* Add slider animations */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.7s cubic-bezier(0.4,0,0.2,1) both;
 }
 
 @keyframes fadeOut {
@@ -277,4 +276,8 @@
 /* Disable transitions during theme switch to prevent flickering */
 .theme-transitioning * {
   transition: none !important;
+}
+
+html, body, #root {
+  transition: background 0.3s, color 0.3s;
 }

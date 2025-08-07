@@ -4,7 +4,7 @@ import { useThemeProvider } from '../utils/ThemeContext';
 
 Chart.register(...registerables);
 
-const DoughnutChart = ({ data, width = 300, height = 300, centerText = null }) => {
+const LineChartTrend = ({ data, width = 400, height = 200 }) => {
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
   const { currentTheme } = useThemeProvider();
@@ -18,24 +18,34 @@ const DoughnutChart = ({ data, width = 300, height = 300, centerText = null }) =
     const darkMode = currentTheme === 'dark';
 
     chartInstance.current = new Chart(ctx, {
-      type: 'doughnut',
+      type: 'line',
       data: {
         labels: data.labels,
-        datasets: [{
-          data: data.datasets[0].data,
-          backgroundColor: data.datasets[0].backgroundColor,
-          borderWidth: 0,
-          cutout: '70%',
-          hoverOffset: 4
-        }]
+        datasets: data.datasets.map((dataset, index) => ({
+          ...dataset,
+          borderWidth: 3,
+          pointBackgroundColor: dataset.borderColor,
+          pointBorderColor: darkMode ? '#1f2937' : '#ffffff',
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          pointHoverBorderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          backgroundColor: dataset.backgroundColor || dataset.borderColor + '20'
+        }))
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        interaction: {
+          intersect: false,
+          mode: 'index'
+        },
         plugins: {
           legend: {
             display: true,
-            position: 'bottom',
+            position: 'top',
             labels: {
               color: darkMode ? '#9ca3af' : '#6b7280',
               font: { size: 12 },
@@ -52,12 +62,44 @@ const DoughnutChart = ({ data, width = 300, height = 300, centerText = null }) =
             cornerRadius: 8,
             displayColors: true,
             callbacks: {
+              title: (context) => {
+                return `Tanggal: ${context[0].label}`;
+              },
               label: (context) => {
-                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                const percentage = ((context.parsed / total) * 100).toFixed(1);
-                return `${context.label}: ${context.parsed} (${percentage}%)`;
+                return `${context.dataset.label}: ${context.parsed.y} orang`;
               }
             }
+          }
+        },
+        scales: {
+          x: {
+            grid: {
+              color: darkMode ? 'rgba(156, 163, 175, 0.1)' : 'rgba(156, 163, 175, 0.2)',
+              drawBorder: false
+            },
+            ticks: {
+              color: darkMode ? '#9ca3af' : '#6b7280',
+              font: { size: 11 },
+              maxRotation: 45
+            }
+          },
+          y: {
+            grid: {
+              color: darkMode ? 'rgba(156, 163, 175, 0.1)' : 'rgba(156, 163, 175, 0.2)',
+              drawBorder: false
+            },
+            ticks: {
+              color: darkMode ? '#9ca3af' : '#6b7280',
+              font: { size: 11 },
+              beginAtZero: true,
+              stepSize: 1
+            }
+          }
+        },
+        elements: {
+          point: {
+            hoverRadius: 6,
+            radius: 4
           }
         }
       }
@@ -73,20 +115,8 @@ const DoughnutChart = ({ data, width = 300, height = 300, centerText = null }) =
   return (
     <div className="relative" style={{ width, height }}>
       <canvas ref={chartRef} />
-      {centerText && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-gray-800 dark:text-gray-100">
-              {centerText.value}
-            </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              {centerText.label}
-            </div>
-      </div>
-      </div>
-      )}
     </div>
   );
 };
 
-export default DoughnutChart;
+export default LineChartTrend; 
