@@ -116,86 +116,224 @@ function Dashboard() {
     const thisMonth = new Date().getMonth();
     const thisYear = new Date().getFullYear();
     
-    // Total presensi hari ini
-    const todayPresensi = allPresensi.filter(p => 
-      p.waktu_presensi?.split('T')[0] === today
-    ).length;
-    
-    // Total presensi bulan ini
-    const thisMonthPresensi = allPresensi.filter(p => {
-      const presensiDate = new Date(p.waktu_presensi);
-      return presensiDate.getMonth() === thisMonth && 
-             presensiDate.getFullYear() === thisYear;
-    }).length;
-    
-    // Attendance rate
-    const totalPresensi = allPresensi.length;
-    const hadirCount = allPresensi.filter(p => p.status === 'hadir').length;
-    const attendanceRate = totalPresensi > 0 ? (hadirCount / totalPresensi * 100).toFixed(1) : 0;
-    
-    // Total user terdaftar
-    const totalUsers = profiles.filter(p => p.role === 'user').length;
-    
-    // Calculate trends (simple comparison with previous period)
-    const previousMonthPresensi = allPresensi.filter(p => {
-      const presensiDate = new Date(p.waktu_presensi);
-      const prevMonth = thisMonth === 0 ? 11 : thisMonth - 1;
-      const prevYear = thisMonth === 0 ? thisYear - 1 : thisYear;
-      return presensiDate.getMonth() === prevMonth && 
-             presensiDate.getFullYear() === prevYear;
-    }).length;
-    
-    const monthTrend = previousMonthPresensi > 0 ? 
-      ((thisMonthPresensi - previousMonthPresensi) / previousMonthPresensi * 100).toFixed(1) : 0;
-    
-    const stats = [
-      {
-        title: 'Total Presensi Hari Ini',
-        value: todayPresensi,
-        trend: 0, // Will be calculated based on previous day
-        icon: (
-          <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-        ),
-        iconBg: 'bg-blue-100 dark:bg-blue-900/30'
-      },
-      {
-        title: 'Total Presensi Bulan Ini',
-        value: thisMonthPresensi,
-        trend: parseFloat(monthTrend),
-        icon: (
-          <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
-        ),
-        iconBg: 'bg-green-100 dark:bg-green-900/30'
-      },
-      {
-        title: 'Attendance Rate',
-        value: `${attendanceRate}%`,
-        trend: 0, // Will be calculated based on previous period
-        icon: (
-          <svg className="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-          </svg>
-        ),
-        iconBg: 'bg-yellow-100 dark:bg-yellow-900/30'
-      },
-      {
-        title: 'Total User Terdaftar',
-        value: totalUsers,
-        trend: 0, // Will be calculated based on new registrations
-        icon: (
-          <svg className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-          </svg>
-        ),
-        iconBg: 'bg-purple-100 dark:bg-purple-900/30'
-      }
-    ];
-    
-    setDashboardStats(stats);
+    if (role === 'admin') {
+      // Admin stats (existing logic)
+      const todayPresensi = allPresensi.filter(p => 
+        p.waktu_presensi?.split('T')[0] === today
+      ).length;
+      
+      const thisMonthPresensi = allPresensi.filter(p => {
+        const presensiDate = new Date(p.waktu_presensi);
+        return presensiDate.getMonth() === thisMonth && 
+               presensiDate.getFullYear() === thisYear;
+      }).length;
+      
+      const totalPresensi = allPresensi.length;
+      const hadirCount = allPresensi.filter(p => p.status === 'hadir').length;
+      const attendanceRate = totalPresensi > 0 ? (hadirCount / totalPresensi * 100).toFixed(1) : 0;
+      
+      const totalUsers = profiles.filter(p => p.role === 'user').length;
+      
+      const previousMonthPresensi = allPresensi.filter(p => {
+        const presensiDate = new Date(p.waktu_presensi);
+        const prevMonth = thisMonth === 0 ? 11 : thisMonth - 1;
+        const prevYear = thisMonth === 0 ? thisYear - 1 : thisYear;
+        return presensiDate.getMonth() === prevMonth && 
+               presensiDate.getFullYear() === prevYear;
+      }).length;
+      
+      const monthTrend = previousMonthPresensi > 0 ? 
+        ((thisMonthPresensi - previousMonthPresensi) / previousMonthPresensi * 100).toFixed(1) : 0;
+      
+      const stats = [
+        {
+          title: 'Total Presensi Hari Ini',
+          value: todayPresensi,
+          trend: 0,
+          icon: (
+            <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          ),
+          iconBg: 'bg-blue-100 dark:bg-blue-900/30'
+        },
+        {
+          title: 'Total Presensi Bulan Ini',
+          value: thisMonthPresensi,
+          trend: parseFloat(monthTrend),
+          icon: (
+            <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          ),
+          iconBg: 'bg-green-100 dark:bg-green-900/30'
+        },
+        {
+          title: 'Attendance Rate',
+          value: `${attendanceRate}%`,
+          trend: 0,
+          icon: (
+            <svg className="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          ),
+          iconBg: 'bg-yellow-100 dark:bg-yellow-900/30'
+        },
+        {
+          title: 'Total User Terdaftar',
+          value: totalUsers,
+          trend: 0,
+          icon: (
+            <svg className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+            </svg>
+          ),
+          iconBg: 'bg-purple-100 dark:bg-purple-900/30'
+        }
+      ];
+      
+      setDashboardStats(stats);
+    } else {
+      // User stats (new logic)
+      const userPresensiData = userPresensi || [];
+      
+      // 1. Total Presensi Saya
+      const totalMyPresensi = userPresensiData.length;
+      
+      // 2. Kehadiran Bulan Ini
+      const thisMonthMyPresensi = userPresensiData.filter(p => {
+        const presensiDate = new Date(p.waktu_presensi);
+        return presensiDate.getMonth() === thisMonth && 
+               presensiDate.getFullYear() === thisYear;
+      }).length;
+      
+      // 3. Status Terakhir
+      const lastPresensi = userPresensiData.sort((a, b) => 
+        new Date(b.waktu_presensi) - new Date(a.waktu_presensi)
+      )[0];
+      const lastStatus = lastPresensi ? lastPresensi.status : 'Belum ada presensi';
+      
+      // 4. Streak Kehadiran (berturut-turut)
+      const calculateStreak = () => {
+        if (userPresensiData.length === 0) return 0;
+        
+        const sortedPresensi = userPresensiData
+          .filter(p => p.status === 'hadir')
+          .sort((a, b) => new Date(b.waktu_presensi) - new Date(a.waktu_presensi));
+        
+        if (sortedPresensi.length === 0) return 0;
+        
+        let streak = 0;
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        
+        // Check if last presensi was today or yesterday
+        const lastPresensiDate = new Date(sortedPresensi[0].waktu_presensi);
+        const daysDiff = Math.floor((today - lastPresensiDate) / (1000 * 60 * 60 * 24));
+        
+        if (daysDiff > 1) return 0; // Streak broken
+        
+        // Count consecutive days
+        for (let i = 0; i < sortedPresensi.length - 1; i++) {
+          const currentDate = new Date(sortedPresensi[i].waktu_presensi);
+          const nextDate = new Date(sortedPresensi[i + 1].waktu_presensi);
+          const diffDays = Math.floor((currentDate - nextDate) / (1000 * 60 * 60 * 24));
+          
+          if (diffDays === 1) {
+            streak++;
+          } else {
+            break;
+          }
+        }
+        
+        return streak + 1; // +1 for the last presensi
+      };
+      
+      const streak = calculateStreak();
+      
+      // 5. Target Bulanan (asumsi target 20x/bulan)
+      const targetBulanan = 20;
+      const progressBulanan = thisMonthMyPresensi;
+      const progressPercentage = Math.min((progressBulanan / targetBulanan) * 100, 100);
+      
+      // 6. Rata-rata Kehadiran
+      const totalHadir = userPresensiData.filter(p => p.status === 'hadir').length;
+      const rataRataKehadiran = totalMyPresensi > 0 ? (totalHadir / totalMyPresensi * 100).toFixed(1) : 0;
+      
+      const stats = [
+        {
+          title: 'Total Presensi Saya',
+          value: totalMyPresensi,
+          trend: 0,
+          icon: (
+            <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          ),
+          iconBg: 'bg-blue-100 dark:bg-blue-900/30'
+        },
+        {
+          title: 'Kehadiran Bulan Ini',
+          value: thisMonthMyPresensi,
+          trend: 0,
+          icon: (
+            <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          ),
+          iconBg: 'bg-green-100 dark:bg-green-900/30'
+        },
+        {
+          title: 'Status Terakhir',
+          value: lastStatus === 'hadir' ? 'Hadir' : lastStatus === 'terlambat' ? 'Terlambat' : 'Belum ada',
+          trend: 0,
+          icon: (
+            <svg className="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          ),
+          iconBg: lastStatus === 'hadir' ? 'bg-green-100 dark:bg-green-900/30' : 
+                  lastStatus === 'terlambat' ? 'bg-yellow-100 dark:bg-yellow-900/30' : 
+                  'bg-gray-100 dark:bg-gray-900/30'
+        },
+        {
+          title: 'Streak Kehadiran',
+          value: `${streak} hari`,
+          trend: 0,
+          icon: (
+            <svg className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          ),
+          iconBg: 'bg-purple-100 dark:bg-purple-900/30'
+        },
+        {
+          title: 'Target Bulanan',
+          value: `${progressBulanan}/${targetBulanan}`,
+          trend: parseFloat(progressPercentage.toFixed(1)),
+          icon: (
+            <svg className="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          ),
+          iconBg: 'bg-indigo-100 dark:bg-indigo-900/30'
+        },
+        {
+          title: 'Rata-rata Kehadiran',
+          value: `${rataRataKehadiran}%`,
+          trend: 0,
+          icon: (
+            <svg className="w-6 h-6 text-pink-600 dark:text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          ),
+          iconBg: 'bg-pink-100 dark:bg-pink-900/30'
+        }
+      ];
+      
+      setDashboardStats(stats);
+    }
   };
 
   // Fungsi untuk menghitung attendance trend data
