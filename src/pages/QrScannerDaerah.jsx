@@ -38,10 +38,10 @@ export default function QrScannerDaerah() {
     const fetchJamTepatWaktu = async () => {
       try {
         const { data, error } = await supabase
-          .from('settings')
-          .select('value')
-          .eq('key', 'jam_tepat_waktu')
-          .single();
+        .from('settings')
+        .select('value')
+        .eq('key', 'jam_tepat_waktu')
+        .single();
         
         if (error && error.code === 'PGRST116') {
           // Data tidak ditemukan, buat data default

@@ -63,31 +63,31 @@ function BarChart01({
       };
 
       newChart = new Chart(ctx, {
-        type: 'bar',
+      type: 'bar',
         data: enhancedData,
-        options: {
+      options: {
           responsive: true,
           maintainAspectRatio: false,
-          layout: {
-            padding: {
+        layout: {
+          padding: {
               top: 20,
               bottom: 20,
-              left: 20,
-              right: 20,
-            },
+            left: 20,
+            right: 20,
           },
-          scales: {
-            y: {
+        },
+        scales: {
+          y: {
               beginAtZero: true,
-              border: {
-                display: false,
-              },
+            border: {
+              display: false,
+            },
               grid: {
                 color: darkMode ? 'rgba(156, 163, 175, 0.1)' : 'rgba(156, 163, 175, 0.2)',
                 drawBorder: false,
                 lineWidth: 1,
               },
-              ticks: {
+            ticks: {
                 maxTicksLimit: 6,
                 padding: 10,
                 color: darkMode ? '#9ca3af' : '#6b7280',
@@ -95,18 +95,18 @@ function BarChart01({
                   size: 11,
                   weight: '500',
                 },
-                callback: (value) => formatValue(value),
-              },
+              callback: (value) => formatValue(value),
             },
-            x: {
+          },
+          x: {
               type: 'category',
-              border: {
-                display: false,
-              },
-              grid: {
-                display: false,
-              },
-              ticks: {
+            border: {
+              display: false,
+            },
+            grid: {
+              display: false,
+            },
+            ticks: {
                 color: darkMode ? '#9ca3af' : '#6b7280',
                 font: {
                   size: 11,
@@ -114,14 +114,14 @@ function BarChart01({
                 },
                 maxRotation: 45,
                 minRotation: 0,
-              },
             },
           },
-          plugins: {
-            legend: {
-              display: false,
-            },
-            tooltip: {
+        },
+        plugins: {
+          legend: {
+            display: false,
+          },
+          tooltip: {
               backgroundColor: darkMode ? 'rgba(17, 24, 39, 0.95)' : 'rgba(255, 255, 255, 0.95)',
               titleColor: darkMode ? '#f3f4f6' : '#1f2937',
               bodyColor: darkMode ? '#d1d5db' : '#4b5563',
@@ -138,7 +138,7 @@ function BarChart01({
                 size: 12,
                 weight: '500',
               },
-              callbacks: {
+            callbacks: {
                 title: (context) => {
                   const monthLabel = context[0].label;
                   return `Bulan: ${monthLabel}`;
@@ -147,46 +147,46 @@ function BarChart01({
                   return `${context.dataset.label}: ${formatValue(context.parsed.y)}`;
                 },
               },
-            },
           },
-          interaction: {
-            intersect: false,
+        },
+        interaction: {
+          intersect: false,
             mode: 'index',
-          },
-          animation: {
+        },
+        animation: {
             duration: 750,
             easing: 'easeInOutQuart',
-          },
+        },
           elements: {
             bar: {
               borderRadius: 6,
             },
           },
-        },
-        plugins: [
-          {
-            id: 'htmlLegend',
-            afterUpdate(c, args, options) {
-              const ul = legend.current;
-              if (!ul) return;
-              // Remove old legend items
-              while (ul.firstChild) {
-                ul.firstChild.remove();
-              }
-              // Reuse the built-in legendItems generator
-              const items = c.options.plugins.legend.labels.generateLabels(c);
-              items.forEach((item) => {
-                const li = document.createElement('li');
+      },
+      plugins: [
+        {
+          id: 'htmlLegend',
+          afterUpdate(c, args, options) {
+            const ul = legend.current;
+            if (!ul) return;
+            // Remove old legend items
+            while (ul.firstChild) {
+              ul.firstChild.remove();
+            }
+            // Reuse the built-in legendItems generator
+            const items = c.options.plugins.legend.labels.generateLabels(c);
+            items.forEach((item) => {
+              const li = document.createElement('li');
                 li.className = 'flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors';
                 
-                // Button element
-                const button = document.createElement('button');
+              // Button element
+              const button = document.createElement('button');
                 button.className = 'flex items-center space-x-3 w-full';
                 button.style.opacity = item.hidden ? '0.4' : '1';
-                button.onclick = () => {
-                  c.setDatasetVisibility(item.datasetIndex, !c.isDatasetVisible(item.datasetIndex));
-                  c.update();
-                };
+              button.onclick = () => {
+                c.setDatasetVisibility(item.datasetIndex, !c.isDatasetVisible(item.datasetIndex));
+                c.update();
+              };
                 
                 // Color indicator
                 const indicator = document.createElement('div');
@@ -194,13 +194,13 @@ function BarChart01({
                 indicator.style.backgroundColor = item.fillStyle;
                 indicator.style.border = `2px solid ${item.fillStyle}20`;
                 
-                // Label
+              // Label
                 const label = document.createElement('span');
                 label.className = 'text-sm font-medium text-gray-700 dark:text-gray-200';
                 label.textContent = item.text;
                 
                 // Value
-                const value = document.createElement('span');
+              const value = document.createElement('span');
                 value.className = 'text-sm font-semibold text-gray-900 dark:text-gray-100';
                 const totalValue = c.data.datasets[item.datasetIndex].data.reduce((a, b) => a + b, 0);
                 value.textContent = formatValue(totalValue);
@@ -208,14 +208,14 @@ function BarChart01({
                 button.appendChild(indicator);
                 button.appendChild(label);
                 button.appendChild(value);
-                li.appendChild(button);
-                ul.appendChild(li);
-              });
-            },
+              li.appendChild(button);
+              ul.appendChild(li);
+            });
           },
-        ],
-      });
-      setChart(newChart);
+        },
+      ],
+    });
+    setChart(newChart);
     }
     return () => {
       if (newChart) {

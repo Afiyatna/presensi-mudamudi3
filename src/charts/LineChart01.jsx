@@ -57,24 +57,24 @@ function LineChart01({
       };
 
       newChart = new Chart(ctx, {
-        type: 'line',
+      type: 'line',
         data: enhancedData,
-        options: {
+      options: {
           responsive: true,
           maintainAspectRatio: false,
-          layout: {
+        layout: {
             padding: {
               top: 20,
               bottom: 20,
               left: 20,
               right: 20,
             },
-          },
-          scales: {
-            y: {
+        },
+        scales: {
+          y: {
               beginAtZero: true,
               border: {
-                display: false,
+            display: false,
               },
               grid: {
                 color: darkMode ? 'rgba(156, 163, 175, 0.1)' : 'rgba(156, 163, 175, 0.2)',
@@ -91,15 +91,15 @@ function LineChart01({
                 },
                 callback: (value) => formatValue(value),
               },
-            },
-            x: {
+          },
+          x: {
               type: 'category',
               border: {
                 display: false,
-              },
+            },
               grid: {
-                display: false,
-              },
+            display: false,
+          },
               ticks: {
                 color: darkMode ? '#9ca3af' : '#6b7280',
                 font: {
@@ -112,9 +112,9 @@ function LineChart01({
             },
           },
           plugins: {
-            legend: {
-              display: false,
-            },
+          legend: {
+            display: false,
+          },
             tooltip: {
               backgroundColor: darkMode ? 'rgba(17, 24, 39, 0.95)' : 'rgba(255, 255, 255, 0.95)',
               titleColor: darkMode ? '#f3f4f6' : '#1f2937',
@@ -142,15 +142,15 @@ function LineChart01({
                 },
               },
             },
-          },
-          interaction: {
-            intersect: false,
+        },
+        interaction: {
+          intersect: false,
             mode: 'index',
           },
           animation: {
             duration: 750,
             easing: 'easeInOutQuart',
-          },
+        },
           elements: {
             point: {
               hoverRadius: 8,
@@ -160,9 +160,9 @@ function LineChart01({
               tension: 0.4,
             },
           },
-        },
-      });
-      setChart(newChart);
+      },
+    });
+    setChart(newChart);
     }
     return () => {
       if (newChart) {
@@ -197,7 +197,7 @@ function LineChart01({
 
   return (
     <div className="p-4">
-      <canvas ref={canvas} width={width} height={height}></canvas>
+    <canvas ref={canvas} width={width} height={height}></canvas>
     </div>
   );
 }
