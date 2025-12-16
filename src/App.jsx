@@ -9,9 +9,7 @@ import './charts/ChartjsConfig';
 import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
 // import QRScanner from './pages/QRScanner';
-import QrScannerMenu from './pages/QrScannerMenu';
-import QrScannerDaerah from './pages/QrScannerDaerah';
-import QrScannerDesa from './pages/QrScannerDesa';
+import QrScannerUniversal from './pages/QrScannerUniversal';
 import UserQRCode from './pages/UserQRCode';
 import UserPresensiHistory from './pages/UserPresensiHistory';
 import RequireAuth from './components/RequireAuth';
@@ -25,6 +23,12 @@ import ResetPassword from './pages/ResetPassword';
 import Footer from './components/Footer';
 import DataProfileUser from './pages/DataProfileUser';
 import PageTransition from './components/PageTransition';
+import KegiatanAdmin from './pages/KegiatanAdmin';
+import KegiatanUser from './pages/KegiatanUser';
+import KelolaIzinAdmin from './pages/KelolaIzinAdmin';
+import RiwayatPresensiTerintegrasi from './pages/RiwayatPresensiTerintegrasi';
+import NotifikasiAdmin from './pages/NotifikasiAdmin';
+import AnalyticsAdmin from './pages/AnalyticsAdmin';
 
 function App() {
 
@@ -41,9 +45,14 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
-        <Route path="/qr-scanner" element={<RequireAuth><RequireAdmin><QrScannerMenu /></RequireAdmin></RequireAuth>} />
-        <Route path="/qr-scanner/daerah" element={<RequireAuth><RequireAdmin><QrScannerDaerah /></RequireAdmin></RequireAuth>} />
-        <Route path="/qr-scanner/desa" element={<RequireAuth><RequireAdmin><QrScannerDesa /></RequireAdmin></RequireAuth>} />
+        <Route path="/kegiatan" element={<RequireAuth><RequireAdmin><KegiatanAdmin /></RequireAdmin></RequireAuth>} />
+        <Route path="/user-kegiatan" element={<RequireAuth><KegiatanUser /></RequireAuth>} />
+        <Route path="/kelola-izin" element={<RequireAuth><RequireAdmin><KelolaIzinAdmin /></RequireAdmin></RequireAuth>} />
+        <Route path="/riwayat-presensi" element={<RequireAuth><RequireAdmin><RiwayatPresensiTerintegrasi /></RequireAdmin></RequireAuth>} />
+        <Route path="/notifikasi" element={<RequireAuth><RequireAdmin><NotifikasiAdmin /></RequireAdmin></RequireAuth>} />
+        <Route path="/analytics" element={<RequireAuth><RequireAdmin><AnalyticsAdmin /></RequireAdmin></RequireAuth>} />
+        <Route path="/qr-scanner" element={<RequireAuth><RequireAdmin><QrScannerUniversal /></RequireAdmin></RequireAuth>} />
+        <Route path="/qr-scanner/kegiatan" element={<RequireAuth><RequireAdmin><QrScannerUniversal /></RequireAdmin></RequireAuth>} />
         <Route path="/attendance-report-menu" element={<RequireAuth><RequireAdmin><AttendanceReportMenu /></RequireAdmin></RequireAuth>} />
         <Route path="/attendance-report-daerah" element={<RequireAuth><RequireAdmin><AttendanceReportDaerah /></RequireAdmin></RequireAuth>} />
         <Route path="/attendance-report-desa" element={<RequireAuth><RequireAdmin><AttendanceReportDesa /></RequireAdmin></RequireAuth>} />

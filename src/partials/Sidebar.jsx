@@ -151,11 +151,110 @@ function Sidebar({
                           <path d="M0 1.5A1.5 1.5 0 0 1 1.5 0h3A1.5 1.5 0 0 1 6 1.5v3A1.5 1.5 0 0 1 4.5 6h-3A1.5 1.5 0 0 1 0 4.5v-3ZM1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3ZM0 10.5A1.5 1.5 0 0 1 1.5 9h3A1.5 1.5 0 0 1 6 10.5v3A1.5 1.5 0 0 1 4.5 15h-3A1.5 1.5 0 0 1 0 13.5v-3ZM1.5 10a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3ZM10 1.5A1.5 1.5 0 0 1 11.5 0h3A1.5 1.5 0 0 1 16 1.5v3A1.5 1.5 0 0 1 14.5 6h-3A1.5 1.5 0 0 1 10 4.5v-3ZM11.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3ZM10 10.5A1.5 1.5 0 0 1 11.5 9h3A1.5 1.5 0 0 1 16 10.5v3A1.5 1.5 0 0 1 14.5 15h-3A1.5 1.5 0 0 1 10 13.5v-3ZM11.5 10a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3Z"/>
                     </svg>
                         <span className="text-sm font-medium duration-200">
-                          QR Scanner Menu
-                    </span>
+                          QR Scanner
+                        </span>
                   </div>
                 </NavLink>
               </li>
+                  {/* Kegiatan */}
+                  <li className="px-3 py-2">
+                    <NavLink
+                      end
+                      to="/kegiatan"
+                      className={({ isActive }) =>
+                        "block text-gray-800 dark:text-gray-100 truncate transition duration-150 " + (isActive ? "text-green-600" : "hover:text-gray-900 dark:hover:text-white")
+                      }
+                    >
+                      <div className="flex items-center gap-2">
+                        <svg className={`shrink-0 fill-current ${pathname === "/kegiatan" ? 'text-green-600' : 'text-gray-400 dark:text-gray-500'}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                          <path d="M8 1.333A6.667 6.667 0 1 0 8 14.667 6.667 6.667 0 0 0 8 1.333zm0 12A5.333 5.333 5.333 0 1 1 8 2.667a5.333 5.333 0 0 1 0 10.666z"/>
+                          <path d="M8 4a.667.667 0 0 0-.667.667v3.333c0 .368.299.667.667.667h2.667a.667.667 0 0 0 0-1.334H8.667V4.667A.667.667 0 0 0 8 4z"/>
+                        </svg>
+                        <span className="text-sm font-medium duration-200">
+                          Kelola Kegiatan
+                        </span>
+                      </div>
+                    </NavLink>
+                  </li>
+                  {/* Kelola Izin */}
+                  <li className="px-3 py-2">
+                    <NavLink
+                      end
+                      to="/kelola-izin"
+                      className={({ isActive }) =>
+                        "block text-gray-800 dark:text-gray-100 truncate transition duration-150 " + (isActive ? "text-orange-600" : "hover:text-gray-900 dark:hover:text-white")
+                      }
+                    >
+                      <div className="flex items-center gap-2">
+                        <svg className={`shrink-0 fill-current ${pathname === "/kelola-izin" ? 'text-orange-600' : 'text-gray-400 dark:text-gray-500'}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                          <path d="M8 1.333A6.667 6.667 0 1 0 8 14.667 6.667 6.667 0 0 0 8 1.333zm0 12A5.333 5.333 5.333 0 1 1 8 2.667a5.333 5.333 0 0 1 0 10.666z"/>
+                          <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
+                        </svg>
+                        <span className="text-sm font-medium duration-200">
+                          Kelola Izin
+                        </span>
+                      </div>
+                    </NavLink>
+                  </li>
+                  {/* Riwayat Presensi Terintegrasi */}
+                  <li className="px-3 py-2">
+                    <NavLink
+                      end
+                      to="/riwayat-presensi"
+                      className={({ isActive }) =>
+                        "block text-gray-800 dark:text-gray-100 truncate transition duration-150 " + (isActive ? "text-blue-600" : "hover:text-gray-900 dark:hover:text-white")
+                      }
+                    >
+                      <div className="flex items-center gap-2">
+                        <svg className={`shrink-0 fill-current ${pathname === "/riwayat-presensi" ? 'text-blue-600' : 'text-gray-400 dark:text-gray-500'}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                          <path d="M8 1.333A6.667 6.667 0 1 0 8 14.667 6.667 6.667 0 0 0 8 1.333zm0 12A5.333 5.333 5.333 0 1 1 8 2.667a5.333 5.333 0 0 1 0 10.666z"/>
+                          <path d="M8 4a.667.667 0 0 0-.667.667v3.333c0 .368.299.667.667.667h2.667a.667.667 0 0 0 0-1.334H8.667V4.667A.667.667 0 0 0 8 4z"/>
+                        </svg>
+                        <span className="text-sm font-medium duration-200">
+                          Riwayat Presensi
+                        </span>
+                      </div>
+                    </NavLink>
+                  </li>
+                  {/* Notifikasi */}
+                  <li className="px-3 py-2">
+                    <NavLink
+                      end
+                      to="/notifikasi"
+                      className={({ isActive }) =>
+                        "block text-gray-800 dark:text-gray-100 truncate transition duration-150 " + (isActive ? "text-red-600" : "hover:text-gray-900 dark:hover:text-white")
+                      }
+                    >
+                      <div className="flex items-center gap-2">
+                        <svg className={`shrink-0 fill-current ${pathname === "/notifikasi" ? 'text-red-600' : 'text-gray-400 dark:text-gray-500'}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                          <path d="M8 16A2 2 0 0 0 10 14H6A2 2 0 0 0 8 16ZM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 1.197-.334 1.754A2.004 2.004 0 0 1 2 10c0 1.01.377 1.928 1 2.614A3.978 3.978 0 0 1 6 14h4c1.01 0 1.928-.377 2.614-1A3.978 3.978 0 0 1 14 10c0-.628.134-1.197.334-1.754A2.004 2.004 0 0 1 16 10c0-1.01-.377-1.928-1-2.614A3.978 3.978 0 0 1 12 6a4.002 4.002 0 0 0-1.203-2.92L8 1.918z"/>
+                        </svg>
+                        <span className="text-sm font-medium duration-200">
+                          Notifikasi
+                        </span>
+                      </div>
+                    </NavLink>
+                  </li>
+                  {/* Analytics */}
+                  <li className="px-3 py-2">
+                    <NavLink
+                      end
+                      to="/analytics"
+                      className={({ isActive }) =>
+                        "block text-gray-800 dark:text-gray-100 truncate transition duration-150 " + (isActive ? "text-indigo-600" : "hover:text-gray-900 dark:hover:text-white")
+                      }
+                    >
+                      <div className="flex items-center gap-2">
+                        <svg className={`shrink-0 fill-current ${pathname === "/analytics" ? 'text-indigo-600' : 'text-gray-400 dark:text-gray-500'}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                          <path d="M8 1.333A6.667 6.667 0 1 0 8 14.667 6.667 6.667 0 0 0 8 1.333zm0 12A5.333 5.333 5.333 0 1 1 8 2.667a5.333 5.333 0 0 1 0 10.666z"/>
+                          <path d="M8 4a.667.667 0 0 0-.667.667v3.333c0 .368.299.667.667.667h2.667a.667.667 0 0 0 0-1.334H8.667V4.667A.667.667 0 0 0 8 4z"/>
+                        </svg>
+                        <span className="text-sm font-medium duration-200">
+                          Analytics
+                        </span>
+                      </div>
+                    </NavLink>
+                  </li>
                   {/* Riwayat Presensi Menu */}
                   <li className="px-3 py-2">
                     <NavLink
@@ -292,6 +391,26 @@ function Sidebar({
                         <span className="text-sm font-medium duration-200">
                           Riwayat Presensi
                               </span>
+                      </div>
+                    </NavLink>
+                          </li>
+                  {/* Kegiatan User */}
+                  <li className="px-3 py-2">
+                    <NavLink
+                      end
+                      to="/user-kegiatan"
+                      className={({ isActive }) =>
+                        "block text-gray-800 dark:text-gray-100 truncate transition duration-150 " + (isActive ? "text-green-600" : "hover:text-gray-900 dark:hover:text-white")
+                      }
+                    >
+                      <div className="flex items-center gap-2">
+                        <svg className={`shrink-0 fill-current ${pathname === "/user-kegiatan" ? 'text-green-600' : 'text-gray-400 dark:text-gray-500'}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                          <path d="M8 1.333A6.667 6.667 0 1 0 8 14.667 6.667 6.667 0 0 0 8 1.333zm0 12A5.333 5.333 5.333 0 1 1 8 2.667a5.333 5.333 0 0 1 0 10.666z"/>
+                          <path d="M8 4a.667.667 0 0 0-.667.667v3.333c0 .368.299.667.667.667h2.667a.667.667 0 0 0 0-1.334H8.667V4.667A.667.667 0 0 0 8 4z"/>
+                        </svg>
+                        <span className="text-sm font-medium duration-200">
+                          Kegiatan
+                        </span>
                       </div>
                     </NavLink>
                   </li>

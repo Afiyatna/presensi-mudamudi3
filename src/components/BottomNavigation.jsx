@@ -7,7 +7,7 @@ function BottomNavigation({ role }) {
 
   const adminItems = [
     { path: '/dashboard', icon: '🏠', label: 'Dashboard', activePaths: ['/dashboard'] },
-    { path: '/qr-scanner', icon: '📷', label: 'QR Scanner', activePaths: ['/qr-scanner', '/qr-scanner-daerah', '/qr-scanner-desa'] },
+    { path: '/qr-scanner', icon: '📷', label: 'QR Scanner', activePaths: ['/qr-scanner', '/qr-scanner/kegiatan'] },
     { path: '/attendance-report-menu', icon: '📊', label: 'Rekap Presensi', activePaths: ['/attendance-report-menu', '/attendance-report', '/attendance-report-daerah', '/attendance-report-desa', '/attendance-report-dummy'] },
     { path: '/data-profile-user', icon: '👥', label: 'Profile User', activePaths: ['/data-profile-user'] },
   ];

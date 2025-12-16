@@ -1,17 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
-import Sidebar from '../partials/Sidebar';
-import Header from '../partials/Header';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-import { useNavigate } from 'react-router-dom';
-import toast, { Toaster } from 'react-hot-toast';
+import { presensiKegiatanService } from '../lib/presensiKegiatanService';
 import LayoutDashboard from '../layouts/LayoutDashboard';
+import { toast } from 'react-hot-toast';
 import DataLoadingSpinner from '../components/DataLoadingSpinner';
 
-const beepUrl = '/beep.mp3';
+const beepUrl = '/beep.mp3'; // letakkan beep.mp3 di public folder project Anda
 
-export default function QrScannerDesa() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+export default function QrScannerUniversal() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [scanResult, setScanResult] = useState('');
   const [scanHistory, setScanHistory] = useState([]);
   const [scanning, setScanning] = useState(false);
@@ -24,15 +24,25 @@ export default function QrScannerDesa() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [successStatus, setSuccessStatus] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-  const qrId = 'qr-reader-desa';
+  const [kegiatan, setKegiatan] = useState(null);
+  const qrId = 'qr-reader-universal';
   const qrRef = useRef();
   const html5QrInstance = useRef(null);
-  const navigate = useNavigate();
   const beepAudio = useRef(null);
 
   useEffect(() => {
     beepAudio.current = new window.Audio(beepUrl);
   }, []);
+
+  useEffect(() => {
+    // Ambil data kegiatan dari state navigasi
+    if (location.state?.kegiatanId) {
+      fetchKegiatanData(location.state.kegiatanId);
+    } else {
+      toast.error('Data kegiatan tidak ditemukan');
+      navigate('/kegiatan');
+    }
+  }, [location.state, navigate]);
 
   useEffect(() => {
     const fetchJamTepatWaktu = async () => {
@@ -62,6 +72,23 @@ export default function QrScannerDesa() {
     };
     fetchJamTepatWaktu();
   }, []);
+
+  const fetchKegiatanData = async (kegiatanId) => {
+    try {
+      const { data, error } = await supabase
+        .from('kegiatan')
+        .select('*')
+        .eq('id', kegiatanId)
+        .single();
+
+      if (error) throw error;
+      setKegiatan(data);
+    } catch (error) {
+      console.error('Error fetching kegiatan:', error);
+      toast.error('Gagal memuat data kegiatan');
+      navigate('/kegiatan');
+    }
+  };
 
   const handleSaveJamTepatWaktu = async () => {
     try {
@@ -119,40 +146,78 @@ export default function QrScannerDesa() {
     }
   };
 
-  const handleScanPresensi = async (userId) => {
+  const handleScanPresensi = async (qrData) => {
     setPresensiLoading(true);
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('nama_lengkap, kelompok, desa, jenis_kelamin')
-      .eq('id', userId)
-      .single();
-    if (!profile) {
-      toast.error('Data user tidak ditemukan!');
+    
+    try {
+      // Parse QR code data: user_id|nama|kelompok|desa
+      const [userId, nama, kelompok, desa] = qrData.split('|');
+      
+      if (!userId || !nama || !kelompok || !desa) {
+        toast.error('Format QR Code tidak valid');
+        setPresensiLoading(false);
+        return '';
+      }
+
+      // Check if user already has presensi for this kegiatan
+      const existingPresensi = await presensiKegiatanService.getPresensiByUserAndKegiatan(userId, kegiatan.id);
+      
+      if (existingPresensi.data && existingPresensi.data.length > 0) {
+        toast.error('User sudah melakukan presensi untuk kegiatan ini');
+        setPresensiLoading(false);
+        return '';
+      }
+
+      // Get user profile data
+      const { data: userProfile, error: userError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (userError) {
+        toast.error('Data user tidak ditemukan');
+        setPresensiLoading(false);
+        return '';
+      }
+
+      // Determine status based on time
+      const now = new Date();
+      const [batasJam, batasMenit] = jamTepatWaktu.split(':').map(Number);
+      const status = (now.getHours() < batasJam || (now.getHours() === batasJam && now.getMinutes() <= batasMenit))
+        ? 'hadir'
+        : 'terlambat';
+
+      // Create presensi record
+      const presensiData = {
+        kegiatan_id: kegiatan.id,
+        user_id: userId,
+        nama_lengkap: nama,
+        kelompok: kelompok,
+        desa: desa,
+        jenis_kelamin: userProfile.jenis_kelamin || 'Tidak diketahui',
+        status: status,
+        waktu_presensi: now.toISOString()
+      };
+
+      const { data: newPresensi, error: presensiError } = await presensiKegiatanService.createPresensiKegiatan(presensiData);
+      
+      if (presensiError) {
+        toast.error('Gagal mencatat presensi');
+        setPresensiLoading(false);
+        return '';
+      }
+
+      toast.success(`Presensi berhasil! ${nama} - Status: ${status}`);
+      setPresensiLoading(false);
+      return status;
+      
+    } catch (error) {
+      console.error('Error processing presensi:', error);
+      toast.error('Gagal memproses presensi');
       setPresensiLoading(false);
       return '';
     }
-    const now = new Date();
-    const pad = n => n.toString().padStart(2, '0');
-    const waktuPresensi = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}+07:00`;
-    const [batasJam, batasMenit] = jamTepatWaktu.split(':').map(Number);
-    const status = (now.getHours() < batasJam || (now.getHours() === batasJam && now.getMinutes() <= batasMenit))
-      ? 'hadir'
-      : 'terlambat';
-    const { error: presensiError } = await supabase.from('presensi_desa').insert([{
-      nama_lengkap: profile.nama_lengkap,
-      kelompok: profile.kelompok,
-      desa: profile.desa,
-      jenis_kelamin: profile.jenis_kelamin,
-      status: status,
-      waktu_presensi: waktuPresensi,
-    }]);
-    setPresensiLoading(false);
-    if (presensiError) {
-      toast.error('Gagal menyimpan presensi desa!');
-    } else {
-      toast.success(`Presensi berhasil! ${profile.nama_lengkap} - Status: ${status}`);
-    }
-    return status;
   };
 
   const startScanner = async () => {
@@ -187,15 +252,17 @@ export default function QrScannerDesa() {
             await stopScanner();
             
             const status = await handleScanPresensi(decodedText);
-            setSuccessStatus(status);
-            setSuccessMessage(`Presensi berhasil! Status: ${status}`);
-            setShowSuccess(true);
-            
-            // Auto restart scanner after 3 seconds
-            setTimeout(() => {
-              setShowSuccess(false);
-              setScanning(true);
-            }, 3000);
+            if (status) {
+              setSuccessStatus(status);
+              setSuccessMessage(`Presensi berhasil! Status: ${status}`);
+              setShowSuccess(true);
+              
+              // Auto restart scanner after 3 seconds
+              setTimeout(() => {
+                setShowSuccess(false);
+                setScanning(true);
+              }, 3000);
+            }
           } catch (e) {
             console.error('Scan callback error:', e);
           }
@@ -231,19 +298,33 @@ export default function QrScannerDesa() {
     setScanHistory([]);
   };
 
+  if (!kegiatan) {
+    return (
+      <LayoutDashboard>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600 dark:text-gray-400">Memuat data kegiatan...</p>
+          </div>
+        </div>
+      </LayoutDashboard>
+    );
+  }
+
   return (
-    <LayoutDashboard pageTitle="QR Scanner Presensi Desa">
-      <Toaster position="top-right" />
+    <LayoutDashboard>
       <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto animate-fade-in">
         <div className="flex items-center gap-4 mb-6">
-          <button onClick={() => navigate('/qr-scanner')} className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-gray-700 font-semibold transition-all">← Kembali</button>
+          <button onClick={() => navigate('/kegiatan')} className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-gray-700 font-semibold transition-all">← Kembali</button>
         </div>
         
         {/* Deskripsi halaman */}
         <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <h1 className="text-xl font-bold text-blue-800 mb-2">QR Scanner Presensi Desa</h1>
+          <h1 className="text-xl font-bold text-blue-800 mb-2">
+            QR Scanner: {kegiatan.nama_kegiatan} ({kegiatan.kategori_kegiatan || 'Kelompok'})
+          </h1>
           <p className="text-blue-700 text-sm text-justify">
-            Halaman ini memungkinkan admin untuk memindai QR Code peserta untuk mencatat presensi kegiatan pengajian desa. 
+            Halaman ini memungkinkan admin untuk memindai QR Code peserta untuk mencatat presensi kegiatan {kegiatan.kategori_kegiatan || 'Kelompok'}. 
             Sistem akan otomatis menentukan status kehadiran berdasarkan waktu presensi dan batas waktu yang ditentukan. 
             Kamera akan otomatis mati setelah scan berhasil untuk menghindari scan berulang.
           </p>
@@ -257,7 +338,7 @@ export default function QrScannerDesa() {
                 Scanner QR Code
               </h2>
               <p className="text-sm text-gray-600">
-                Arahkan kamera ke QR Code untuk memulai presensi desa
+                Arahkan kamera ke QR Code untuk memulai presensi {kegiatan.kategori_kegiatan || 'Kelompok'}
               </p>
             </div>
             {presensiLoading && <DataLoadingSpinner message="Memproses presensi..." />}
