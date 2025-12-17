@@ -251,7 +251,7 @@ export default function Register() {
                 </div>
                 <select name="jenis_kelamin" className="w-full pl-4 pr-3 py-2 border-2 border-violet-200 rounded-full bg-gray-50 focus:outline-none focus:border-violet-500 text-gray-800" value={form.jenis_kelamin} onChange={handleChange} required>
                   <option value="">Pilih Jenis Kelamin</option>
-                  <option value="Laki-laki">Laki-laki</option>
+                  <option value="Laki-Laki">Laki-Laki</option>
                   <option value="Perempuan">Perempuan</option>
                 </select>
                 <div className="flex gap-2">

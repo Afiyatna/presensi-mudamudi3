@@ -167,7 +167,7 @@ export default function Profile() {
                 <label className="block text-gray-500 text-sm mb-1">Jenis Kelamin</label>
                 <select name="jenis_kelamin" className="w-full p-2 border rounded" value={form.jenis_kelamin || ''} onChange={handleChange} required>
                   <option value="">Pilih Jenis Kelamin</option>
-                  <option value="Laki-laki">Laki-laki</option>
+                  <option value="Laki-Laki">Laki-Laki</option>
                   <option value="Perempuan">Perempuan</option>
                 </select>
               </div>
