@@ -234,11 +234,11 @@ export default function Profile() {
                 <label className="block text-gray-500 text-sm mb-1">Desa</label>
                 <select name="desa" className="w-full p-2 border rounded" value={form.desa || ''} onChange={handleChange} required>
                   <option value="">Pilih Desa</option>
-                  <option value="BOJA">PATEAN</option>
-                  <option value="BOJA">KENDAL</option>
+                  <option value="PATEAN">PATEAN</option>
+                  <option value="KENDAL">KENDAL</option>
                   <option value="BRANGSONG">BRANGSONG</option>                              
-                  <option value="KENDAL">BOJA</option>
-                  <option value="PATEAN">MIJEN</option>                
+                  <option value="BOJA">BOJA</option>
+                  <option value="MIJEN">MIJEN</option>                
                 </select>
               </div>
               <div>
