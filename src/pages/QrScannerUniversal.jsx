@@ -146,10 +146,81 @@ export default function QrScannerUniversal() {
     }
   };
 
+  // Helper function to refresh session if needed
+  const refreshSessionIfNeeded = async () => {
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error('Session error:', error);
+        // If there's an error getting session, try to get user
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError || !user) {
+          toast.error('Session expired. Silakan login kembali.');
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 2000);
+          return false;
+        }
+        return true;
+      }
+      if (!session) {
+        // No session, try to get user (might trigger auto-refresh)
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError || !user) {
+          toast.error('Session expired. Silakan login kembali.');
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 2000);
+          return false;
+        }
+        return true;
+      }
+      // Check if session is expired (within 5 minutes of expiry)
+      const expiresAt = session.expires_at;
+      if (expiresAt) {
+        const expiresIn = expiresAt - Math.floor(Date.now() / 1000);
+        if (expiresIn < 300) { // Less than 5 minutes
+          // Try to refresh
+          const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession(session);
+          if (refreshError) {
+            console.error('Session refresh error:', refreshError);
+            toast.error('Session expired. Silakan login kembali.');
+            setTimeout(() => {
+              window.location.href = '/';
+            }, 2000);
+            return false;
+          }
+          return refreshData?.session ? true : false;
+        }
+      }
+      return true;
+    } catch (error) {
+      console.error('Error checking session:', error);
+      // Try one more time with getUser
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        return !!user;
+      } catch (e) {
+        toast.error('Session expired. Silakan login kembali.');
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 2000);
+        return false;
+      }
+    }
+  };
+
   const handleScanPresensi = async (qrData) => {
     setPresensiLoading(true);
     
     try {
+      // Refresh session before making API calls
+      const sessionValid = await refreshSessionIfNeeded();
+      if (!sessionValid) {
+        setPresensiLoading(false);
+        return '';
+      }
+
       // Parse QR code data: user_id|nama|kelompok|desa
       const [userId, nama, kelompok, desa] = qrData.split('|');
       
@@ -161,6 +232,21 @@ export default function QrScannerUniversal() {
 
       // Check if user already has presensi for this kegiatan
       const existingPresensi = await presensiKegiatanService.getPresensiByUserAndKegiatan(userId, kegiatan.id);
+      
+      if (existingPresensi.error) {
+        // Check if it's an auth error
+        if (existingPresensi.error.message?.includes('JWT') || existingPresensi.error.message?.includes('token') || existingPresensi.error.message?.includes('session')) {
+          toast.error('Session expired. Silakan login kembali.');
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 2000);
+          setPresensiLoading(false);
+          return '';
+        }
+        toast.error('Gagal memeriksa presensi: ' + existingPresensi.error.message);
+        setPresensiLoading(false);
+        return '';
+      }
       
       if (existingPresensi.data && existingPresensi.data.length > 0) {
         toast.error('User sudah melakukan presensi untuk kegiatan ini');
@@ -176,7 +262,16 @@ export default function QrScannerUniversal() {
         .single();
 
       if (userError) {
-        toast.error('Data user tidak ditemukan');
+        // Check if it's an auth error
+        if (userError.message?.includes('JWT') || userError.message?.includes('token') || userError.message?.includes('session')) {
+          toast.error('Session expired. Silakan login kembali.');
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 2000);
+          setPresensiLoading(false);
+          return '';
+        }
+        toast.error('Data user tidak ditemukan: ' + userError.message);
         setPresensiLoading(false);
         return '';
       }
@@ -203,7 +298,16 @@ export default function QrScannerUniversal() {
       const { data: newPresensi, error: presensiError } = await presensiKegiatanService.createPresensiKegiatan(presensiData);
       
       if (presensiError) {
-        toast.error('Gagal mencatat presensi');
+        // Check if it's an auth error
+        if (presensiError.message?.includes('JWT') || presensiError.message?.includes('token') || presensiError.message?.includes('session')) {
+          toast.error('Session expired. Silakan login kembali.');
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 2000);
+          setPresensiLoading(false);
+          return '';
+        }
+        toast.error('Gagal mencatat presensi: ' + presensiError.message);
         setPresensiLoading(false);
         return '';
       }
@@ -214,7 +318,15 @@ export default function QrScannerUniversal() {
       
     } catch (error) {
       console.error('Error processing presensi:', error);
-      toast.error('Gagal memproses presensi');
+      // Check if it's an auth error
+      if (error.message?.includes('JWT') || error.message?.includes('token') || error.message?.includes('session') || error.message?.includes('refresh')) {
+        toast.error('Session expired. Silakan login kembali.');
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 2000);
+      } else {
+        toast.error('Gagal memproses presensi: ' + error.message);
+      }
       setPresensiLoading(false);
       return '';
     }
@@ -233,7 +345,13 @@ export default function QrScannerUniversal() {
     try {
       await qr.start(
         { facingMode: cameraFacing },
-        { fps: 10, qrbox: 250, rememberLastUsedCamera: true },
+        { 
+          fps: 10, 
+          qrbox: 250, 
+          rememberLastUsedCamera: true,
+          aspectRatio: 1.0,
+          disableFlip: false
+        },
         async (decodedText) => {
           try {
             setLastScannedId(decodedText);
@@ -246,7 +364,13 @@ export default function QrScannerUniversal() {
               type: 'success',
             };
             setScanHistory((prev) => [scanData, ...prev.slice(0, 9)]);
-            if (beepAudio.current) beepAudio.current.play();
+            if (beepAudio.current) {
+              try {
+                beepAudio.current.play().catch(e => console.log('Audio play error:', e));
+              } catch (e) {
+                console.log('Audio error:', e);
+              }
+            }
             
             // Stop scanner immediately after successful scan
             await stopScanner();
@@ -265,14 +389,28 @@ export default function QrScannerUniversal() {
             }
           } catch (e) {
             console.error('Scan callback error:', e);
+            toast.error('Error saat memproses scan: ' + e.message);
           }
         },
         (error) => {
-          setScannerError('Gagal mengakses kamera atau scanner error. Coba restart scanner.');
+          // Only show error if it's not a common scanning error (like NotFoundException)
+          if (error && !error.name?.includes('NotFound') && !error.message?.includes('No QR code')) {
+            console.error('Scanner error:', error);
+            setScannerError('Gagal mengakses kamera atau scanner error. Pastikan izin kamera sudah diberikan dan coba restart scanner.');
+          }
         }
       );
     } catch (e) {
-      setScannerError('Gagal mengakses kamera. Pastikan izin kamera sudah diberikan.');
+      console.error('Scanner start error:', e);
+      let errorMessage = 'Gagal mengakses kamera. ';
+      if (e.message?.includes('Permission denied') || e.message?.includes('NotAllowedError')) {
+        errorMessage += 'Izin kamera ditolak. Silakan berikan izin kamera di pengaturan browser.';
+      } else if (e.message?.includes('NotFoundError') || e.message?.includes('No camera')) {
+        errorMessage += 'Kamera tidak ditemukan. Pastikan perangkat memiliki kamera.';
+      } else {
+        errorMessage += 'Pastikan izin kamera sudah diberikan dan coba restart scanner.';
+      }
+      setScannerError(errorMessage);
     }
   };
 

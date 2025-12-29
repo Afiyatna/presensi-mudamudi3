@@ -9,6 +9,8 @@ export default function UserQRCode() {
   const [userId, setUserId] = useState('');
   const [namaLengkap, setNamaLengkap] = useState('');
   const [kelompok, setKelompok] = useState('');
+  const [desa, setDesa] = useState('');
+  const [qrValue, setQrValue] = useState('');
   const [loading, setLoading] = useState(true);
   const qrRef = useRef(null);
 
@@ -17,14 +19,19 @@ export default function UserQRCode() {
       const { data, error } = await supabase.auth.getUser();
       if (data?.user) {
         setUserId(data.user.id);
-        // Ambil nama lengkap dan kelompok dari profiles
+        // Ambil nama lengkap, kelompok, dan desa dari profiles
         const { data: profile } = await supabase
           .from('profiles')
-          .select('nama_lengkap, kelompok')
+          .select('nama_lengkap, kelompok, desa')
           .eq('id', data.user.id)
           .single();
         if (profile?.nama_lengkap) setNamaLengkap(profile.nama_lengkap);
         if (profile?.kelompok) setKelompok(profile.kelompok);
+        if (profile?.desa) setDesa(profile.desa);
+        
+        // Format QR code: userId|nama|kelompok|desa (sesuai dengan format yang diharapkan scanner)
+        const qrCodeValue = `${data.user.id}|${profile?.nama_lengkap || ''}|${profile?.kelompok || ''}|${profile?.desa || ''}`;
+        setQrValue(qrCodeValue);
       }
       setLoading(false);
     };
@@ -171,7 +178,7 @@ export default function UserQRCode() {
           <div className="mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 sm:p-8 max-w-md">
             <div className="flex justify-center mb-5">
               <div ref={qrRef} className="p-3 bg-gray-50 dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700">
-                <QRCodeCanvas value={userId} size={240} />
+                <QRCodeCanvas value={qrValue || userId} size={240} />
               </div>
             </div>
 

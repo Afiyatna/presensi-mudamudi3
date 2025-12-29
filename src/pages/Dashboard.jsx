@@ -22,6 +22,7 @@ import DoughnutChart from '../charts/DoughnutChart';
 import StatisticsCards from '../components/StatisticsCards';
 import RecentActivity from '../components/RecentActivity';
 import { supabase } from '../supabaseClient';
+import { presensiKegiatanService } from '../lib/presensiKegiatanService';
 import { useThemeProvider } from '../utils/ThemeContext';
 import DropdownFilter from '../components/DropdownFilter';
 import LayoutDashboard from '../layouts/LayoutDashboard';
@@ -600,80 +601,70 @@ function Dashboard() {
         .select('*');
       setProfiles(allProfiles || []);
       
-      // Jika user, ambil data presensi user dari tabel terpisah
-      if (profile?.role === 'user' && profile?.nama_lengkap) {
-        const [presensiDaerah, presensiDesa] = await Promise.all([
-          supabase.from('presensi_daerah').select('*').eq('nama_lengkap', profile.nama_lengkap),
-          supabase.from('presensi_desa').select('*').eq('nama_lengkap', profile.nama_lengkap),
-        ]);
+      // Jika user, ambil data presensi hanya dari presensi_kegiatan (sistem terpusat)
+      if (profile?.role === 'user') {
+        const presensiKegiatan = await presensiKegiatanService.getPresensiByUserId(userData.user.id);
         
-        // Mapping dan tambahkan jenis_presensi
-        const dataDaerah = (presensiDaerah.data || []).map(row => ({
-          ...row,
-          jenis_presensi: 'Presensi Daerah',
-          tabel: 'presensi_daerah',
+        // Mapping presensi kegiatan dengan format yang sama
+        const dataKegiatan = (presensiKegiatan.data || []).map(row => ({
+          id: row.id,
+          nama_lengkap: row.nama_lengkap,
+          kelompok: row.kelompok,
+          desa: row.desa,
+          jenis_kelamin: row.jenis_kelamin,
+          status: row.status,
           waktu_presensi: row.waktu_presensi,
-        }));
-        const dataDesa = (presensiDesa.data || []).map(row => ({
-          ...row,
-          jenis_presensi: 'Presensi Desa',
-          tabel: 'presensi_desa',
-          waktu_presensi: row.waktu_presensi,
+          jenis_presensi: row.kegiatan?.nama_kegiatan || 'Presensi Kegiatan',
+          tabel: 'presensi_kegiatan',
+          kegiatan_id: row.kegiatan_id,
+          kegiatan_nama: row.kegiatan?.nama_kegiatan,
+          kegiatan_tanggal: row.kegiatan?.tanggal,
+          kegiatan_lokasi: row.kegiatan?.lokasi,
+          kategori_kegiatan: row.kegiatan?.kategori_kegiatan,
         }));
         
-        // Gabungkan dan urutkan berdasarkan waktu_presensi
-        const allUserData = [...dataDaerah, ...dataDesa].sort((a, b) => new Date(a.waktu_presensi) - new Date(b.waktu_presensi));
+        // Urutkan berdasarkan waktu_presensi
+        const allUserData = dataKegiatan.sort((a, b) => new Date(a.waktu_presensi) - new Date(b.waktu_presensi));
         setUserPresensi(allUserData);
       }
       
-      // Jika admin, ambil semua data presensi dari tabel terpisah
+      // Jika admin, ambil semua data presensi hanya dari presensi_kegiatan (sistem terpusat)
       if (profile?.role === 'admin') {
-        const [presensiDaerah, presensiDesa] = await Promise.all([
-          supabase.from('presensi_daerah').select('*'),
-          supabase.from('presensi_desa').select('*'),
-        ]);
+        const presensiKegiatan = await presensiKegiatanService.getAllPresensiKegiatan();
         
-        // Mapping dan tambahkan jenis_presensi
-        const dataDaerah = (presensiDaerah.data || []).map(row => ({
-          ...row,
-          jenis_presensi: 'Presensi Daerah',
-          tabel: 'presensi_daerah',
+        // Mapping presensi kegiatan
+        const dataKegiatan = (presensiKegiatan.data || []).map(row => ({
+          id: row.id,
+          nama_lengkap: row.nama_lengkap,
+          kelompok: row.kelompok,
+          desa: row.desa,
+          jenis_kelamin: row.jenis_kelamin,
+          status: row.status,
           waktu_presensi: row.waktu_presensi,
-        }));
-        const dataDesa = (presensiDesa.data || []).map(row => ({
-          ...row,
-          jenis_presensi: 'Presensi Desa',
-          tabel: 'presensi_desa',
-          waktu_presensi: row.waktu_presensi,
+          jenis_presensi: row.kegiatan?.nama_kegiatan || 'Presensi Kegiatan',
+          tabel: 'presensi_kegiatan',
+          kegiatan_id: row.kegiatan_id,
+          kegiatan_nama: row.kegiatan?.nama_kegiatan,
+          kegiatan_tanggal: row.kegiatan?.tanggal,
+          kegiatan_lokasi: row.kegiatan?.lokasi,
+          kategori_kegiatan: row.kegiatan?.kategori_kegiatan,
         }));
         
-        // Gabungkan dan urutkan berdasarkan waktu_presensi
-        const allAdminData = [...dataDaerah, ...dataDesa].sort((a, b) => new Date(a.waktu_presensi) - new Date(b.waktu_presensi));
+        // Urutkan berdasarkan waktu_presensi
+        const allAdminData = dataKegiatan.sort((a, b) => new Date(a.waktu_presensi) - new Date(b.waktu_presensi));
         setAllPresensi(allAdminData);
       }
       setUserLoading(false);
     };
     fetchRoleAndPresensi();
 
-    // Real-time subscription untuk update otomatis
-    const subscriptionDaerah = supabase
-      .channel('presensi_daerah_changes')
+    // Real-time subscription untuk update otomatis dari presensi_kegiatan
+    const subscriptionKegiatan = supabase
+      .channel('presensi_kegiatan_changes')
       .on('postgres_changes', { 
         event: '*', 
         schema: 'public', 
-        table: 'presensi_daerah' 
-      }, () => {
-        // Refresh data ketika ada perubahan
-        fetchRoleAndPresensi();
-      })
-      .subscribe();
-
-    const subscriptionDesa = supabase
-      .channel('presensi_desa_changes')
-      .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
-        table: 'presensi_desa' 
+        table: 'presensi_kegiatan' 
       }, () => {
         // Refresh data ketika ada perubahan
         fetchRoleAndPresensi();
@@ -682,8 +673,7 @@ function Dashboard() {
 
     // Cleanup subscriptions
     return () => {
-      subscriptionDaerah.unsubscribe();
-      subscriptionDesa.unsubscribe();
+      subscriptionKegiatan.unsubscribe();
     };
   }, []);
 

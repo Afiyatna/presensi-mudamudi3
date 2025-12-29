@@ -5,6 +5,9 @@ import LayoutDashboard from '../layouts/LayoutDashboard';
 import DataLoadingSpinner from '../components/DataLoadingSpinner';
 import { QRCodeCanvas } from 'qrcode.react';
 import jsPDF from 'jspdf';
+import JSZip from 'jszip';
+import QRCode from 'qrcode';
+import { toast } from 'react-hot-toast';
 
 export default function DataProfileUser() {
   const [profiles, setProfiles] = useState([]);
@@ -14,6 +17,8 @@ export default function DataProfileUser() {
   const qrRef = useRef(null);
   // Tambah state filter
   const [filters, setFilters] = useState({ jenis_kelamin: 'Semua', kelompok: 'Semua', desa: 'Semua', search: '' });
+  const [downloadingAll, setDownloadingAll] = useState(false);
+  const [downloadingFiltered, setDownloadingFiltered] = useState(false);
 
   useEffect(() => {
     const fetchProfiles = async () => {
@@ -172,6 +177,281 @@ export default function DataProfileUser() {
     pdf.save(getSafeFileName(qrModal.user.nama_lengkap, 'pdf'));
   };
 
+  // Generate QR code card untuk user tertentu (tanpa DOM)
+  const generateQrCardForUser = async (user) => {
+    try {
+      // Format QR code: userId|nama|kelompok|desa (sesuai dengan format yang diharapkan scanner)
+      const qrValue = `${user.id}|${user.nama_lengkap || ''}|${user.kelompok || ''}|${user.desa || ''}`;
+      
+      // Generate QR code sebagai data URL
+      const qrDataUrl = await QRCode.toDataURL(qrValue, {
+        width: 240,
+        margin: 2,
+        color: {
+          dark: '#000000',
+          light: '#FFFFFF'
+        }
+      });
+
+      // Create canvas untuk card
+      const cardWidth = 360;
+      const cardHeight = 500;
+      const qrSize = 220;
+      const topPadding = 32;
+      const gapAfterQr = 28;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = cardWidth;
+      canvas.height = cardHeight;
+      const ctx = canvas.getContext('2d');
+
+      // Background
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, cardWidth, cardHeight);
+
+      // Border
+      ctx.strokeStyle = '#e5e7eb';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(10, 10, cardWidth - 20, cardHeight - 20);
+
+      // Load QR code image
+      const qrImage = new Image();
+      await new Promise((resolve, reject) => {
+        qrImage.onload = resolve;
+        qrImage.onerror = reject;
+        qrImage.src = qrDataUrl;
+      });
+
+      // Draw QR code
+      const qrX = (cardWidth - qrSize) / 2;
+      ctx.drawImage(qrImage, qrX, topPadding, qrSize, qrSize);
+
+      // Text boxes
+      const boxWidth = cardWidth - 80;
+      const boxHeight = 40;
+      const textStartY = topPadding + qrSize + gapAfterQr;
+      const center = cardWidth / 2;
+      ctx.textAlign = 'center';
+
+      // Nama box
+      const nameBoxX = (cardWidth - boxWidth) / 2;
+      const nameBoxY = textStartY - boxHeight / 2;
+      drawRoundedRect(ctx, nameBoxX, nameBoxY, boxWidth, boxHeight, 10);
+      ctx.fillStyle = '#f9fafb';
+      ctx.fill();
+      ctx.strokeStyle = '#e5e7eb';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.fillStyle = '#111827';
+      ctx.font = 'bold 16px "Inter", system-ui, -apple-system, sans-serif';
+      ctx.fillText(truncateLabel(user?.nama_lengkap || 'Nama belum diisi', 28), center, nameBoxY + boxHeight / 2 + 5);
+
+      // Kelompok box
+      const groupBoxY = nameBoxY + boxHeight + 12;
+      drawRoundedRect(ctx, nameBoxX, groupBoxY, boxWidth, boxHeight, 10);
+      ctx.fillStyle = '#eef2ff';
+      ctx.fill();
+      ctx.strokeStyle = '#c7d2fe';
+      ctx.stroke();
+      ctx.fillStyle = '#4f46e5';
+      ctx.font = '14px "Inter", system-ui, -apple-system, sans-serif';
+      ctx.fillText(truncateLabel(user?.kelompok || 'Belum ada kelompok'), center, groupBoxY + boxHeight / 2 + 4);
+
+      return canvas;
+    } catch (error) {
+      console.error('Error generating QR card for user:', user?.nama_lengkap, error);
+      return null;
+    }
+  };
+
+  // Download semua QR code dalam format ZIP
+  const handleDownloadAllQRCodes = async () => {
+    if (profiles.length === 0) {
+      toast.error('Tidak ada data pengguna untuk didownload');
+      return;
+    }
+
+    setDownloadingAll(true);
+    toast.loading('Membuat QR code untuk semua pengguna...', { id: 'download-all' });
+
+    try {
+      const zip = new JSZip();
+      let successCount = 0;
+      let failCount = 0;
+
+      // Process users in batches to avoid memory issues
+      const batchSize = 10;
+      const totalBatches = Math.ceil(profiles.length / batchSize);
+
+      for (let i = 0; i < profiles.length; i += batchSize) {
+        const batch = profiles.slice(i, i + batchSize);
+        const batchNumber = Math.floor(i / batchSize) + 1;
+
+        toast.loading(
+          `Memproses batch ${batchNumber}/${totalBatches} (${i + 1}-${Math.min(i + batchSize, profiles.length)} dari ${profiles.length})...`,
+          { id: 'download-all' }
+        );
+
+        // Process batch
+        const promises = batch.map(async (user) => {
+          try {
+            const canvas = await generateQrCardForUser(user);
+            if (canvas) {
+              // Convert canvas to blob
+              const blob = await new Promise((resolve) => {
+                canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.9);
+              });
+
+              if (blob) {
+                const fileName = getSafeFileName(user.nama_lengkap || `user_${user.id}`, 'jpg');
+                zip.file(fileName, blob);
+                successCount++;
+              } else {
+                failCount++;
+              }
+            } else {
+              failCount++;
+            }
+          } catch (error) {
+            console.error(`Error processing user ${user.nama_lengkap}:`, error);
+            failCount++;
+          }
+        });
+
+        await Promise.all(promises);
+      }
+
+      if (successCount === 0) {
+        toast.error('Gagal membuat QR code. Silakan coba lagi.', { id: 'download-all' });
+        setDownloadingAll(false);
+        return;
+      }
+
+      toast.loading('Membuat file ZIP...', { id: 'download-all' });
+
+      // Generate ZIP file
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      const url = URL.createObjectURL(zipBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `semua_qr_code_${new Date().toISOString().split('T')[0]}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success(
+        `Download berhasil! ${successCount} QR code${failCount > 0 ? ` (${failCount} gagal)` : ''}`,
+        { id: 'download-all' }
+      );
+    } catch (error) {
+      console.error('Error downloading all QR codes:', error);
+      toast.error('Gagal membuat file ZIP. Silakan coba lagi.', { id: 'download-all' });
+    } finally {
+      setDownloadingAll(false);
+    }
+  };
+
+  // Download QR code berdasarkan filter yang diterapkan
+  const handleDownloadFilteredQRCodes = async () => {
+    if (filteredProfiles.length === 0) {
+      toast.error('Tidak ada data pengguna yang sesuai dengan filter untuk didownload');
+      return;
+    }
+
+    setDownloadingFiltered(true);
+    
+    // Generate nama file berdasarkan filter
+    const filterParts = [];
+    if (filters.kelompok !== 'Semua') filterParts.push(`Kelompok_${filters.kelompok.replace(/\s+/g, '_')}`);
+    if (filters.desa !== 'Semua') filterParts.push(`Desa_${filters.desa.replace(/\s+/g, '_')}`);
+    if (filters.jenis_kelamin !== 'Semua') filterParts.push(filters.jenis_kelamin.replace(/\s+/g, '_'));
+    if (filters.search) filterParts.push(`Search_${filters.search.replace(/\s+/g, '_')}`);
+    
+    const fileNamePrefix = filterParts.length > 0 
+      ? filterParts.join('_') 
+      : 'Filtered';
+    
+    toast.loading(`Membuat QR code untuk ${filteredProfiles.length} pengguna...`, { id: 'download-filtered' });
+
+    try {
+      const zip = new JSZip();
+      let successCount = 0;
+      let failCount = 0;
+
+      // Process users in batches to avoid memory issues
+      const batchSize = 10;
+      const totalBatches = Math.ceil(filteredProfiles.length / batchSize);
+
+      for (let i = 0; i < filteredProfiles.length; i += batchSize) {
+        const batch = filteredProfiles.slice(i, i + batchSize);
+        const batchNumber = Math.floor(i / batchSize) + 1;
+
+        toast.loading(
+          `Memproses batch ${batchNumber}/${totalBatches} (${i + 1}-${Math.min(i + batchSize, filteredProfiles.length)} dari ${filteredProfiles.length})...`,
+          { id: 'download-filtered' }
+        );
+
+        // Process batch
+        const promises = batch.map(async (user) => {
+          try {
+            const canvas = await generateQrCardForUser(user);
+            if (canvas) {
+              // Convert canvas to blob
+              const blob = await new Promise((resolve) => {
+                canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.9);
+              });
+
+              if (blob) {
+                const fileName = getSafeFileName(user.nama_lengkap || `user_${user.id}`, 'jpg');
+                zip.file(fileName, blob);
+                successCount++;
+              } else {
+                failCount++;
+              }
+            } else {
+              failCount++;
+            }
+          } catch (error) {
+            console.error(`Error processing user ${user.nama_lengkap}:`, error);
+            failCount++;
+          }
+        });
+
+        await Promise.all(promises);
+      }
+
+      if (successCount === 0) {
+        toast.error('Gagal membuat QR code. Silakan coba lagi.', { id: 'download-filtered' });
+        setDownloadingFiltered(false);
+        return;
+      }
+
+      toast.loading('Membuat file ZIP...', { id: 'download-filtered' });
+
+      // Generate ZIP file
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      const url = URL.createObjectURL(zipBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `qr_code_${fileNamePrefix}_${new Date().toISOString().split('T')[0]}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success(
+        `Download berhasil! ${successCount} QR code${failCount > 0 ? ` (${failCount} gagal)` : ''}`,
+        { id: 'download-filtered' }
+      );
+    } catch (error) {
+      console.error('Error downloading filtered QR codes:', error);
+      toast.error('Gagal membuat file ZIP. Silakan coba lagi.', { id: 'download-filtered' });
+    } finally {
+      setDownloadingFiltered(false);
+    }
+  };
+
   return (
     <LayoutDashboard pageTitle="Data Profile User">
       <div className="p-4 pb-32 min-h-screen flex flex-col">
@@ -186,9 +466,35 @@ export default function DataProfileUser() {
         ) : (
           <div className="overflow-x-auto flex-1">
             <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700/60">
-              <p className="text-sm text-blue-700 dark:text-blue-200">
-                <strong>Total Pengguna:</strong> {profiles.length} &nbsp;|&nbsp; <strong>Terfilter:</strong> {filteredProfiles.length}
-              </p>
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-blue-700 dark:text-blue-200">
+                  <strong>Total Pengguna:</strong> {profiles.length} &nbsp;|&nbsp; <strong>Terfilter:</strong> {filteredProfiles.length}
+                </p>
+                {role === 'admin' && (
+                  <button
+                    onClick={handleDownloadAllQRCodes}
+                    disabled={downloadingAll || profiles.length === 0}
+                    className="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors"
+                  >
+                    {downloadingAll ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Memproses...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Download Semua QR Code
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Filter Panel */}
@@ -266,13 +572,40 @@ export default function DataProfileUser() {
               </div>
               <div className="flex items-center justify-between mt-3">
                 <span className="text-xs text-gray-600 dark:text-gray-300">Menampilkan {filteredProfiles.length} dari {profiles.length} pengguna</span>
-                <button
-                  type="button"
-                  onClick={handleResetFilters}
-                  className="inline-flex items-center px-3 py-1.5 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-                >
-                  Reset
-                </button>
+                <div className="flex items-center gap-2">
+                  {role === 'admin' && filteredProfiles.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={handleDownloadFilteredQRCodes}
+                      disabled={downloadingFiltered}
+                      className="inline-flex items-center px-3 py-1.5 rounded-lg bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white text-sm font-medium transition-colors"
+                    >
+                      {downloadingFiltered ? (
+                        <>
+                          <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Memproses...
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                          Download QR Code ({filteredProfiles.length})
+                        </>
+                      )}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleResetFilters}
+                    className="inline-flex items-center px-3 py-1.5 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                  >
+                    Reset
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -339,7 +672,10 @@ export default function DataProfileUser() {
 
             <div className="flex justify-center mb-5">
               <div ref={qrRef} className="p-3 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
-                <QRCodeCanvas value={qrModal.user.id} size={240} />
+                <QRCodeCanvas 
+                  value={`${qrModal.user.id}|${qrModal.user.nama_lengkap || ''}|${qrModal.user.kelompok || ''}|${qrModal.user.desa || ''}`} 
+                  size={240} 
+                />
               </div>
             </div>
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
+import { presensiKegiatanService } from '../lib/presensiKegiatanService';
 import LayoutDashboard from '../layouts/LayoutDashboard';
 import DateRangePicker from '../components/DateRangePicker';
 import DataLoadingSpinner from '../components/DataLoadingSpinner';
@@ -31,24 +32,34 @@ export default function UserPresensiHistory() {
         return;
       }
       setNamaLengkap(profile.nama_lengkap);
-      // Ambil presensi dari tiga tabel
-      const [presensiDaerah, presensiDesa] = await Promise.all([
-        supabase.from('presensi_daerah').select('*').eq('nama_lengkap', profile.nama_lengkap),
-        supabase.from('presensi_desa').select('*').eq('nama_lengkap', profile.nama_lengkap),
-      ]);
-      // Mapping dan tambahkan jenis_presensi
-      const dataDaerah = (presensiDaerah.data || []).map(row => ({
-        ...row,
-        jenis_presensi: 'Presensi Daerah',
+      
+      // Ambil presensi hanya dari presensi_kegiatan (sistem terpusat)
+      const presensiKegiatan = await presensiKegiatanService.getPresensiByUserId(userData.user.id);
+      
+      // Mapping presensi kegiatan
+      const dataKegiatan = (presensiKegiatan.data || []).map(row => ({
+        id: row.id,
+        nama_lengkap: row.nama_lengkap,
+        kelompok: row.kelompok,
+        desa: row.desa,
+        jenis_kelamin: row.jenis_kelamin,
+        status: row.status,
         waktu_presensi: row.waktu_presensi,
+        jenis_presensi: row.kegiatan?.nama_kegiatan || 'Presensi Kegiatan',
+        kegiatan_id: row.kegiatan_id,
+        kegiatan_nama: row.kegiatan?.nama_kegiatan,
+        kegiatan_tanggal: row.kegiatan?.tanggal,
+        kegiatan_lokasi: row.kegiatan?.lokasi,
+        kategori_kegiatan: row.kegiatan?.kategori_kegiatan,
       }));
-      const dataDesa = (presensiDesa.data || []).map(row => ({
-        ...row,
-        jenis_presensi: 'Presensi Desa',
-        waktu_presensi: row.waktu_presensi,
-      }));
-      // Gabungkan dan urutkan berdasarkan waktu_presensi terbaru
-      const allData = [...dataDaerah, ...dataDesa].sort((a, b) => new Date(b.waktu_presensi) - new Date(a.waktu_presensi));
+      
+      // Urutkan berdasarkan waktu_presensi terbaru
+      const allData = dataKegiatan.sort((a, b) => {
+        const dateA = new Date(a.waktu_presensi);
+        const dateB = new Date(b.waktu_presensi);
+        return dateB - dateA; // Terbaru di atas
+      });
+      
       setPresensi(allData);
       setLoading(false);
     };
@@ -92,8 +103,9 @@ export default function UserPresensiHistory() {
   }, [presensi, filterJenis, filterDateRange, filterStatus]);
 
   // Untuk dropdown Jenis Presensi dan Status
-  const jenisOptions = ['Presensi Daerah', 'Presensi Desa'];
-  const statusOptions = ['hadir', 'terlambat'];
+  // Ambil opsi jenis presensi dari data yang ada (nama kegiatan)
+  const jenisOptions = [...new Set(presensi.map(p => p.jenis_presensi).filter(Boolean))];
+  const statusOptions = ['hadir', 'terlambat', 'izin'];
 
   if (loading) return <DataLoadingSpinner message="Memuat riwayat presensi..." />;
 
@@ -104,7 +116,7 @@ export default function UserPresensiHistory() {
           <h2 className="text-2xl font-bold mb-2 text-gray-800 dark:text-gray-100">Riwayat Presensi Anda</h2>
           <p className="text-gray-600 dark:text-gray-300 mb-4">
             Halaman ini menampilkan riwayat lengkap presensi Anda untuk semua kegiatan pengajian. 
-            Anda dapat melihat detail waktu presensi, jenis kegiatan (Daerah/Desa), kelompok, dan status kehadiran. 
+            Anda dapat melihat detail waktu presensi, nama kegiatan, kelompok, dan status kehadiran. 
             Gunakan filter di bawah untuk mencari data presensi tertentu.
           </p>
           <div className="mb-6 text-gray-600 dark:text-gray-300 text-lg font-medium">
@@ -177,7 +189,7 @@ export default function UserPresensiHistory() {
                         Tanggal & Waktu
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Jenis Presensi
+                        Nama Kegiatan
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         Kelompok
