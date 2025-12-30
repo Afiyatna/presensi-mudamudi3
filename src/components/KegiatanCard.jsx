@@ -44,7 +44,7 @@ const KegiatanCard = ({ kegiatan, onEdit, onDelete, onClick }) => {
   };
 
   return (
-    <div 
+    <div
       className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow duration-200 cursor-pointer"
       onClick={() => onClick(kegiatan)}
     >
@@ -123,7 +123,7 @@ const KegiatanCard = ({ kegiatan, onEdit, onDelete, onClick }) => {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            onDelete(kegiatan);
+            onDelete(kegiatan.id);
           }}
           className="flex-1 bg-red-100 hover:bg-red-200 text-red-700 dark:bg-red-900/30 dark:hover:bg-red-900/50 dark:text-red-300 px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
         >
