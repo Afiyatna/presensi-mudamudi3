@@ -48,17 +48,17 @@ export default function QrScannerUniversal() {
     const fetchJamTepatWaktu = async () => {
       try {
         const { data, error } = await supabase
-        .from('settings')
-        .select('value')
-        .eq('key', 'jam_tepat_waktu')
-        .single();
-        
+          .from('settings')
+          .select('value')
+          .eq('key', 'jam_tepat_waktu')
+          .single();
+
         if (error && error.code === 'PGRST116') {
           // Data tidak ditemukan, buat data default
           const { error: insertError } = await supabase
             .from('settings')
             .insert({ key: 'jam_tepat_waktu', value: '07:00' });
-          
+
           if (!insertError) {
             setJamTepatWaktu('07:00');
           }
@@ -93,16 +93,16 @@ export default function QrScannerUniversal() {
   const handleSaveJamTepatWaktu = async () => {
     try {
       console.log('Attempting to save jam tepat waktu:', jamTepatWaktu);
-      
+
       // Cek apakah data sudah ada
       const { data: existingData, error: checkError } = await supabase
         .from('settings')
         .select('*')
         .eq('key', 'jam_tepat_waktu')
         .single();
-      
+
       console.log('Existing data check:', { existingData, checkError });
-      
+
       let result;
       if (checkError && checkError.code === 'PGRST116') {
         // Data tidak ada, insert baru
@@ -118,9 +118,9 @@ export default function QrScannerUniversal() {
           .update({ value: jamTepatWaktu })
           .eq('key', 'jam_tepat_waktu');
       }
-      
+
       console.log('Save result:', result);
-      
+
       if (result.error) {
         console.error('Error saving jam tepat waktu:', result.error);
         toast.error(`Gagal menyimpan jam tepat waktu: ${result.error.message}`);
@@ -132,7 +132,7 @@ export default function QrScannerUniversal() {
           .select('value')
           .eq('key', 'jam_tepat_waktu')
           .single();
-        
+
         if (fetchError) {
           console.error('Error fetching updated jam tepat waktu:', fetchError);
         } else if (data) {
@@ -212,28 +212,36 @@ export default function QrScannerUniversal() {
 
   const handleScanPresensi = async (qrData) => {
     setPresensiLoading(true);
-    
+    console.log('[QR Process] Starting presensi process for QR Data:', qrData);
+
     try {
       // Refresh session before making API calls
       const sessionValid = await refreshSessionIfNeeded();
       if (!sessionValid) {
+        console.error('[QR Process] Session invalid or expired');
         setPresensiLoading(false);
         return '';
       }
 
       // Parse QR code data: user_id|nama|kelompok|desa
-      const [userId, nama, kelompok, desa] = qrData.split('|');
-      
+      const parts = qrData.split('|');
+      console.log('[QR Process] Parsed data parts:', parts);
+      const [userId, nama, kelompok, desa] = parts;
+
       if (!userId || !nama || !kelompok || !desa) {
+        console.error('[QR Process] Invalid QR Format. Data:', qrData);
         toast.error('Format QR Code tidak valid');
         setPresensiLoading(false);
         return '';
       }
 
       // Check if user already has presensi for this kegiatan
+      console.log(`[QR Process] Checking existing presensi for UserID: ${userId}, KegiatanID: ${kegiatan.id}`);
       const existingPresensi = await presensiKegiatanService.getPresensiByUserAndKegiatan(userId, kegiatan.id);
-      
+      console.log('[QR Process] Existing presensi result:', existingPresensi);
+
       if (existingPresensi.error) {
+        console.error('[QR Process] Error checking existing presensi:', existingPresensi.error);
         // Check if it's an auth error
         if (existingPresensi.error.message?.includes('JWT') || existingPresensi.error.message?.includes('token') || existingPresensi.error.message?.includes('session')) {
           toast.error('Session expired. Silakan login kembali.');
@@ -247,21 +255,28 @@ export default function QrScannerUniversal() {
         setPresensiLoading(false);
         return '';
       }
-      
+
       if (existingPresensi.data && existingPresensi.data.length > 0) {
+        console.warn('[QR Process] User already present:', existingPresensi.data);
         toast.error('User sudah melakukan presensi untuk kegiatan ini');
         setPresensiLoading(false);
         return '';
       }
 
       // Get user profile data
+      console.log('[QR Process] Fetching user profile for:', userId);
       const { data: userProfile, error: userError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single();
 
+      if (userProfile) {
+        console.log('[QR Process] User profile found:', userProfile);
+      }
+
       if (userError) {
+        console.error('[QR Process] Error fetching user profile:', userError);
         // Check if it's an auth error
         if (userError.message?.includes('JWT') || userError.message?.includes('token') || userError.message?.includes('session')) {
           toast.error('Session expired. Silakan login kembali.');
@@ -296,8 +311,9 @@ export default function QrScannerUniversal() {
       };
 
       const { data: newPresensi, error: presensiError } = await presensiKegiatanService.createPresensiKegiatan(presensiData);
-      
+
       if (presensiError) {
+        console.error('[QR Process] Error creating presensi record:', presensiError);
         // Check if it's an auth error
         if (presensiError.message?.includes('JWT') || presensiError.message?.includes('token') || presensiError.message?.includes('session')) {
           toast.error('Session expired. Silakan login kembali.');
@@ -312,10 +328,12 @@ export default function QrScannerUniversal() {
         return '';
       }
 
+      console.log('[QR Process] Presensi created successfully:', newPresensi);
+
       toast.success(`Presensi berhasil! ${nama} - Status: ${status}`);
       setPresensiLoading(false);
       return status;
-      
+
     } catch (error) {
       console.error('Error processing presensi:', error);
       // Check if it's an auth error
@@ -336,8 +354,8 @@ export default function QrScannerUniversal() {
     setScanResult('');
     setScannerError('');
     if (html5QrInstance.current) {
-      try { await html5QrInstance.current.stop(); } catch (e) {}
-      try { await html5QrInstance.current.clear(); } catch (e) {}
+      try { await html5QrInstance.current.stop(); } catch (e) { }
+      try { await html5QrInstance.current.clear(); } catch (e) { }
     }
     if (qrRef.current) qrRef.current.innerHTML = '';
     const qr = new Html5Qrcode(qrId);
@@ -345,9 +363,9 @@ export default function QrScannerUniversal() {
     try {
       await qr.start(
         { facingMode: cameraFacing },
-        { 
-          fps: 10, 
-          qrbox: 250, 
+        {
+          fps: 10,
+          qrbox: 250,
           rememberLastUsedCamera: true,
           aspectRatio: 1.0,
           disableFlip: false
@@ -371,16 +389,16 @@ export default function QrScannerUniversal() {
                 console.log('Audio error:', e);
               }
             }
-            
+
             // Stop scanner immediately after successful scan
             await stopScanner();
-            
+
             const status = await handleScanPresensi(decodedText);
             if (status) {
               setSuccessStatus(status);
               setSuccessMessage(`Presensi berhasil! Status: ${status}`);
               setShowSuccess(true);
-              
+
               // Auto restart scanner after 3 seconds
               setTimeout(() => {
                 setShowSuccess(false);
@@ -394,9 +412,16 @@ export default function QrScannerUniversal() {
         },
         (error) => {
           // Only show error if it's not a common scanning error (like NotFoundException)
-          if (error && !error.name?.includes('NotFound') && !error.message?.includes('No QR code')) {
-            console.error('Scanner error:', error);
-            setScannerError('Gagal mengakses kamera atau scanner error. Pastikan izin kamera sudah diberikan dan coba restart scanner.');
+          if (error) {
+            // Log all scanner errors to console for debugging, but only show relevant ones to user
+            if (!error.name?.includes('NotFound') && !error.message?.includes('No QR code')) {
+              console.error('[QR Scanner Error] Critical error:', error);
+              setScannerError('Gagal mengakses kamera atau scanner error. Pastikan izin kamera sudah diberikan dan coba restart scanner.');
+            } else {
+              // Info level for common scanning errors to avoid spamming error console, but still visible if needed
+              // Uncomment line below if you successfully want to see every frame scan fail
+              // console.info('[QR Scanner Info] Frame scan error (normal):', error.message || error);
+            }
           }
         }
       );
@@ -417,8 +442,8 @@ export default function QrScannerUniversal() {
   const stopScanner = async () => {
     setScanning(false);
     if (html5QrInstance.current) {
-      try { await html5QrInstance.current.stop(); } catch (e) {}
-      try { await html5QrInstance.current.clear(); } catch (e) {}
+      try { await html5QrInstance.current.stop(); } catch (e) { }
+      try { await html5QrInstance.current.clear(); } catch (e) { }
     }
     if (qrRef.current) qrRef.current.innerHTML = '';
   };
@@ -455,19 +480,19 @@ export default function QrScannerUniversal() {
         <div className="flex items-center gap-4 mb-6">
           <button onClick={() => navigate('/kegiatan')} className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-gray-700 font-semibold transition-all">← Kembali</button>
         </div>
-        
+
         {/* Deskripsi halaman */}
         <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
           <h1 className="text-xl font-bold text-blue-800 mb-2">
             QR Scanner: {kegiatan.nama_kegiatan} ({kegiatan.kategori_kegiatan || 'Kelompok'})
           </h1>
           <p className="text-blue-700 text-sm text-justify">
-            Halaman ini memungkinkan admin untuk memindai QR Code peserta untuk mencatat presensi kegiatan {kegiatan.kategori_kegiatan || 'Kelompok'}. 
-            Sistem akan otomatis menentukan status kehadiran berdasarkan waktu presensi dan batas waktu yang ditentukan. 
+            Halaman ini memungkinkan admin untuk memindai QR Code peserta untuk mencatat presensi kegiatan {kegiatan.kategori_kegiatan || 'Kelompok'}.
+            Sistem akan otomatis menentukan status kehadiran berdasarkan waktu presensi dan batas waktu yang ditentukan.
             Kamera akan otomatis mati setelah scan berhasil untuk menghindari scan berulang.
           </p>
         </div>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* QR Scanner Section */}
           <div className="bg-white shadow-xs rounded-xl p-6">
