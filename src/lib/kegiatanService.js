@@ -9,7 +9,7 @@ export const kegiatanService = {
         .from('kegiatan')
         .select('*')
         .order('tanggal', { ascending: false });
-      
+
       if (error) throw error;
       return { data, error: null };
     } catch (error) {
@@ -26,7 +26,7 @@ export const kegiatanService = {
         .select('*')
         .eq('id', id)
         .single();
-      
+
       if (error) throw error;
       return { data, error: null };
     } catch (error) {
@@ -43,7 +43,7 @@ export const kegiatanService = {
         .insert([kegiatanData])
         .select()
         .single();
-      
+
       if (error) throw error;
       return { data, error: null };
     } catch (error) {
@@ -61,7 +61,7 @@ export const kegiatanService = {
         .eq('id', id)
         .select()
         .single();
-      
+
       if (error) throw error;
       return { data, error: null };
     } catch (error) {
@@ -73,11 +73,20 @@ export const kegiatanService = {
   // Delete kegiatan
   async deleteKegiatan(id) {
     try {
+      // First delete related presensi records
+      const { error: presensiError } = await supabase
+        .from('presensi_kegiatan')
+        .delete()
+        .eq('kegiatan_id', id);
+
+      if (presensiError) throw presensiError;
+
+      // Then delete the kegiatan
       const { error } = await supabase
         .from('kegiatan')
         .delete()
         .eq('id', id);
-      
+
       if (error) throw error;
       return { error: null };
     } catch (error) {
@@ -94,7 +103,7 @@ export const kegiatanService = {
         .select('*')
         .eq('status', status)
         .order('tanggal', { ascending: false });
-      
+
       if (error) throw error;
       return { data, error: null };
     } catch (error) {
@@ -112,7 +121,7 @@ export const kegiatanService = {
         .gte('tanggal', startDate)
         .lte('tanggal', endDate)
         .order('tanggal', { ascending: false });
-      
+
       if (error) throw error;
       return { data, error: null };
     } catch (error) {
@@ -129,7 +138,7 @@ export const kegiatanService = {
         .select('*')
         .eq('kategori_kegiatan', kategori)
         .order('tanggal', { ascending: false });
-      
+
       if (error) throw error;
       return { data, error: null };
     } catch (error) {
@@ -146,7 +155,7 @@ export const kegiatanService = {
         .select('*')
         .in('kategori_kegiatan', kategoriList)
         .order('tanggal', { ascending: false });
-      
+
       if (error) throw error;
       return { data, error: null };
     } catch (error) {
@@ -162,9 +171,9 @@ export const kegiatanService = {
         .from('kegiatan')
         .select('kategori_kegiatan')
         .not('kategori_kegiatan', 'is', null);
-      
+
       if (error) throw error;
-      
+
       // Get unique kategori values
       const uniqueKategori = [...new Set(data.map(item => item.kategori_kegiatan))];
       return { data: uniqueKategori, error: null };
