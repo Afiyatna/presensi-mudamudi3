@@ -32,10 +32,10 @@ export default function UserPresensiHistory() {
         return;
       }
       setNamaLengkap(profile.nama_lengkap);
-      
+
       // Ambil presensi hanya dari presensi_kegiatan (sistem terpusat)
       const presensiKegiatan = await presensiKegiatanService.getPresensiByUserId(userData.user.id);
-      
+
       // Mapping presensi kegiatan
       const dataKegiatan = (presensiKegiatan.data || []).map(row => ({
         id: row.id,
@@ -52,14 +52,14 @@ export default function UserPresensiHistory() {
         kegiatan_lokasi: row.kegiatan?.lokasi,
         kategori_kegiatan: row.kegiatan?.kategori_kegiatan,
       }));
-      
+
       // Urutkan berdasarkan waktu_presensi terbaru
       const allData = dataKegiatan.sort((a, b) => {
         const dateA = new Date(a.waktu_presensi);
         const dateB = new Date(b.waktu_presensi);
         return dateB - dateA; // Terbaru di atas
       });
-      
+
       setPresensi(allData);
       setLoading(false);
     };
@@ -68,18 +68,18 @@ export default function UserPresensiHistory() {
 
   useEffect(() => {
     let filtered = presensi;
-    
+
     // Filter jenis presensi
     if (filterJenis) {
       filtered = filtered.filter(row => row.jenis_presensi === filterJenis);
     }
-    
+
     // Filter rentang tanggal
     if (filterDateRange.from || filterDateRange.to) {
       filtered = filtered.filter(row => {
         if (!row.waktu_presensi) return false;
         const presensiDate = row.waktu_presensi.split('T')[0]; // Ambil tanggal saja
-        
+
         if (filterDateRange.from && filterDateRange.to) {
           // Filter dengan rentang tanggal
           return presensiDate >= filterDateRange.from && presensiDate <= filterDateRange.to;
@@ -93,12 +93,12 @@ export default function UserPresensiHistory() {
         return true;
       });
     }
-    
+
     // Filter status
     if (filterStatus) {
       filtered = filtered.filter(row => row.status === filterStatus);
     }
-    
+
     setFilteredPresensi(filtered);
   }, [presensi, filterJenis, filterDateRange, filterStatus]);
 
@@ -115,8 +115,8 @@ export default function UserPresensiHistory() {
         <div className="bg-white dark:bg-gray-800 shadow-xs rounded-xl p-6">
           <h2 className="text-2xl font-bold mb-2 text-gray-800 dark:text-gray-100">Riwayat Presensi Anda</h2>
           <p className="text-gray-600 dark:text-gray-300 mb-4">
-            Halaman ini menampilkan riwayat lengkap presensi Anda untuk semua kegiatan pengajian. 
-            Anda dapat melihat detail waktu presensi, nama kegiatan, kelompok, dan status kehadiran. 
+            Halaman ini menampilkan riwayat lengkap presensi Anda untuk semua kegiatan pengajian.
+            Anda dapat melihat detail waktu presensi, nama kegiatan, kelompok, dan status kehadiran.
             Gunakan filter di bawah untuk mencari data presensi tertentu.
           </p>
           <div className="mb-6 text-gray-600 dark:text-gray-300 text-lg font-medium">
@@ -130,43 +130,43 @@ export default function UserPresensiHistory() {
               Gunakan filter di bawah untuk mencari data presensi Anda:
             </p>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Jenis Presensi</label>
-              <select value={filterJenis} onChange={e => setFilterJenis(e.target.value)} className="form-select w-full">
-                <option value="">Semua</option>
-                {jenisOptions.map(jenis => (
-                  <option key={jenis} value={jenis}>{jenis}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rentang Tanggal</label>
-              <DateRangePicker
-                value={filterDateRange}
-                onChange={setFilterDateRange}
-                placeholder="Pilih rentang tanggal"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
-              <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="form-select w-full">
-                <option value="">Semua</option>
-                {statusOptions.map(status => (
-                  <option key={status} value={status}>{status.charAt(0).toUpperCase() + status.slice(1)}</option>
-                ))}
-              </select>
-            </div>
-            <div className="flex items-end">
-              <button 
-                onClick={() => { 
-                  setFilterJenis(''); 
-                  setFilterDateRange({ from: '', to: '' }); 
-                  setFilterStatus(''); 
-                }} 
-                className="btn bg-gray-500 hover:bg-gray-600 text-white w-full"
-              >
-                Reset Filter
-              </button>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Jenis Presensi</label>
+                <select value={filterJenis} onChange={e => setFilterJenis(e.target.value)} className="form-select w-full">
+                  <option value="">Semua</option>
+                  {jenisOptions.map(jenis => (
+                    <option key={jenis} value={jenis}>{jenis}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rentang Tanggal</label>
+                <DateRangePicker
+                  value={filterDateRange}
+                  onChange={setFilterDateRange}
+                  placeholder="Pilih rentang tanggal"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
+                <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="form-select w-full">
+                  <option value="">Semua</option>
+                  {statusOptions.map(status => (
+                    <option key={status} value={status}>{status.charAt(0).toUpperCase() + status.slice(1)}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex items-end">
+                <button
+                  onClick={() => {
+                    setFilterJenis('');
+                    setFilterDateRange({ from: '', to: '' });
+                    setFilterStatus('');
+                  }}
+                  className="btn bg-gray-500 hover:bg-gray-600 text-white w-full"
+                >
+                  Reset Filter
+                </button>
               </div>
             </div>
           </div>
@@ -218,13 +218,12 @@ export default function UserPresensiHistory() {
                           {row.desa}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            row.status === 'hadir' 
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${row.status === 'hadir'
                               ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
                               : row.status === 'terlambat'
-                              ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
-                              : 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300'
-                          }`}>
+                                ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+                                : 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300'
+                            }`}>
                             {row.status}
                           </span>
                         </td>

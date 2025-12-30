@@ -43,6 +43,19 @@ export default function KegiatanAdmin() {
   useEffect(() => {
     fetchKegiatan();
     fetchAllPresensi();
+
+    // Subscribe to realtime changes
+    const presensiSubscription = supabase
+      .channel('public:presensi_kegiatan')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'presensi_kegiatan' }, (payload) => {
+        console.log('Realtime update received:', payload);
+        fetchAllPresensi();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(presensiSubscription);
+    };
   }, []);
 
   const fetchKegiatan = async () => {
@@ -90,7 +103,7 @@ export default function KegiatanAdmin() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.nama_kegiatan || !formData.tanggal || !formData.jam_mulai || !formData.lokasi || !formData.kategori_kegiatan) {
       toast.error('Semua field wajib diisi');
       return;
@@ -108,7 +121,7 @@ export default function KegiatanAdmin() {
         if (error) throw error;
         toast.success('Kegiatan berhasil ditambahkan');
       }
-      
+
       setShowModal(false);
       setEditingKegiatan(null);
       resetForm();
@@ -135,13 +148,13 @@ export default function KegiatanAdmin() {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Apakah Anda yakin ingin menghapus kegiatan ini?')) return;
-    
+
     try {
       const { error } = await kegiatanService.deleteKegiatan(id);
       if (error) throw error;
       toast.success('Kegiatan berhasil dihapus');
       fetchKegiatan();
-      
+
       // Reset selected kegiatan if deleted
       if (selectedKegiatan && selectedKegiatan.id === id) {
         setSelectedKegiatan(null);
@@ -155,19 +168,19 @@ export default function KegiatanAdmin() {
 
   const handleScanner = (kegiatan) => {
     // Navigate to QR Scanner with kegiatan context
-    navigate('/qr-scanner', { 
-      state: { 
-        kegiatanId: kegiatan.id, 
+    navigate('/qr-scanner', {
+      state: {
+        kegiatanId: kegiatan.id,
         kegiatanNama: kegiatan.nama_kegiatan,
         kategoriKegiatan: kegiatan.kategori_kegiatan || 'Kelompok'
-      } 
+      }
     });
   };
 
   const handleKegiatanClick = async (kegiatan) => {
     setSelectedKegiatan(kegiatan);
     setActiveTab('detail');
-    
+
     // Fetch presensi for this kegiatan
     const presensi = await fetchPresensiByKegiatan(kegiatan.id);
     setPresensiList(presensi);
@@ -182,7 +195,7 @@ export default function KegiatanAdmin() {
   const handleDateSelect = (date) => {
     setSelectedDate(date);
     // Find kegiatan for selected date
-    const kegiatanOnDate = kegiatan.find(k => 
+    const kegiatanOnDate = kegiatan.find(k =>
       new Date(k.tanggal).toDateString() === date.toDateString()
     );
     if (kegiatanOnDate) {
@@ -292,10 +305,10 @@ export default function KegiatanAdmin() {
         </div>
 
         {/* Tab Navigation */}
-        <TabNavigation 
-          activeTab={activeTab} 
-          onTabChange={setActiveTab} 
-          tabs={tabs} 
+        <TabNavigation
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          tabs={tabs}
         />
 
         {/* Tab Content */}
@@ -384,7 +397,7 @@ export default function KegiatanAdmin() {
                       required
                     />
                   </div>
-                  
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -399,7 +412,7 @@ export default function KegiatanAdmin() {
                         required
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Jam Mulai *
@@ -414,7 +427,7 @@ export default function KegiatanAdmin() {
                       />
                     </div>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Lokasi *
@@ -428,7 +441,7 @@ export default function KegiatanAdmin() {
                       required
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Kategori Kegiatan *
@@ -445,7 +458,7 @@ export default function KegiatanAdmin() {
                       <option value="Kelompok">Kelompok</option>
                     </select>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Deskripsi
@@ -458,7 +471,7 @@ export default function KegiatanAdmin() {
                       className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Status
@@ -474,7 +487,7 @@ export default function KegiatanAdmin() {
                       <option value="dibatalkan">Dibatalkan</option>
                     </select>
                   </div>
-                  
+
                   <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 pt-4">
                     <button
                       type="submit"

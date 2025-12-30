@@ -31,6 +31,13 @@ const StatistikKegiatan = ({ presensiList, kegiatan }) => {
     };
   }, [presensiList]);
 
+  // Log update for verification
+  React.useEffect(() => {
+    if (presensiList && presensiList.length > 0) {
+      console.log(`StatistikKegiatan updated. Total records: ${presensiList.length}`);
+    }
+  }, [presensiList]);
+
   // Statistik berdasarkan kelompok
   const statistikKelompok = useMemo(() => {
     if (!presensiList || presensiList.length === 0) return [];
@@ -154,7 +161,7 @@ const StatistikKegiatan = ({ presensiList, kegiatan }) => {
               </span>
             </div>
             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
-              <div 
+              <div
                 className="bg-green-500 h-3 rounded-full transition-all duration-500"
                 style={{ width: `${statistik.persentaseHadir}%` }}
               ></div>
@@ -170,7 +177,7 @@ const StatistikKegiatan = ({ presensiList, kegiatan }) => {
               </span>
             </div>
             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
-              <div 
+              <div
                 className="bg-yellow-500 h-3 rounded-full transition-all duration-500"
                 style={{ width: `${statistik.persentaseTerlambat}%` }}
               ></div>
@@ -186,7 +193,7 @@ const StatistikKegiatan = ({ presensiList, kegiatan }) => {
               </span>
             </div>
             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
-              <div 
+              <div
                 className="bg-orange-500 h-3 rounded-full transition-all duration-500"
                 style={{ width: `${statistik.persentaseIzin}%` }}
               ></div>

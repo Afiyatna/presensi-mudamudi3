@@ -7,6 +7,9 @@ import DataLoadingSpinner from '../components/DataLoadingSpinner';
 import CalendarView from '../components/CalendarView';
 import BulkActions from '../components/BulkActions';
 import { toast } from 'react-hot-toast';
+import { jsPDF } from 'jspdf';
+import * as XLSX from 'xlsx';
+import html2canvas from 'html2canvas';
 
 export default function RiwayatPresensiTerintegrasi() {
   const [presensiList, setPresensiList] = useState([]);
@@ -19,7 +22,8 @@ export default function RiwayatPresensiTerintegrasi() {
     status: '',
     tanggal: '',
     kelompok: '',
-    desa: ''
+    desa: '',
+    jenis_kelamin: ''
   });
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
@@ -32,9 +36,9 @@ export default function RiwayatPresensiTerintegrasi() {
     try {
       setLoading(true);
       let { data, error } = await presensiKegiatanService.getAllPresensiKegiatan();
-      
+
       if (error) throw error;
-      
+
       // Apply filters
       if (filters.kegiatan) {
         data = data.filter(presensi => presensi.kegiatan?.id === filters.kegiatan);
@@ -54,7 +58,10 @@ export default function RiwayatPresensiTerintegrasi() {
       if (filters.desa) {
         data = data.filter(presensi => presensi.desa === filters.desa);
       }
-      
+      if (filters.jenis_kelamin) {
+        data = data.filter(presensi => presensi.jenis_kelamin === filters.jenis_kelamin);
+      }
+
       setPresensiList(data || []);
     } catch (error) {
       console.error('Error fetching presensi list:', error);
@@ -132,8 +139,8 @@ export default function RiwayatPresensiTerintegrasi() {
       toast.error('Pilih presensi yang akan di-export');
       return;
     }
-    
-    const selectedData = presensiList.filter(presensi => 
+
+    const selectedData = presensiList.filter(presensi =>
       selectedPresensi.includes(presensi.id)
     );
     exportToPDF(selectedData, 'presensi-terpilih');
@@ -144,8 +151,8 @@ export default function RiwayatPresensiTerintegrasi() {
       toast.error('Pilih presensi yang akan di-export');
       return;
     }
-    
-    const selectedData = presensiList.filter(presensi => 
+
+    const selectedData = presensiList.filter(presensi =>
       selectedPresensi.includes(presensi.id)
     );
     exportToExcel(selectedData, 'presensi-terpilih');
@@ -153,41 +160,40 @@ export default function RiwayatPresensiTerintegrasi() {
 
   const exportToPDF = (data, filename) => {
     try {
-      const { jsPDF } = require('jspdf');
       const doc = new jsPDF();
-      
+
       // Add title
       doc.setFontSize(18);
       doc.text('Laporan Presensi Kegiatan', 20, 20);
       doc.setFontSize(12);
       doc.text(`Tanggal: ${new Date().toLocaleDateString('id-ID')}`, 20, 30);
       doc.text(`Total Data: ${data.length}`, 20, 40);
-      
+
       // Add table headers
       const headers = ['Nama', 'Kegiatan', 'Tanggal', 'Waktu', 'Status', 'Lokasi'];
       const startY = 60;
       let currentY = startY;
-      
+
       // Set table styling
       doc.setFontSize(10);
       doc.setFillColor(240, 240, 240);
-      
+
       // Draw header row
       headers.forEach((header, index) => {
         const x = 20 + (index * 30);
         doc.rect(x, currentY - 5, 30, 8, 'F');
         doc.text(header, x + 2, currentY);
       });
-      
+
       currentY += 10;
-      
+
       // Add data rows
       data.forEach((presensi, rowIndex) => {
         if (currentY > 280) {
           doc.addPage();
           currentY = 20;
         }
-        
+
         const rowData = [
           presensi.nama_lengkap || '-',
           presensi.kegiatan?.nama_kegiatan || '-',
@@ -196,15 +202,15 @@ export default function RiwayatPresensiTerintegrasi() {
           presensi.status,
           presensi.kegiatan?.lokasi || '-'
         ];
-        
+
         rowData.forEach((text, index) => {
           const x = 20 + (index * 30);
           doc.text(text.substring(0, 15), x + 2, currentY);
         });
-        
+
         currentY += 8;
       });
-      
+
       // Save PDF
       doc.save(`${filename}-${new Date().toISOString().split('T')[0]}.pdf`);
       toast.success('Export PDF berhasil');
@@ -216,8 +222,6 @@ export default function RiwayatPresensiTerintegrasi() {
 
   const exportToExcel = (data, filename) => {
     try {
-      const XLSX = require('xlsx');
-      
       // Prepare data for Excel
       const excelData = data.map(presensi => ({
         'Nama Lengkap': presensi.nama_lengkap || '-',
@@ -234,11 +238,11 @@ export default function RiwayatPresensiTerintegrasi() {
         'Disetujui Oleh': presensi.approved_by || '-',
         'Waktu Disetujui': presensi.approved_at || '-'
       }));
-      
+
       // Create workbook and worksheet
       const workbook = XLSX.utils.book_new();
       const worksheet = XLSX.utils.json_to_sheet(excelData);
-      
+
       // Auto-size columns
       const columnWidths = [
         { wch: 20 }, // Nama Lengkap
@@ -256,10 +260,10 @@ export default function RiwayatPresensiTerintegrasi() {
         { wch: 20 }  // Waktu Disetujui
       ];
       worksheet['!cols'] = columnWidths;
-      
+
       // Add worksheet to workbook
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Presensi Kegiatan');
-      
+
       // Save Excel file
       XLSX.writeFile(workbook, `${filename}-${new Date().toISOString().split('T')[0]}.xlsx`);
       toast.success('Export Excel berhasil');
@@ -271,18 +275,17 @@ export default function RiwayatPresensiTerintegrasi() {
 
   const handleExportJPG = async () => {
     try {
-      const html2canvas = require('html2canvas');
-      
+
       // Get the table element
       const tableElement = document.querySelector('table');
       if (!tableElement) {
         toast.error('Tabel tidak ditemukan');
         return;
       }
-      
+
       // Show loading
       toast.loading('Mengkonversi ke JPG...', { duration: 2000 });
-      
+
       // Convert table to canvas
       const canvas = await html2canvas(tableElement, {
         backgroundColor: '#ffffff',
@@ -290,7 +293,7 @@ export default function RiwayatPresensiTerintegrasi() {
         useCORS: true,
         allowTaint: true
       });
-      
+
       // Convert canvas to blob
       canvas.toBlob((blob) => {
         // Create download link
@@ -298,18 +301,18 @@ export default function RiwayatPresensiTerintegrasi() {
         const link = document.createElement('a');
         link.href = url;
         link.download = `presensi-kegiatan-${new Date().toISOString().split('T')[0]}.jpg`;
-        
+
         // Trigger download
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        
+
         // Cleanup
         URL.revokeObjectURL(url);
-        
+
         toast.success('Export JPG berhasil');
       }, 'image/jpeg', 0.9);
-      
+
     } catch (error) {
       console.error('Error exporting JPG:', error);
       toast.error('Gagal export JPG');
@@ -474,6 +477,23 @@ export default function RiwayatPresensiTerintegrasi() {
               ))}
             </select>
           </div>
+
+          <div>
+            <label htmlFor="jenis_kelamin" className="block text-sm font-medium text-gray-700">
+              Jenis Kelamin
+            </label>
+            <select
+              id="jenis_kelamin"
+              name="jenis_kelamin"
+              value={filters.jenis_kelamin}
+              onChange={handleFilterChange}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            >
+              <option value="">Semua</option>
+              <option value="Laki-laki">Laki-laki</option>
+              <option value="Perempuan">Perempuan</option>
+            </select>
+          </div>
         </div>
 
         {/* Bulk Actions */}
@@ -551,7 +571,7 @@ export default function RiwayatPresensiTerintegrasi() {
               itemType="presensi"
               showStatusChange={false}
             />
-            
+
             <div className="mt-8 flow-root">
               <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                 <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
@@ -569,6 +589,9 @@ export default function RiwayatPresensiTerintegrasi() {
                           </th>
                           <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             User
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Jenis Kelamin
                           </th>
                           <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Jenis Kegiatan
@@ -604,6 +627,9 @@ export default function RiwayatPresensiTerintegrasi() {
                               </div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900">{presensi.jenis_kelamin || '-'}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
                               <div className="text-sm font-medium text-gray-900">
                                 {presensi.kegiatan?.nama_kegiatan}
                               </div>
@@ -621,8 +647,8 @@ export default function RiwayatPresensiTerintegrasi() {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(presensi.status)}`}>
-                                {presensi.status === 'hadir' ? 'Hadir' : 
-                                 presensi.status === 'terlambat' ? 'Terlambat' : 'Izin'}
+                                {presensi.status === 'hadir' ? 'Hadir' :
+                                  presensi.status === 'terlambat' ? 'Terlambat' : 'Izin'}
                               </span>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">

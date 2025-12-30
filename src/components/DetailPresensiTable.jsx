@@ -1,11 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
+import html2canvas from 'html2canvas';
+import { toast } from 'react-hot-toast';
 
 const DetailPresensiTable = ({ presensiList, kegiatan, onQrScanner }) => {
   const [filterStatus, setFilterStatus] = useState('semua');
   const [filterKelompok, setFilterKelompok] = useState('semua');
   const [filterDesa, setFilterDesa] = useState('semua');
+  const [filterJenisKelamin, setFilterJenisKelamin] = useState('semua');
   const [searchQuery, setSearchQuery] = useState('');
 
   // Get unique values for filters
@@ -25,13 +28,14 @@ const DetailPresensiTable = ({ presensiList, kegiatan, onQrScanner }) => {
       const matchStatus = filterStatus === 'semua' || presensi.status === filterStatus;
       const matchKelompok = filterKelompok === 'semua' || presensi.kelompok === filterKelompok;
       const matchDesa = filterDesa === 'semua' || presensi.desa === filterDesa;
+      const matchJenisKelamin = filterJenisKelamin === 'semua' || presensi.jenis_kelamin === filterJenisKelamin;
       const matchSearch = presensi.nama_lengkap.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         presensi.kelompok?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         presensi.desa?.toLowerCase().includes(searchQuery.toLowerCase());
+        presensi.kelompok?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        presensi.desa?.toLowerCase().includes(searchQuery.toLowerCase());
 
-      return matchStatus && matchKelompok && matchDesa && matchSearch;
+      return matchStatus && matchKelompok && matchDesa && matchJenisKelamin && matchSearch;
     });
-  }, [presensiList, filterStatus, filterKelompok, filterDesa, searchQuery]);
+  }, [presensiList, filterStatus, filterKelompok, filterDesa, filterJenisKelamin, searchQuery]);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -69,6 +73,41 @@ const DetailPresensiTable = ({ presensiList, kegiatan, onQrScanner }) => {
     }
   };
 
+  const handleExportJPG = async () => {
+    try {
+      const tableElement = document.querySelector('table');
+      if (!tableElement) {
+        toast.error('Tabel tidak ditemukan');
+        return;
+      }
+
+      toast.loading('Mengkonversi ke JPG...', { duration: 2000 });
+
+      const canvas = await html2canvas(tableElement, {
+        backgroundColor: '#ffffff',
+        scale: 2,
+        useCORS: true,
+        allowTaint: true
+      });
+
+      canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `presensi-${kegiatan.nama_kegiatan}-${new Date().toISOString().split('T')[0]}.jpg`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        toast.success('Export JPG berhasil');
+      }, 'image/jpeg', 0.9);
+
+    } catch (error) {
+      console.error('Error exporting JPG:', error);
+      toast.error('Gagal export JPG');
+    }
+  };
+
   if (!kegiatan) {
     return (
       <div className="text-center py-12">
@@ -91,20 +130,31 @@ const DetailPresensiTable = ({ presensiList, kegiatan, onQrScanner }) => {
             {format(new Date(kegiatan.tanggal), 'EEEE, d MMMM yyyy', { locale: id })} • {kegiatan.jam_mulai.substring(0, 5)}
           </p>
         </div>
-        <button
-          onClick={onQrScanner}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V6a1 1 0 00-1-1H5a1 1 0 00-1 1v1a1 1 0 001 1zm12 0h2a1 1 0 001-1V6a1 1 0 00-1-1h-2a1 1 0 00-1 1v1a1 1 0 001 1zM5 20h2a1 1 0 001-1v-1a1 1 0 00-1-1H5a1 1 0 00-1 1v1a1 1 0 001 1z" />
-          </svg>
-          <span>QR Scanner</span>
-        </button>
+        <div className="flex space-x-2">
+          <button
+            onClick={handleExportJPG}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span>Export JPG</span>
+          </button>
+          <button
+            onClick={onQrScanner}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V6a1 1 0 00-1-1H5a1 1 0 00-1 1v1a1 1 0 001 1zm12 0h2a1 1 0 001-1V6a1 1 0 00-1-1h-2a1 1 0 00-1 1v1a1 1 0 001 1zM5 20h2a1 1 0 001-1v-1a1 1 0 00-1-1H5a1 1 0 00-1 1v1a1 1 0 001 1z" />
+            </svg>
+            <span>QR Scanner</span>
+          </button>
+        </div>
       </div>
 
       {/* Filter dan Pencarian */}
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           {/* Filter Status */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -156,6 +206,22 @@ const DetailPresensiTable = ({ presensiList, kegiatan, onQrScanner }) => {
             </select>
           </div>
 
+          {/* Filter Jenis Kelamin */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Jenis Kelamin
+            </label>
+            <select
+              value={filterJenisKelamin}
+              onChange={(e) => setFilterJenisKelamin(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="semua">Semua</option>
+              <option value="Laki-laki">Laki-laki</option>
+              <option value="Perempuan">Perempuan</option>
+            </select>
+          </div>
+
           {/* Pencarian */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -183,6 +249,9 @@ const DetailPresensiTable = ({ presensiList, kegiatan, onQrScanner }) => {
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   NAMA LENGKAP
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  JENIS KELAMIN
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   KELOMPOK
@@ -218,6 +287,9 @@ const DetailPresensiTable = ({ presensiList, kegiatan, onQrScanner }) => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
                       {presensi.nama_lengkap}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                      {presensi.jenis_kelamin || '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {presensi.kelompok || '-'}
