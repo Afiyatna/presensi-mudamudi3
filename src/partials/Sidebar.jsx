@@ -68,9 +68,8 @@ function Sidebar({
     <div className="min-w-fit">
       {/* Sidebar backdrop (mobile only) */}
       <div
-        className={`fixed inset-0 bg-gray-900/30 z-40 lg:hidden lg:z-auto transition-opacity duration-200 ${
-          sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
+        className={`fixed inset-0 bg-gray-900/30 z-40 lg:hidden lg:z-auto transition-opacity duration-200 ${sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
         aria-hidden="true"
       ></div>
 
@@ -139,8 +138,8 @@ function Sidebar({
                 <>
                   {/* QR Scanner */}
                   <li className="px-3 py-2">
-                <NavLink
-                  end
+                    <NavLink
+                      end
                       to="/qr-scanner"
                       className={({ isActive }) =>
                         "block text-gray-800 dark:text-gray-100 truncate transition duration-150 " + (isActive ? "text-violet-500" : "hover:text-gray-900 dark:hover:text-white")
@@ -148,14 +147,14 @@ function Sidebar({
                     >
                       <div className="flex items-center gap-2">
                         <svg className={`shrink-0 fill-current ${pathname === "/qr-scanner" ? 'text-violet-500' : 'text-gray-400 dark:text-gray-500'}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                          <path d="M0 1.5A1.5 1.5 0 0 1 1.5 0h3A1.5 1.5 0 0 1 6 1.5v3A1.5 1.5 0 0 1 4.5 6h-3A1.5 1.5 0 0 1 0 4.5v-3ZM1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3ZM0 10.5A1.5 1.5 0 0 1 1.5 9h3A1.5 1.5 0 0 1 6 10.5v3A1.5 1.5 0 0 1 4.5 15h-3A1.5 1.5 0 0 1 0 13.5v-3ZM1.5 10a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3ZM10 1.5A1.5 1.5 0 0 1 11.5 0h3A1.5 1.5 0 0 1 16 1.5v3A1.5 1.5 0 0 1 14.5 6h-3A1.5 1.5 0 0 1 10 4.5v-3ZM11.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3ZM10 10.5A1.5 1.5 0 0 1 11.5 9h3A1.5 1.5 0 0 1 16 10.5v3A1.5 1.5 0 0 1 14.5 15h-3A1.5 1.5 0 0 1 10 13.5v-3ZM11.5 10a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3Z"/>
-                    </svg>
+                          <path d="M0 1.5A1.5 1.5 0 0 1 1.5 0h3A1.5 1.5 0 0 1 6 1.5v3A1.5 1.5 0 0 1 4.5 6h-3A1.5 1.5 0 0 1 0 4.5v-3ZM1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3ZM0 10.5A1.5 1.5 0 0 1 1.5 9h3A1.5 1.5 0 0 1 6 10.5v3A1.5 1.5 0 0 1 4.5 15h-3A1.5 1.5 0 0 1 0 13.5v-3ZM1.5 10a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3ZM10 1.5A1.5 1.5 0 0 1 11.5 0h3A1.5 1.5 0 0 1 16 1.5v3A1.5 1.5 0 0 1 14.5 6h-3A1.5 1.5 0 0 1 10 4.5v-3ZM11.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3ZM10 10.5A1.5 1.5 0 0 1 11.5 9h3A1.5 1.5 0 0 1 16 10.5v3A1.5 1.5 0 0 1 14.5 15h-3A1.5 1.5 0 0 1 10 13.5v-3ZM11.5 10a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3Z" />
+                        </svg>
                         <span className="text-sm font-medium duration-200">
                           QR Scanner
                         </span>
-                  </div>
-                </NavLink>
-              </li>
+                      </div>
+                    </NavLink>
+                  </li>
                   {/* Kegiatan */}
                   <li className="px-3 py-2">
                     <NavLink
@@ -167,8 +166,8 @@ function Sidebar({
                     >
                       <div className="flex items-center gap-2">
                         <svg className={`shrink-0 fill-current ${pathname === "/kegiatan" ? 'text-green-600' : 'text-gray-400 dark:text-gray-500'}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                          <path d="M8 1.333A6.667 6.667 0 1 0 8 14.667 6.667 6.667 0 0 0 8 1.333zm0 12A5.333 5.333 5.333 0 1 1 8 2.667a5.333 5.333 0 0 1 0 10.666z"/>
-                          <path d="M8 4a.667.667 0 0 0-.667.667v3.333c0 .368.299.667.667.667h2.667a.667.667 0 0 0 0-1.334H8.667V4.667A.667.667 0 0 0 8 4z"/>
+                          <path d="M8 1.333A6.667 6.667 0 1 0 8 14.667 6.667 6.667 0 0 0 8 1.333zm0 12A5.333 5.333 0 1 1 8 2.667a5.333 5.333 0 0 1 0 10.666z" />
+                          <path d="M8 4a.667.667 0 0 0-.667.667v3.333c0 .368.299.667.667.667h2.667a.667.667 0 0 0 0-1.334H8.667V4.667A.667.667 0 0 0 8 4z" />
                         </svg>
                         <span className="text-sm font-medium duration-200">
                           Kelola Kegiatan
@@ -187,8 +186,8 @@ function Sidebar({
                     >
                       <div className="flex items-center gap-2">
                         <svg className={`shrink-0 fill-current ${pathname === "/kelola-izin" ? 'text-orange-600' : 'text-gray-400 dark:text-gray-500'}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                          <path d="M8 1.333A6.667 6.667 0 1 0 8 14.667 6.667 6.667 0 0 0 8 1.333zm0 12A5.333 5.333 5.333 0 1 1 8 2.667a5.333 5.333 0 0 1 0 10.666z"/>
-                          <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
+                          <path d="M8 1.333A6.667 6.667 0 1 0 8 14.667 6.667 6.667 0 0 0 8 1.333zm0 12A5.333 5.333 0 1 1 8 2.667a5.333 5.333 0 0 1 0 10.666z" />
+                          <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z" />
                         </svg>
                         <span className="text-sm font-medium duration-200">
                           Kelola Izin
@@ -207,8 +206,8 @@ function Sidebar({
                     >
                       <div className="flex items-center gap-2">
                         <svg className={`shrink-0 fill-current ${pathname === "/riwayat-presensi" ? 'text-blue-600' : 'text-gray-400 dark:text-gray-500'}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                          <path d="M8 1.333A6.667 6.667 0 1 0 8 14.667 6.667 6.667 0 0 0 8 1.333zm0 12A5.333 5.333 5.333 0 1 1 8 2.667a5.333 5.333 0 0 1 0 10.666z"/>
-                          <path d="M8 4a.667.667 0 0 0-.667.667v3.333c0 .368.299.667.667.667h2.667a.667.667 0 0 0 0-1.334H8.667V4.667A.667.667 0 0 0 8 4z"/>
+                          <path d="M8 1.333A6.667 6.667 0 1 0 8 14.667 6.667 6.667 0 0 0 8 1.333zm0 12A5.333 5.333 0 1 1 8 2.667a5.333 5.333 0 0 1 0 10.666z" />
+                          <path d="M8 4a.667.667 0 0 0-.667.667v3.333c0 .368.299.667.667.667h2.667a.667.667 0 0 0 0-1.334H8.667V4.667A.667.667 0 0 0 8 4z" />
                         </svg>
                         <span className="text-sm font-medium duration-200">
                           Riwayat Presensi
@@ -227,7 +226,7 @@ function Sidebar({
                     >
                       <div className="flex items-center gap-2">
                         <svg className={`shrink-0 fill-current ${pathname === "/notifikasi" ? 'text-red-600' : 'text-gray-400 dark:text-gray-500'}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                          <path d="M8 16A2 2 0 0 0 10 14H6A2 2 0 0 0 8 16ZM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 1.197-.334 1.754A2.004 2.004 0 0 1 2 10c0 1.01.377 1.928 1 2.614A3.978 3.978 0 0 1 6 14h4c1.01 0 1.928-.377 2.614-1A3.978 3.978 0 0 1 14 10c0-.628.134-1.197.334-1.754A2.004 2.004 0 0 1 16 10c0-1.01-.377-1.928-1-2.614A3.978 3.978 0 0 1 12 6a4.002 4.002 0 0 0-1.203-2.92L8 1.918z"/>
+                          <path d="M8 16A2 2 0 0 0 10 14H6A2 2 0 0 0 8 16ZM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 1.197-.334 1.754A2.004 2.004 0 0 1 2 10c0 1.01.377 1.928 1 2.614A3.978 3.978 0 0 1 6 14h4c1.01 0 1.928-.377 2.614-1A3.978 3.978 0 0 1 14 10c0-.628.134-1.197.334-1.754A2.004 2.004 0 0 1 16 10c0-1.01-.377-1.928-1-2.614A3.978 3.978 0 0 1 12 6a4.002 4.002 0 0 0-1.203-2.92L8 1.918z" />
                         </svg>
                         <span className="text-sm font-medium duration-200">
                           Notifikasi
@@ -246,8 +245,8 @@ function Sidebar({
                     >
                       <div className="flex items-center gap-2">
                         <svg className={`shrink-0 fill-current ${pathname === "/analytics" ? 'text-indigo-600' : 'text-gray-400 dark:text-gray-500'}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                          <path d="M8 1.333A6.667 6.667 0 1 0 8 14.667 6.667 6.667 0 0 0 8 1.333zm0 12A5.333 5.333 5.333 0 1 1 8 2.667a5.333 5.333 0 0 1 0 10.666z"/>
-                          <path d="M8 4a.667.667 0 0 0-.667.667v3.333c0 .368.299.667.667.667h2.667a.667.667 0 0 0 0-1.334H8.667V4.667A.667.667 0 0 0 8 4z"/>
+                          <path d="M8 1.333A6.667 6.667 0 1 0 8 14.667 6.667 6.667 0 0 0 8 1.333zm0 12A5.333 5.333 0 1 1 8 2.667a5.333 5.333 0 0 1 0 10.666z" />
+                          <path d="M8 4a.667.667 0 0 0-.667.667v3.333c0 .368.299.667.667.667h2.667a.667.667 0 0 0 0-1.334H8.667V4.667A.667.667 0 0 0 8 4z" />
                         </svg>
                         <span className="text-sm font-medium duration-200">
                           Analytics
@@ -266,7 +265,7 @@ function Sidebar({
                     >
                       <div className="flex items-center gap-2">
                         <svg className={`shrink-0 fill-current ${pathname === "/attendance-report-menu" ? 'text-blue-700' : 'text-gray-400 dark:text-gray-500'}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                          <path d="M8 1.333A6.667 6.667 0 1 0 8 14.667 6.667 6.667 0 0 0 8 1.333zm0 12A5.333 5.333 0 1 1 8 2.667a5.333 5.333 0 0 1 0 10.666zm0-8A2.667 2.667 0 1 0 8 10.667 2.667 2.667 0 0 0 8 5.333z"/>
+                          <path d="M8 1.333A6.667 6.667 0 1 0 8 14.667 6.667 6.667 0 0 0 8 1.333zm0 12A5.333 5.333 0 1 1 8 2.667a5.333 5.333 0 0 1 0 10.666zm0-8A2.667 2.667 0 1 0 8 10.667 2.667 2.667 0 0 0 8 5.333z" />
                         </svg>
                         <span className="text-sm font-medium duration-200">
                           Rekap Presensi Menu
@@ -304,7 +303,7 @@ function Sidebar({
                       }
                     >
                       <div className="flex items-center gap-2">
-                        <svg className={`shrink-0 fill-current ${pathname === "/data-profile-user" ? 'text-blue-700' : 'text-gray-400 dark:text-gray-500'}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 2.08 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                        <svg className={`shrink-0 fill-current ${pathname === "/data-profile-user" ? 'text-blue-700' : 'text-gray-400 dark:text-gray-500'}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 2.08 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" /></svg>
                         <span className="text-sm font-medium duration-200">
                           Data Profile User
                         </span>
@@ -322,8 +321,8 @@ function Sidebar({
                     >
                       <div className="flex items-center gap-2">
                         <svg className={`shrink-0 fill-current ${pathname === "/dashboard-dummy" ? 'text-violet-500' : 'text-gray-400 dark:text-gray-500'}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                          <path d="M0 0h16v16H0z" fill="none"/>
-                          <path d="M2 13h12V3H2v10zm1-9h10v8H3V4zm2 2h2v2H5V6zm0 3h2v2H5V9zm3-3h2v2H8V6zm0 3h2v2H8V9z"/>
+                          <path d="M0 0h16v16H0z" fill="none" />
+                          <path d="M2 13h12V3H2v10zm1-9h10v8H3V4zm2 2h2v2H5V6zm0 3h2v2H5V9zm3-3h2v2H8V6zm0 3h2v2H8V9z" />
                         </svg>
                         <span className="text-sm font-medium duration-200">
                           Dashboard Dummy
@@ -342,8 +341,8 @@ function Sidebar({
                     >
                       <div className="flex items-center gap-2">
                         <svg className={`shrink-0 fill-current ${pathname === "/rekap-presensi-dummy" ? 'text-violet-500' : 'text-gray-400 dark:text-gray-500'}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                          <path d="M2 2h12v12H2z" fill="none"/>
-                          <path d="M4 4h8v1H4zm0 2h8v1H4zm0 2h8v1H4zm0 2h8v1H4z"/>
+                          <path d="M2 2h12v12H2z" fill="none" />
+                          <path d="M4 4h8v1H4zm0 2h8v1H4zm0 2h8v1H4zm0 2h8v1H4z" />
                         </svg>
                         <span className="text-sm font-medium duration-200">
                           Rekap Presensi Dummy
@@ -357,43 +356,43 @@ function Sidebar({
                 <>
                   {/* QR Code */}
                   <li className="px-3 py-2">
-                            <NavLink
-                              end
+                    <NavLink
+                      end
                       to="/user-qr"
-                              className={({ isActive }) =>
+                      className={({ isActive }) =>
                         "block text-gray-800 dark:text-gray-100 truncate transition duration-150 " + (isActive ? "text-violet-500" : "hover:text-gray-900 dark:hover:text-white")
                       }
                     >
                       <div className="flex items-center gap-2">
                         <svg className={`shrink-0 fill-current ${pathname === "/user-qr" ? 'text-violet-500' : 'text-gray-400 dark:text-gray-500'}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                          <path d="M2 2h2v2H2V2zm1 1h1V3H3v1zm2-1h2v2H5V2zm1 1h1V3H6v1zm2-1h2v2H8V2zm1 1h1V3H9v1zm2-1h2v2h-2V2zm1 1h1V3h-1v1zM2 5h2v2H2V5zm1 1h1V6H3v1zm2-1h2v2H5V5zm1 1h1V6H6v1zm2-1h2v2H8V5zm1 1h1V6H9v1zm2-1h2v2h-2V5zm1 1h1V6h-1v1zM2 8h2v2H2V8zm1 1h1V9H3v1zm2-1h2v2H5V8zm1 1h1V9H6v1zm2-1h2v2H8V8zm1 1h1V9H9v1zm2-1h2v2h-2V8zm1 1h1V9h-1v1zM2 11h2v2H2v-2zm1 1h1v-1H3v1zm2-1h2v2H5v-2zm1 1h1v-1H6v1zm2-1h2v2H8v-2zm1 1h1v-1H9v1zm2-1h2v2h-2v-2zm1 1h1v-1h-1v1z"/>
-                            </svg>
+                          <path d="M2 2h2v2H2V2zm1 1h1V3H3v1zm2-1h2v2H5V2zm1 1h1V3H6v1zm2-1h2v2H8V2zm1 1h1V3H9v1zm2-1h2v2h-2V2zm1 1h1V3h-1v1zM2 5h2v2H2V5zm1 1h1V6H3v1zm2-1h2v2H5V5zm1 1h1V6H6v1zm2-1h2v2H8V5zm1 1h1V6H9v1zm2-1h2v2h-2V5zm1 1h1V6h-1v1zM2 8h2v2H2V8zm1 1h1V9H3v1zm2-1h2v2H5V8zm1 1h1V9H6v1zm2-1h2v2H8V8zm1 1h1V9H9v1zm2-1h2v2h-2V8zm1 1h1V9h-1v1zM2 11h2v2H2v-2zm1 1h1v-1H3v1zm2-1h2v2H5v-2zm1 1h1v-1H6v1zm2-1h2v2H8v-2zm1 1h1v-1H9v1zm2-1h2v2h-2v-2zm1 1h1v-1h-1v1z" />
+                        </svg>
                         <span className="text-sm font-medium duration-200">
                           QR Code
-                              </span>
+                        </span>
                       </div>
-                            </NavLink>
-                          </li>
+                    </NavLink>
+                  </li>
                   {/* Riwayat Presensi */}
                   <li className="px-3 py-2">
-                            <NavLink
-                              end
+                    <NavLink
+                      end
                       to="/user-history"
-                              className={({ isActive }) =>
+                      className={({ isActive }) =>
                         "block text-gray-800 dark:text-gray-100 truncate transition duration-150 " + (isActive ? "text-violet-500" : "hover:text-gray-900 dark:hover:text-white")
                       }
                     >
                       <div className="flex items-center gap-2">
                         <svg className={`shrink-0 fill-current ${pathname === "/user-history" ? 'text-violet-500' : 'text-gray-400 dark:text-gray-500'}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                          <path d="M8 3.293l-6 6V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V9.293l-6-6zm5 9.207a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V9.707l5-5 5 5V12.5z"/>
-                          <path d="M7.5 10.5v-3h1v3h-1zm0 2v-1h1v1h-1z"/>
+                          <path d="M8 3.293l-6 6V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V9.293l-6-6zm5 9.207a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V9.707l5-5 5 5V12.5z" />
+                          <path d="M7.5 10.5v-3h1v3h-1zm0 2v-1h1v1h-1z" />
                         </svg>
                         <span className="text-sm font-medium duration-200">
                           Riwayat Presensi
-                              </span>
+                        </span>
                       </div>
                     </NavLink>
-                          </li>
+                  </li>
                   {/* Kegiatan User */}
                   <li className="px-3 py-2">
                     <NavLink
@@ -405,8 +404,8 @@ function Sidebar({
                     >
                       <div className="flex items-center gap-2">
                         <svg className={`shrink-0 fill-current ${pathname === "/user-kegiatan" ? 'text-green-600' : 'text-gray-400 dark:text-gray-500'}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                          <path d="M8 1.333A6.667 6.667 0 1 0 8 14.667 6.667 6.667 0 0 0 8 1.333zm0 12A5.333 5.333 5.333 0 1 1 8 2.667a5.333 5.333 0 0 1 0 10.666z"/>
-                          <path d="M8 4a.667.667 0 0 0-.667.667v3.333c0 .368.299.667.667.667h2.667a.667.667 0 0 0 0-1.334H8.667V4.667A.667.667 0 0 0 8 4z"/>
+                          <path d="M8 1.333A6.667 6.667 0 1 0 8 14.667 6.667 6.667 0 0 0 8 1.333zm0 12A5.333 5.333 0 1 1 8 2.667a5.333 5.333 0 0 1 0 10.666z" />
+                          <path d="M8 4a.667.667 0 0 0-.667.667v3.333c0 .368.299.667.667.667h2.667a.667.667 0 0 0 0-1.334H8.667V4.667A.667.667 0 0 0 8 4z" />
                         </svg>
                         <span className="text-sm font-medium duration-200">
                           Kegiatan

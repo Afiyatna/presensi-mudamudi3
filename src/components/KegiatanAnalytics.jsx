@@ -28,27 +28,31 @@ const KegiatanAnalytics = () => {
   const fetchAnalyticsData = async () => {
     try {
       setLoading(true);
-      
+
       // Fetch all data
       const [kegiatan, presensi, izin] = await Promise.all([
         kegiatanService.getAllKegiatan(),
-        presensiKegiatanService.getAllPresensi(),
-        izinKegiatanService.getAllIzin()
+        presensiKegiatanService.getAllPresensiKegiatan(),
+        izinKegiatanService.getAllIzinKegiatan()
       ]);
 
       // Filter by date range
-      const filteredKegiatan = kegiatan.filter(k => 
-        new Date(k.tanggal) >= new Date(dateRange.from) && 
+      const kegiatanData = kegiatan.data || [];
+      const presensiData = presensi.data || [];
+      const izinData = izin.data || [];
+
+      const filteredKegiatan = kegiatanData.filter(k =>
+        new Date(k.tanggal) >= new Date(dateRange.from) &&
         new Date(k.tanggal) <= new Date(dateRange.to)
       );
 
-      const filteredPresensi = presensi.filter(p => 
-        new Date(p.created_at) >= new Date(dateRange.from) && 
+      const filteredPresensi = presensiData.filter(p =>
+        new Date(p.created_at) >= new Date(dateRange.from) &&
         new Date(p.created_at) <= new Date(dateRange.to)
       );
 
-      const filteredIzin = izin.filter(i => 
-        new Date(i.created_at) >= new Date(dateRange.from) && 
+      const filteredIzin = izinData.filter(i =>
+        new Date(i.created_at) >= new Date(dateRange.from) &&
         new Date(i.created_at) <= new Date(dateRange.to)
       );
 
@@ -56,7 +60,7 @@ const KegiatanAnalytics = () => {
       const totalKegiatan = filteredKegiatan.length;
       const totalPresensi = filteredPresensi.length;
       const totalIzin = filteredIzin.length;
-      
+
       // Calculate presensi rate per kegiatan
       const presensiRate = totalKegiatan > 0 ? (totalPresensi / totalKegiatan).toFixed(1) : 0;
 
@@ -257,11 +261,10 @@ const KegiatanAnalytics = () => {
               {analyticsData.statusDistribution.map((status, index) => (
                 <div key={index} className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <div className={`w-3 h-3 rounded-full ${
-                      status.status === 'hadir' ? 'bg-green-500' :
+                    <div className={`w-3 h-3 rounded-full ${status.status === 'hadir' ? 'bg-green-500' :
                       status.status === 'terlambat' ? 'bg-yellow-500' :
-                      status.status === 'izin' ? 'bg-blue-500' : 'bg-gray-500'
-                    }`}></div>
+                        status.status === 'izin' ? 'bg-blue-500' : 'bg-gray-500'
+                      }`}></div>
                     <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 capitalize">
                       {status.status}
                     </span>
@@ -283,10 +286,10 @@ const KegiatanAnalytics = () => {
               {analyticsData.presensiTrend.map((trend, index) => {
                 const maxCount = Math.max(...analyticsData.presensiTrend.map(t => t.count));
                 const height = maxCount > 0 ? (trend.count / maxCount) * 100 : 0;
-                
+
                 return (
                   <div key={index} className="flex flex-col items-center">
-                    <div 
+                    <div
                       className="w-8 bg-blue-500 rounded-t-sm transition-all duration-300 hover:bg-blue-600"
                       style={{ height: `${height}%` }}
                     ></div>

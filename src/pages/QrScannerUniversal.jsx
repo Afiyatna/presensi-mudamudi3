@@ -410,18 +410,31 @@ export default function QrScannerUniversal() {
             toast.error('Error saat memproses scan: ' + e.message);
           }
         },
-        (error) => {
-          // Only show error if it's not a common scanning error (like NotFoundException)
-          if (error) {
-            // Log all scanner errors to console for debugging, but only show relevant ones to user
-            if (!error.name?.includes('NotFound') && !error.message?.includes('No QR code')) {
-              console.error('[QR Scanner Error] Critical error:', error);
-              setScannerError('Gagal mengakses kamera atau scanner error. Pastikan izin kamera sudah diberikan dan coba restart scanner.');
-            } else {
-              // Info level for common scanning errors to avoid spamming error console, but still visible if needed
-              // Uncomment line below if you successfully want to see every frame scan fail
-              // console.info('[QR Scanner Info] Frame scan error (normal):', error.message || error);
-            }
+        (errorMessage) => {
+          // html5-qrcode standardly calls this callback for every frame where it fails to detect a QR code.
+          // This is NOT usually a critical error, just "not found yet".
+
+          let errorStr = '';
+          if (typeof errorMessage === 'string') {
+            errorStr = errorMessage;
+          } else if (errorMessage.message) {
+            errorStr = errorMessage.message;
+          } else {
+            errorStr = JSON.stringify(errorMessage);
+          }
+
+          // Check for common temporary scanning errors that we should ignore
+          const isCommonError =
+            errorStr.includes('NotFound') ||
+            errorStr.includes('No QR code') ||
+            errorStr.includes('No MultiFormat Readers') ||
+            errorStr.includes('e.indexOf is not a function'); // Sometimes happens in internal library logic
+
+          if (!isCommonError) {
+            console.error('[QR Scanner Error] Critical error:', errorMessage);
+            setScannerError('Gagal mengakses kamera atau scanner error. Pastikan izin kamera sudah diberikan dan coba restart scanner.');
+          } else {
+            // Optional: console.debug('[QR Scanner] Frame scan failed (normal):', errorStr);
           }
         }
       );

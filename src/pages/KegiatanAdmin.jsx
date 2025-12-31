@@ -43,20 +43,32 @@ export default function KegiatanAdmin() {
   useEffect(() => {
     fetchKegiatan();
     fetchAllPresensi();
+  }, []);
 
-    // Subscribe to realtime changes
+  // Realtime subscription that depends on selectedKegiatan
+  useEffect(() => {
+    const handleRealtimeUpdate = async (payload) => {
+      console.log('Realtime update received:', payload);
+
+      if (selectedKegiatan) {
+        // Jika sedang melihat detail kegiatan, refresh data kegiatan tersebut saja
+        const data = await fetchPresensiByKegiatan(selectedKegiatan.id);
+        setPresensiList(data);
+      } else {
+        // Jika di halaman utama, refresh semua data
+        fetchAllPresensi();
+      }
+    };
+
     const presensiSubscription = supabase
       .channel('public:presensi_kegiatan')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'presensi_kegiatan' }, (payload) => {
-        console.log('Realtime update received:', payload);
-        fetchAllPresensi();
-      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'presensi_kegiatan' }, handleRealtimeUpdate)
       .subscribe();
 
     return () => {
       supabase.removeChannel(presensiSubscription);
     };
-  }, []);
+  }, [selectedKegiatan]);
 
   const fetchKegiatan = async () => {
     try {
