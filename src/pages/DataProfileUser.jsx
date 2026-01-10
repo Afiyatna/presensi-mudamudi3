@@ -77,6 +77,26 @@ export default function DataProfileUser() {
     setFilters({ jenis_kelamin: 'Semua', kelompok: 'Semua', desa: 'Semua', kategori: 'Semua', search: '' });
   };
 
+  const handleDelete = async (userId, userName) => {
+    if (!window.confirm(`Apakah Anda yakin ingin menghapus user ${userName}? Tindakan ini tidak dapat dibatalkan.`)) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase.rpc('delete_user_account', { user_id: userId });
+      if (error) throw error;
+
+      toast.success(`User ${userName} berhasil dihapus`);
+      // Refresh data
+      const { data, error: fetchError } = await supabase.from('profiles').select('*');
+      if (!fetchError) setProfiles(data || []);
+
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      toast.error(`Gagal menghapus user: ${error.message}`);
+    }
+  };
+
   const getSafeFileName = (name, ext) => {
     if (!name) return `qr-code.${ext}`;
     return `${name.replace(/\s+/g, '_')}_qr-code.${ext}`;
@@ -645,6 +665,7 @@ export default function DataProfileUser() {
                   <th className="px-4 py-2 border dark:border-gray-700">Desa</th>
                   <th className="px-4 py-2 border dark:border-gray-700">Kategori</th>
                   <th className="px-4 py-2 border dark:border-gray-700">Role</th>
+                  <th className="px-4 py-2 border dark:border-gray-700 text-center">Aksi</th>
                   <th className="px-4 py-2 border dark:border-gray-700 text-center">QR</th>
                 </tr>
               </thead>
@@ -660,6 +681,14 @@ export default function DataProfileUser() {
                     <td className="px-4 py-2 border dark:border-gray-700">{profile.desa}</td>
                     <td className="px-4 py-2 border dark:border-gray-700">{profile.kategori || '-'}</td>
                     <td className="px-4 py-2 border dark:border-gray-700">{profile.role}</td>
+                    <td className="px-4 py-2 border dark:border-gray-700 text-center">
+                      <button
+                        onClick={() => handleDelete(profile.id, profile.nama_lengkap)}
+                        className="text-red-600 hover:text-red-800 font-medium text-sm bg-red-50 dark:bg-red-900/20 px-3 py-1 rounded hover:bg-red-100 dark:hover:bg-red-900/40 transition"
+                      >
+                        Hapus
+                      </button>
+                    </td>
                     <td className="px-4 py-2 border dark:border-gray-700 text-center">
                       <button
                         onClick={() => setQrModal({ open: true, user: profile })}
