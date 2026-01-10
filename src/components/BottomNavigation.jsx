@@ -10,6 +10,7 @@ function BottomNavigation({ role }) {
     { path: '/qr-scanner', icon: '📷', label: 'QR Scanner', activePaths: ['/qr-scanner', '/qr-scanner/kegiatan'] },
     { path: '/riwayat-presensi', icon: '📊', label: 'Riwayat Presensi', activePaths: ['/riwayat-presensi'] },
     { path: '/data-profile-user', icon: '👥', label: 'Profile User', activePaths: ['/data-profile-user'] },
+    { path: '/batch-create-user', icon: '📝', label: 'Batch Create', activePaths: ['/batch-create-user'] },
   ];
   const userItems = [
     { path: '/dashboard', icon: '🏠', label: 'Dashboard', activePaths: ['/dashboard'] },
@@ -26,11 +27,10 @@ function BottomNavigation({ role }) {
           <NavLink
             key={index}
             to={item.path}
-            className={`flex flex-col items-center justify-center flex-1 h-full transition-all duration-200 py-1 ${
-              isActive(item.activePaths)
+            className={`flex flex-col items-center justify-center flex-1 h-full transition-all duration-200 py-1 ${isActive(item.activePaths)
                 ? 'text-blue-600 dark:text-blue-400'
                 : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
-            }`}
+              }`}
             onClick={() => {
               if ('vibrate' in navigator) navigator.vibrate(50);
             }}

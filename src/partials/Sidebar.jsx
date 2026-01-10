@@ -310,6 +310,25 @@ function Sidebar({
                       </div>
                     </NavLink>
                   </li>
+                  {/* Batch Create User */}
+                  <li className="px-3 py-2">
+                    <NavLink
+                      end
+                      to="/batch-create-user"
+                      className={({ isActive }) =>
+                        "block text-gray-800 dark:text-gray-100 truncate transition duration-150 " + (isActive ? "text-indigo-600" : "hover:text-gray-900 dark:hover:text-white")
+                      }
+                    >
+                      <div className="flex items-center gap-2">
+                        <svg className={`shrink-0 fill-current ${pathname === "/batch-create-user" ? 'text-indigo-600' : 'text-gray-400 dark:text-gray-500'}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                          <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM8 12.5a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1 0-1h5a.5.5 0 0 1 .5.5zm0-3a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1 0-1h5a.5.5 0 0 1 .5.5zm0-3a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1 0-1h5a.5.5 0 0 1 .5.5zm4.5-.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1h2zm0 3a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1h2zm0 3a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1h2z" />
+                        </svg>
+                        <span className="text-sm font-medium duration-200">
+                          Batch Create User
+                        </span>
+                      </div>
+                    </NavLink>
+                  </li>
                   {/* Dashboard Dummy */}
                   <li className="px-3 py-2">
                     <NavLink

@@ -29,6 +29,7 @@ import KelolaIzinAdmin from './pages/KelolaIzinAdmin';
 import RiwayatPresensiTerintegrasi from './pages/RiwayatPresensiTerintegrasi';
 import NotifikasiAdmin from './pages/NotifikasiAdmin';
 import AnalyticsAdmin from './pages/AnalyticsAdmin';
+import BatchCreateUser from './pages/BatchCreateUser';
 
 function App() {
 
@@ -62,6 +63,7 @@ function App() {
         <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/data-profile-user" element={<RequireAuth><RequireAdmin><DataProfileUser /></RequireAdmin></RequireAuth>} />
+        <Route path="/batch-create-user" element={<RequireAuth><RequireAdmin><BatchCreateUser /></RequireAdmin></RequireAuth>} />
       </Routes>
     </PageTransition>
   );
