@@ -85,6 +85,7 @@ export default function Profile() {
         tanggal_lahir: form.tanggal_lahir,
         kelompok: form.kelompok,
         desa: form.desa,
+        kategori: form.kategori,
       })
       .eq('id', profile.id);
     if (updateError) {
@@ -105,7 +106,7 @@ export default function Profile() {
         <div className="bg-white dark:bg-gray-800 p-8 rounded shadow-md w-full max-w-md">
           <h2 className="text-2xl font-bold mb-2 text-center text-gray-800 dark:text-gray-100">Profile</h2>
           <p className="text-gray-600 dark:text-gray-300 text-justify mb-6 text-sm">
-            Halaman ini menampilkan dan memungkinkan Anda mengubah data profil pribadi Anda. 
+            Halaman ini menampilkan dan memungkinkan Anda mengubah data profil pribadi Anda.
             Pastikan informasi yang Anda masukkan akurat karena akan digunakan untuk sistem presensi.
           </p>
           {success && <div className="mb-4 text-green-600 text-center">Profile berhasil diupdate!</div>}
@@ -140,6 +141,10 @@ export default function Profile() {
                 <div>
                   <span className="block text-gray-500 text-sm">Desa</span>
                   <span className="block text-gray-800 dark:text-gray-100 font-medium">{profile.desa}</span>
+                </div>
+                <div>
+                  <span className="block text-gray-500 text-sm">Kategori User</span>
+                  <span className="block text-gray-800 dark:text-gray-100 font-medium">{profile.kategori || '-'}</span>
                 </div>
                 <div>
                   <span className="block text-gray-500 text-sm">Role</span>
@@ -236,9 +241,17 @@ export default function Profile() {
                   <option value="">Pilih Desa</option>
                   <option value="PATEAN">PATEAN</option>
                   <option value="KENDAL">KENDAL</option>
-                  <option value="BRANGSONG">BRANGSONG</option>                              
+                  <option value="BRANGSONG">BRANGSONG</option>
                   <option value="BOJA">BOJA</option>
-                  <option value="MIJEN">MIJEN</option>                
+                  <option value="MIJEN">MIJEN</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-gray-500 text-sm mb-1">Kategori User</label>
+                <select name="kategori" className="w-full p-2 border rounded" value={form.kategori || ''} onChange={handleChange} required>
+                  <option value="">Pilih Kategori</option>
+                  <option value="Muda - Mudi">Muda - Mudi</option>
+                  <option value="Orang Tua">Orang Tua</option>
                 </select>
               </div>
               <div>

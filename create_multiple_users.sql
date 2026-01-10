@@ -18,7 +18,8 @@ CREATE OR REPLACE FUNCTION create_user_with_profile(
   p_tanggal_lahir DATE DEFAULT NULL,
   p_kelompok TEXT DEFAULT NULL,
   p_desa TEXT DEFAULT NULL,
-  p_role TEXT DEFAULT 'user'
+  p_role TEXT DEFAULT 'user',
+  p_kategori TEXT DEFAULT 'Muda - Mudi'
 )
 RETURNS UUID AS $$
 DECLARE
@@ -42,7 +43,8 @@ BEGIN
     tanggal_lahir,
     kelompok,
     desa,
-    role
+    role,
+    kategori
   ) VALUES (
     v_user_id,
     p_email,
@@ -52,7 +54,8 @@ BEGIN
     p_tanggal_lahir,
     p_kelompok,
     p_desa,
-    p_role
+    p_role,
+    p_kategori
   ) ON CONFLICT (id) DO NOTHING;
   
   RETURN v_user_id;
@@ -82,7 +85,8 @@ BEGIN
     p_tanggal_lahir := '2000-01-01',
     p_kelompok := 'PESAWAHAN',
     p_desa := 'KENDAL',
-    p_role := 'user'
+    p_role := 'user',
+    p_kategori := 'Muda - Mudi'
   );
   
   -- User 2
@@ -95,7 +99,8 @@ BEGIN
     p_tanggal_lahir := '2001-02-15',
     p_kelompok := 'BRANGSONG',
     p_desa := 'KENDAL',
-    p_role := 'user'
+    p_role := 'user',
+    p_kategori := 'Muda - Mudi'
   );
   
   -- User 3
@@ -121,7 +126,8 @@ BEGIN
     p_tanggal_lahir := '2002-08-10',
     p_kelompok := 'WELERI',
     p_desa := 'KENDAL',
-    p_role := 'user'
+    p_role := 'user',
+    p_kategori := 'Muda - Mudi'
   );
   
   -- User 5

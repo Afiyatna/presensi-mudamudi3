@@ -40,6 +40,7 @@ export default function Register() {
     tanggal_lahir: '',
     kelompok: '',
     desa: '',
+    kategori: '',
   });
   const [tanggalLahir, setTanggalLahir] = useState({
     tanggal: '',
@@ -135,6 +136,7 @@ export default function Register() {
         kelompok: form.kelompok,
         desa: form.desa,
         role: 'user',
+        kategori: form.kategori,
       },
     ]);
     if (!profileError) {
@@ -199,7 +201,7 @@ export default function Register() {
               <p className="text-justify text-gray-500 mb-4 text-sm md:text-base max-w-md">
                 Silakan isi data diri Anda untuk membuat akun baru di <b>Presensi Muda Mudi Daerah Kendal</b>.
               </p>
-              
+
               {error && <div className="mb-2 text-red-500 text-center text-sm">{error}</div>}
               {success && <div className="mb-2 text-green-600 text-center text-sm">Registrasi berhasil! Redirect ke dashboard...</div>}
               {loading && <DataLoadingSpinner message="Memproses registrasi..." />}
@@ -209,7 +211,7 @@ export default function Register() {
                 </div>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-violet-400">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z"/><path d="M12 14c-4.418 0-8 1.79-8 4v2h16v-2c0-2.21-3.582-4-8-4Z"/></svg>
+                    <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" /><path d="M12 14c-4.418 0-8 1.79-8 4v2h16v-2c0-2.21-3.582-4-8-4Z" /></svg>
                   </span>
                   <input type="email" name="email" placeholder="Email" className="w-full pl-10 pr-3 py-2 border-2 border-violet-200 rounded-full bg-gray-50 focus:outline-none focus:border-violet-500 text-gray-800" value={form.email} onChange={handleChange} required />
                 </div>
@@ -218,7 +220,7 @@ export default function Register() {
                 </div>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-violet-400">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                   </span>
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -319,7 +321,7 @@ export default function Register() {
                     className="w-1/3 pl-4 pr-3 py-2 border-2 border-violet-200 rounded-full bg-gray-50 focus:outline-none focus:border-violet-500 text-gray-800"
                     value={tanggalLahir.tahun}
                     onChange={(e) => handleTanggalLahirChange('tahun', e.target.value)}
-                  required
+                    required
                   >
                     <option value="">Tahun</option>
                     {tahunOptions.map((option) => (
@@ -368,6 +370,14 @@ export default function Register() {
                   <option value="BOJA">BOJA</option>
                   <option value="MIJEN">MIJEN</option>
                 </select>
+                <div className="flex gap-2">
+                  <label className="text-sm font-medium text-gray-700 mb-1 w-full">Kategori User:</label>
+                </div>
+                <select name="kategori" className="w-full pl-4 pr-3 py-2 border-2 border-violet-200 rounded-full bg-gray-50 focus:outline-none focus:border-violet-500 text-gray-800 mb-2" value={form.kategori} onChange={handleChange} required>
+                  <option value="">Pilih Kategori</option>
+                  <option value="Muda - Mudi">Muda - Mudi</option>
+                  <option value="Orang Tua">Orang Tua</option>
+                </select>
                 <button type="submit" className="w-full bg-gradient-to-r from-violet-600 to-pink-500 text-white font-bold py-2 rounded-full mt-2 shadow-md hover:from-violet-700 hover:to-pink-600 transition" disabled={loading}>
                   {loading ? 'Loading...' : 'Register'}
                 </button>
@@ -379,11 +389,11 @@ export default function Register() {
                 Sudah punya akun? Login
               </button>
             </div>
-              <div className="mb-6 p-3 bg-blue-50 rounded-lg border border-blue-200 mt-4">
-                <p className="text-sm text-blue-700 text-justify">
-                  <strong>Informasi Penting:</strong> Data yang Anda masukkan akan digunakan untuk sistem presensi. 
-                  Pastikan informasi yang Anda berikan akurat dan lengkap.
-                </p>
+            <div className="mb-6 p-3 bg-blue-50 rounded-lg border border-blue-200 mt-4">
+              <p className="text-sm text-blue-700 text-justify">
+                <strong>Informasi Penting:</strong> Data yang Anda masukkan akan digunakan untuk sistem presensi.
+                Pastikan informasi yang Anda berikan akurat dan lengkap.
+              </p>
             </div>
           </div>
         </div>

@@ -16,7 +16,7 @@ export default function DataProfileUser() {
   const [qrModal, setQrModal] = useState({ open: false, user: null });
   const qrRef = useRef(null);
   // Tambah state filter
-  const [filters, setFilters] = useState({ jenis_kelamin: 'Semua', kelompok: 'Semua', desa: 'Semua', search: '' });
+  const [filters, setFilters] = useState({ jenis_kelamin: 'Semua', kelompok: 'Semua', desa: 'Semua', kategori: 'Semua', search: '' });
   const [downloadingAll, setDownloadingAll] = useState(false);
   const [downloadingFiltered, setDownloadingFiltered] = useState(false);
 
@@ -54,6 +54,10 @@ export default function DataProfileUser() {
     () => Array.from(new Set((profiles || []).map(p => p?.desa).filter(Boolean))),
     [profiles]
   );
+  const kategoriOptions = useMemo(
+    () => Array.from(new Set((profiles || []).map(p => p?.kategori).filter(Boolean))),
+    [profiles]
+  );
 
   // Data terfilter
   const filteredProfiles = useMemo(() => {
@@ -62,14 +66,15 @@ export default function DataProfileUser() {
       const matchGender = filters.jenis_kelamin === 'Semua' || (p?.jenis_kelamin || '') === filters.jenis_kelamin;
       const matchKelompok = filters.kelompok === 'Semua' || (p?.kelompok || '') === filters.kelompok;
       const matchDesa = filters.desa === 'Semua' || (p?.desa || '') === filters.desa;
+      const matchKategori = filters.kategori === 'Semua' || (p?.kategori || '') === filters.kategori;
       const matchSearch = !search || (p?.nama_lengkap || '').toLowerCase().includes(search);
-      return matchGender && matchKelompok && matchDesa && matchSearch;
+      return matchGender && matchKelompok && matchDesa && matchKategori && matchSearch;
     });
   }, [profiles, filters]);
 
   // Handler reset
   const handleResetFilters = () => {
-    setFilters({ jenis_kelamin: 'Semua', kelompok: 'Semua', desa: 'Semua', search: '' });
+    setFilters({ jenis_kelamin: 'Semua', kelompok: 'Semua', desa: 'Semua', kategori: 'Semua', search: '' });
   };
 
   const getSafeFileName = (name, ext) => {
@@ -182,7 +187,7 @@ export default function DataProfileUser() {
     try {
       // Format QR code: userId|nama|kelompok|desa (sesuai dengan format yang diharapkan scanner)
       const qrValue = `${user.id}|${user.nama_lengkap || ''}|${user.kelompok || ''}|${user.desa || ''}`;
-      
+
       // Generate QR code sebagai data URL
       const qrDataUrl = await QRCode.toDataURL(qrValue, {
         width: 240,
@@ -360,18 +365,19 @@ export default function DataProfileUser() {
     }
 
     setDownloadingFiltered(true);
-    
+
     // Generate nama file berdasarkan filter
     const filterParts = [];
     if (filters.kelompok !== 'Semua') filterParts.push(`Kelompok_${filters.kelompok.replace(/\s+/g, '_')}`);
     if (filters.desa !== 'Semua') filterParts.push(`Desa_${filters.desa.replace(/\s+/g, '_')}`);
+    if (filters.kategori !== 'Semua') filterParts.push(`Kategori_${filters.kategori.replace(/\s+/g, '_')}`);
     if (filters.jenis_kelamin !== 'Semua') filterParts.push(filters.jenis_kelamin.replace(/\s+/g, '_'));
     if (filters.search) filterParts.push(`Search_${filters.search.replace(/\s+/g, '_')}`);
-    
-    const fileNamePrefix = filterParts.length > 0 
-      ? filterParts.join('_') 
+
+    const fileNamePrefix = filterParts.length > 0
+      ? filterParts.join('_')
       : 'Filtered';
-    
+
     toast.loading(`Membuat QR code untuk ${filteredProfiles.length} pengguna...`, { id: 'download-filtered' });
 
     try {
@@ -499,7 +505,7 @@ export default function DataProfileUser() {
 
             {/* Filter Panel */}
             <div className="mb-4 p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
                 {/* Jenis Kelamin */}
                 <div>
                   <label htmlFor="filter-jenis-kelamin" className="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">
@@ -550,6 +556,24 @@ export default function DataProfileUser() {
                   >
                     <option value="Semua">Semua</option>
                     {desaOptions.map((opt) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                </div>
+                {/* Kategori */}
+                <div>
+                  <label htmlFor="filter-kategori" className="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">
+                    Kategori
+                  </label>
+                  <select
+                    id="filter-kategori"
+                    aria-label="Filter berdasarkan kategori"
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={filters.kategori}
+                    onChange={(e) => setFilters(prev => ({ ...prev, kategori: e.target.value }))}
+                  >
+                    <option value="Semua">Semua</option>
+                    {kategoriOptions.map((opt) => (
                       <option key={opt} value={opt}>{opt}</option>
                     ))}
                   </select>
@@ -619,6 +643,7 @@ export default function DataProfileUser() {
                   <th className="px-4 py-2 border dark:border-gray-700">Tanggal Lahir</th>
                   <th className="px-4 py-2 border dark:border-gray-700">Kelompok</th>
                   <th className="px-4 py-2 border dark:border-gray-700">Desa</th>
+                  <th className="px-4 py-2 border dark:border-gray-700">Kategori</th>
                   <th className="px-4 py-2 border dark:border-gray-700">Role</th>
                   <th className="px-4 py-2 border dark:border-gray-700 text-center">QR</th>
                 </tr>
@@ -633,6 +658,7 @@ export default function DataProfileUser() {
                     <td className="px-4 py-2 border dark:border-gray-700">{profile.tanggal_lahir}</td>
                     <td className="px-4 py-2 border dark:border-gray-700">{profile.kelompok}</td>
                     <td className="px-4 py-2 border dark:border-gray-700">{profile.desa}</td>
+                    <td className="px-4 py-2 border dark:border-gray-700">{profile.kategori || '-'}</td>
                     <td className="px-4 py-2 border dark:border-gray-700">{profile.role}</td>
                     <td className="px-4 py-2 border dark:border-gray-700 text-center">
                       <button
@@ -672,9 +698,9 @@ export default function DataProfileUser() {
 
             <div className="flex justify-center mb-5">
               <div ref={qrRef} className="p-3 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
-                <QRCodeCanvas 
-                  value={`${qrModal.user.id}|${qrModal.user.nama_lengkap || ''}|${qrModal.user.kelompok || ''}|${qrModal.user.desa || ''}`} 
-                  size={240} 
+                <QRCodeCanvas
+                  value={`${qrModal.user.id}|${qrModal.user.nama_lengkap || ''}|${qrModal.user.kelompok || ''}|${qrModal.user.desa || ''}`}
+                  size={240}
                 />
               </div>
             </div>
