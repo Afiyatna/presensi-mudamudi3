@@ -71,7 +71,7 @@ export default function UserQRCode() {
 
     // Card dimensions (portrait)
     const cardWidth = 360;
-    const cardHeight = 500;
+    const cardHeight = 360;
     const qrSize = 140; // Reduced further from 180
     const topPadding = 40;
     const gapAfterQr = 30;
@@ -95,7 +95,7 @@ export default function UserQRCode() {
     ctx.drawImage(qrCanvas, qrX, topPadding, qrSize, qrSize);
 
     // Text section with boxed labels and character limit
-    const boxWidth = cardWidth - 100; // Reduced width
+    const boxWidth = cardWidth - 40; // Widened width
     const boxHeight = 36; // Reduced height
     // Text Configuration
     const leftMargin = 40;
@@ -114,7 +114,7 @@ export default function UserQRCode() {
     ctx.stroke();
     ctx.fillStyle = '#111827';
     ctx.font = 'bold 22px Arial, sans-serif';
-    ctx.fillText(truncateLabel(namaLengkap || 'Nama belum diisi', 22), center, nameBoxY + boxHeight / 2 + 8);
+    ctx.fillText(truncateLabel(namaLengkap || 'Nama belum diisi', 25), center, nameBoxY + boxHeight / 2 + 8);
 
     // Kelompok box
     const groupBoxY = nameBoxY + boxHeight + 8; // Tighter gap

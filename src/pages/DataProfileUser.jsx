@@ -126,7 +126,7 @@ export default function DataProfileUser() {
     const qrCanvas = qrRef.current?.querySelector('canvas');
     if (!qrCanvas) return null;
     const cardWidth = 360;
-    const cardHeight = 500;
+    const cardHeight = 360;
     const qrSize = 140; // Reduced further from 180
     const topPadding = 40; // Increased padding
     const gapAfterQr = 30;
@@ -146,7 +146,7 @@ export default function DataProfileUser() {
     ctx.drawImage(qrCanvas, qrX, topPadding, qrSize, qrSize);
 
     // Text Configuration
-    const boxWidth = cardWidth - 100; // Reduced width (more side padding)
+    const boxWidth = cardWidth - 40; // Widened width (20px margin each side)
     const boxHeight = 36; // Reduced height (tighter fit for text)
     const textStartY = topPadding + qrSize + gapAfterQr;
     const center = cardWidth / 2;
@@ -163,7 +163,7 @@ export default function DataProfileUser() {
     ctx.stroke();
     ctx.fillStyle = '#111827';
     ctx.font = 'bold 22px Arial, sans-serif';
-    ctx.fillText(truncateLabel(user?.nama_lengkap || 'Nama belum diisi', 22), center, nameBoxY + boxHeight / 2 + 8);
+    ctx.fillText(truncateLabel(user?.nama_lengkap || 'Nama belum diisi', 25), center, nameBoxY + boxHeight / 2 + 8);
 
     // Kelompok box
     const groupBoxY = nameBoxY + boxHeight + 8; // Tighter gap
@@ -268,7 +268,7 @@ export default function DataProfileUser() {
 
       // Text boxes
       // Text boxes
-      const boxWidth = cardWidth - 100; // Reduced width
+      const boxWidth = cardWidth - 40; // Widened width
       const boxHeight = 36; // Reduced height
       const textStartY = topPadding + qrSize + gapAfterQr;
       const center = cardWidth / 2;
@@ -285,7 +285,7 @@ export default function DataProfileUser() {
       ctx.stroke();
       ctx.fillStyle = '#111827';
       ctx.font = 'bold 22px Arial, sans-serif';
-      ctx.fillText(truncateLabel(user?.nama_lengkap || 'Nama belum diisi', 22), center, nameBoxY + boxHeight / 2 + 8);
+      ctx.fillText(truncateLabel(user?.nama_lengkap || 'Nama belum diisi', 25), center, nameBoxY + boxHeight / 2 + 8);
 
       // Kelompok box
       const groupBoxY = nameBoxY + boxHeight + 8; // Tighter gap
