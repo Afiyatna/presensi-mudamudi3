@@ -234,7 +234,7 @@ export default function DataProfileUser() {
       // Create canvas untuk card
       const cardWidth = 360;
       const cardHeight = 500;
-      const qrSize = 180; // Reduced
+      const qrSize = 140; // Reduced
       const topPadding = 40;
       const gapAfterQr = 30;
 
