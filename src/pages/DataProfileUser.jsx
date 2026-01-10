@@ -290,7 +290,7 @@ export default function DataProfileUser() {
       // Kelompok box
       const groupBoxY = nameBoxY + boxHeight + 8; // Tighter gap
       drawRoundedRect(ctx, nameBoxX, groupBoxY, boxWidth, boxHeight, 8);
-      ctx.fillStyle = '#eef2ff';
+      ctx.fillStyle = '#f9fafb';
       ctx.fill();
       ctx.strokeStyle = '#e5e7eb';
       ctx.stroke();
@@ -301,7 +301,7 @@ export default function DataProfileUser() {
       // Kategori box
       const categoryBoxY = groupBoxY + boxHeight + 8; // Tighter gap
       drawRoundedRect(ctx, nameBoxX, categoryBoxY, boxWidth, boxHeight, 8);
-      ctx.fillStyle = '#fdf2f8';
+      ctx.fillStyle = '#f9fafb';
       ctx.fill();
       ctx.strokeStyle = '#e5e7eb';
       ctx.stroke();
