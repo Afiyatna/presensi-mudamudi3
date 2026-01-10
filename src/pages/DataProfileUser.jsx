@@ -292,7 +292,7 @@ export default function DataProfileUser() {
       drawRoundedRect(ctx, nameBoxX, groupBoxY, boxWidth, boxHeight, 8);
       ctx.fillStyle = '#eef2ff';
       ctx.fill();
-      ctx.strokeStyle = '#c7d2fe';
+      ctx.strokeStyle = '#e5e7eb';
       ctx.stroke();
       ctx.fillStyle = '#111827'; // Black text
       ctx.font = 'bold 20px Arial, sans-serif';
@@ -303,7 +303,7 @@ export default function DataProfileUser() {
       drawRoundedRect(ctx, nameBoxX, categoryBoxY, boxWidth, boxHeight, 8);
       ctx.fillStyle = '#fdf2f8';
       ctx.fill();
-      ctx.strokeStyle = '#fbcfe8';
+      ctx.strokeStyle = '#e5e7eb';
       ctx.stroke();
       ctx.fillStyle = '#111827'; // Black text
       ctx.font = 'bold 20px Arial, sans-serif';
