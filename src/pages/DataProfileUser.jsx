@@ -295,7 +295,7 @@ export default function DataProfileUser() {
       ctx.strokeStyle = '#c7d2fe';
       ctx.stroke();
       ctx.fillStyle = '#111827'; // Black text
-      ctx.font = 'bold 18px Arial, sans-serif';
+      ctx.font = 'bold 20px Arial, sans-serif';
       ctx.fillText(truncateLabel(user?.kelompok || 'Belum ada kelompok'), center, groupBoxY + boxHeight / 2 + 7);
 
       // Kategori box
@@ -306,7 +306,7 @@ export default function DataProfileUser() {
       ctx.strokeStyle = '#fbcfe8';
       ctx.stroke();
       ctx.fillStyle = '#111827'; // Black text
-      ctx.font = 'bold 18px Arial, sans-serif';
+      ctx.font = 'bold 20px Arial, sans-serif';
       ctx.fillText(truncateLabel(user?.kategori || 'Kategori tidak ada'), center, categoryBoxY + boxHeight / 2 + 7);
 
       return canvas;

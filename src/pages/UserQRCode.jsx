@@ -124,7 +124,7 @@ export default function UserQRCode() {
     ctx.strokeStyle = '#e5e7eb';
     ctx.stroke();
     ctx.fillStyle = '#111827'; // Black text to match name
-    ctx.font = 'bold 18px Arial, sans-serif';
+    ctx.font = 'bold 20px Arial, sans-serif';
     ctx.fillText(truncateLabel(kelompok || 'Belum ada kelompok'), center, groupBoxY + boxHeight / 2 + 7);
 
     // Kategori box
@@ -135,7 +135,7 @@ export default function UserQRCode() {
     ctx.strokeStyle = '#e5e7eb';
     ctx.stroke();
     ctx.fillStyle = '#111827'; // Black text to match name
-    ctx.font = 'bold 18px Arial, sans-serif';
+    ctx.font = 'bold 20px Arial, sans-serif';
     ctx.fillText(truncateLabel(kategori || 'Kategori tidak ada'), center, categoryBoxY + boxHeight / 2 + 7);
 
     return canvas;
