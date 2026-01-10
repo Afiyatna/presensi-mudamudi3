@@ -239,9 +239,11 @@ export default function DataProfileUser() {
       const gapAfterQr = 30;
 
       const canvas = document.createElement('canvas');
-      canvas.width = cardWidth;
-      canvas.height = cardHeight;
+      const scale = 6; // Ultra High resolution scale (Full HD++)
+      canvas.width = cardWidth * scale;
+      canvas.height = cardHeight * scale;
       const ctx = canvas.getContext('2d');
+      ctx.scale(scale, scale); // Scale all drawing operations
 
       // Background
       ctx.fillStyle = '#ffffff';
