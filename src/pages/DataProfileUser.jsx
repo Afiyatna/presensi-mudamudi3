@@ -127,9 +127,9 @@ export default function DataProfileUser() {
     if (!qrCanvas) return null;
     const cardWidth = 360;
     const cardHeight = 500;
-    const qrSize = 220;
-    const topPadding = 32;
-    const gapAfterQr = 28;
+    const qrSize = 140; // Reduced further from 180
+    const topPadding = 40; // Increased padding
+    const gapAfterQr = 30;
 
     const canvas = document.createElement('canvas');
     canvas.width = cardWidth;
@@ -145,35 +145,47 @@ export default function DataProfileUser() {
     const qrX = (cardWidth - qrSize) / 2;
     ctx.drawImage(qrCanvas, qrX, topPadding, qrSize, qrSize);
 
-    const boxWidth = cardWidth - 80;
-    const boxHeight = 40;
+    // Text Configuration
+    const boxWidth = cardWidth - 100; // Reduced width (more side padding)
+    const boxHeight = 36; // Reduced height (tighter fit for text)
     const textStartY = topPadding + qrSize + gapAfterQr;
     const center = cardWidth / 2;
     ctx.textAlign = 'center';
 
     // Nama box
     const nameBoxX = (cardWidth - boxWidth) / 2;
-    const nameBoxY = textStartY - boxHeight / 2;
-    drawRoundedRect(ctx, nameBoxX, nameBoxY, boxWidth, boxHeight, 10);
+    const nameBoxY = textStartY;
+    drawRoundedRect(ctx, nameBoxX, nameBoxY, boxWidth, boxHeight, 8); // Slightly smaller radius
     ctx.fillStyle = '#f9fafb';
     ctx.fill();
     ctx.strokeStyle = '#e5e7eb';
     ctx.lineWidth = 1;
     ctx.stroke();
     ctx.fillStyle = '#111827';
-    ctx.font = 'bold 16px "Inter", system-ui, -apple-system, sans-serif';
-    ctx.fillText(truncateLabel(user?.nama_lengkap || 'Nama belum diisi', 28), center, nameBoxY + boxHeight / 2 + 5);
+    ctx.font = 'bold 22px Arial, sans-serif';
+    ctx.fillText(truncateLabel(user?.nama_lengkap || 'Nama belum diisi', 22), center, nameBoxY + boxHeight / 2 + 8);
 
     // Kelompok box
-    const groupBoxY = nameBoxY + boxHeight + 12;
-    drawRoundedRect(ctx, nameBoxX, groupBoxY, boxWidth, boxHeight, 10);
+    const groupBoxY = nameBoxY + boxHeight + 8; // Tighter gap
+    drawRoundedRect(ctx, nameBoxX, groupBoxY, boxWidth, boxHeight, 8);
     ctx.fillStyle = '#eef2ff';
     ctx.fill();
     ctx.strokeStyle = '#c7d2fe';
     ctx.stroke();
     ctx.fillStyle = '#4f46e5';
-    ctx.font = '14px "Inter", system-ui, -apple-system, sans-serif';
-    ctx.fillText(truncateLabel(user?.kelompok || 'Belum ada kelompok'), center, groupBoxY + boxHeight / 2 + 4);
+    ctx.font = 'bold 18px Arial, sans-serif';
+    ctx.fillText(truncateLabel(user?.kelompok || 'Belum ada kelompok'), center, groupBoxY + boxHeight / 2 + 7);
+
+    // Kategori box
+    const categoryBoxY = groupBoxY + boxHeight + 8; // Tighter gap
+    drawRoundedRect(ctx, nameBoxX, categoryBoxY, boxWidth, boxHeight, 8);
+    ctx.fillStyle = '#fdf2f8';
+    ctx.fill();
+    ctx.strokeStyle = '#fbcfe8';
+    ctx.stroke();
+    ctx.fillStyle = '#db2777';
+    ctx.font = 'bold 18px Arial, sans-serif';
+    ctx.fillText(truncateLabel(user?.kategori || 'Kategori tidak ada'), center, categoryBoxY + boxHeight / 2 + 7);
 
     return canvas;
   };
@@ -199,14 +211,15 @@ export default function DataProfileUser() {
     pdf.addImage(imgData, 'JPEG', 20, 50, canvas.width, canvas.height);
     pdf.text(`Nama: ${qrModal.user.nama_lengkap || '-'}`, 20, 60 + canvas.height);
     pdf.text(`Kelompok: ${qrModal.user.kelompok || '-'}`, 20, 80 + canvas.height);
+    pdf.text(`Kategori: ${qrModal.user.kategori || '-'}`, 20, 100 + canvas.height);
     pdf.save(getSafeFileName(qrModal.user.nama_lengkap, 'pdf'));
   };
 
   // Generate QR code card untuk user tertentu (tanpa DOM)
   const generateQrCardForUser = async (user) => {
     try {
-      // Format QR code: userId|nama|kelompok|desa (sesuai dengan format yang diharapkan scanner)
-      const qrValue = `${user.id}|${user.nama_lengkap || ''}|${user.kelompok || ''}|${user.desa || ''}`;
+      // Format QR code: userId|nama|kelompok|desa|kategori
+      const qrValue = `${user.id}|${user.nama_lengkap || ''}|${user.kelompok || ''}|${user.desa || ''}|${user.kategori || ''}`;
 
       // Generate QR code sebagai data URL
       const qrDataUrl = await QRCode.toDataURL(qrValue, {
@@ -221,9 +234,9 @@ export default function DataProfileUser() {
       // Create canvas untuk card
       const cardWidth = 360;
       const cardHeight = 500;
-      const qrSize = 220;
-      const topPadding = 32;
-      const gapAfterQr = 28;
+      const qrSize = 180; // Reduced
+      const topPadding = 40;
+      const gapAfterQr = 30;
 
       const canvas = document.createElement('canvas');
       canvas.width = cardWidth;
@@ -252,35 +265,47 @@ export default function DataProfileUser() {
       ctx.drawImage(qrImage, qrX, topPadding, qrSize, qrSize);
 
       // Text boxes
-      const boxWidth = cardWidth - 80;
-      const boxHeight = 40;
+      // Text boxes
+      const boxWidth = cardWidth - 100; // Reduced width
+      const boxHeight = 36; // Reduced height
       const textStartY = topPadding + qrSize + gapAfterQr;
       const center = cardWidth / 2;
       ctx.textAlign = 'center';
 
       // Nama box
       const nameBoxX = (cardWidth - boxWidth) / 2;
-      const nameBoxY = textStartY - boxHeight / 2;
-      drawRoundedRect(ctx, nameBoxX, nameBoxY, boxWidth, boxHeight, 10);
+      const nameBoxY = textStartY;
+      drawRoundedRect(ctx, nameBoxX, nameBoxY, boxWidth, boxHeight, 8);
       ctx.fillStyle = '#f9fafb';
       ctx.fill();
       ctx.strokeStyle = '#e5e7eb';
       ctx.lineWidth = 1;
       ctx.stroke();
       ctx.fillStyle = '#111827';
-      ctx.font = 'bold 16px "Inter", system-ui, -apple-system, sans-serif';
-      ctx.fillText(truncateLabel(user?.nama_lengkap || 'Nama belum diisi', 28), center, nameBoxY + boxHeight / 2 + 5);
+      ctx.font = 'bold 22px Arial, sans-serif';
+      ctx.fillText(truncateLabel(user?.nama_lengkap || 'Nama belum diisi', 22), center, nameBoxY + boxHeight / 2 + 8);
 
       // Kelompok box
-      const groupBoxY = nameBoxY + boxHeight + 12;
-      drawRoundedRect(ctx, nameBoxX, groupBoxY, boxWidth, boxHeight, 10);
+      const groupBoxY = nameBoxY + boxHeight + 8; // Tighter gap
+      drawRoundedRect(ctx, nameBoxX, groupBoxY, boxWidth, boxHeight, 8);
       ctx.fillStyle = '#eef2ff';
       ctx.fill();
       ctx.strokeStyle = '#c7d2fe';
       ctx.stroke();
       ctx.fillStyle = '#4f46e5';
-      ctx.font = '14px "Inter", system-ui, -apple-system, sans-serif';
-      ctx.fillText(truncateLabel(user?.kelompok || 'Belum ada kelompok'), center, groupBoxY + boxHeight / 2 + 4);
+      ctx.font = 'bold 18px Arial, sans-serif';
+      ctx.fillText(truncateLabel(user?.kelompok || 'Belum ada kelompok'), center, groupBoxY + boxHeight / 2 + 7);
+
+      // Kategori box
+      const categoryBoxY = groupBoxY + boxHeight + 8; // Tighter gap
+      drawRoundedRect(ctx, nameBoxX, categoryBoxY, boxWidth, boxHeight, 8);
+      ctx.fillStyle = '#fdf2f8';
+      ctx.fill();
+      ctx.strokeStyle = '#fbcfe8';
+      ctx.stroke();
+      ctx.fillStyle = '#db2777';
+      ctx.font = 'bold 18px Arial, sans-serif';
+      ctx.fillText(truncateLabel(user?.kategori || 'Kategori tidak ada'), center, categoryBoxY + boxHeight / 2 + 7);
 
       return canvas;
     } catch (error) {
@@ -728,7 +753,7 @@ export default function DataProfileUser() {
             <div className="flex justify-center mb-5">
               <div ref={qrRef} className="p-3 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
                 <QRCodeCanvas
-                  value={`${qrModal.user.id}|${qrModal.user.nama_lengkap || ''}|${qrModal.user.kelompok || ''}|${qrModal.user.desa || ''}`}
+                  value={`${qrModal.user.id}|${qrModal.user.nama_lengkap || ''}|${qrModal.user.kelompok || ''}|${qrModal.user.desa || ''}|${qrModal.user.kategori || ''}`}
                   size={240}
                 />
               </div>
@@ -742,6 +767,10 @@ export default function DataProfileUser() {
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Kelompok</p>
                 <p className="text-base font-medium text-indigo-600 dark:text-indigo-300">{qrModal.user.kelompok || 'Belum ada kelompok'}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Kategori</p>
+                <p className="text-base font-medium text-pink-600 dark:text-pink-300">{qrModal.user.kategori || '-'}</p>
               </div>
             </div>
 

@@ -10,6 +10,7 @@ export default function UserQRCode() {
   const [namaLengkap, setNamaLengkap] = useState('');
   const [kelompok, setKelompok] = useState('');
   const [desa, setDesa] = useState('');
+  const [kategori, setKategori] = useState('');
   const [qrValue, setQrValue] = useState('');
   const [loading, setLoading] = useState(true);
   const qrRef = useRef(null);
@@ -22,15 +23,16 @@ export default function UserQRCode() {
         // Ambil nama lengkap, kelompok, dan desa dari profiles
         const { data: profile } = await supabase
           .from('profiles')
-          .select('nama_lengkap, kelompok, desa')
+          .select('nama_lengkap, kelompok, desa, kategori')
           .eq('id', data.user.id)
           .single();
         if (profile?.nama_lengkap) setNamaLengkap(profile.nama_lengkap);
         if (profile?.kelompok) setKelompok(profile.kelompok);
         if (profile?.desa) setDesa(profile.desa);
-        
-        // Format QR code: userId|nama|kelompok|desa (sesuai dengan format yang diharapkan scanner)
-        const qrCodeValue = `${data.user.id}|${profile?.nama_lengkap || ''}|${profile?.kelompok || ''}|${profile?.desa || ''}`;
+        if (profile?.kategori) setKategori(profile.kategori);
+
+        // Format QR code: userId|nama|kelompok|desa|kategori
+        const qrCodeValue = `${data.user.id}|${profile?.nama_lengkap || ''}|${profile?.kelompok || ''}|${profile?.desa || ''}|${profile?.kategori || ''}`;
         setQrValue(qrCodeValue);
       }
       setLoading(false);
@@ -70,9 +72,9 @@ export default function UserQRCode() {
     // Card dimensions (portrait)
     const cardWidth = 360;
     const cardHeight = 500;
-    const qrSize = 220;
-    const topPadding = 32;
-    const gapAfterQr = 28;
+    const qrSize = 140; // Reduced further from 180
+    const topPadding = 40;
+    const gapAfterQr = 30;
 
     const canvas = document.createElement('canvas');
     canvas.width = cardWidth;
@@ -93,35 +95,48 @@ export default function UserQRCode() {
     ctx.drawImage(qrCanvas, qrX, topPadding, qrSize, qrSize);
 
     // Text section with boxed labels and character limit
-    const boxWidth = cardWidth - 80;
-    const boxHeight = 40;
+    const boxWidth = cardWidth - 100; // Reduced width
+    const boxHeight = 36; // Reduced height
+    // Text Configuration
+    const leftMargin = 40;
     const textStartY = topPadding + qrSize + gapAfterQr;
     const center = cardWidth / 2;
     ctx.textAlign = 'center';
 
     // Nama box
     const nameBoxX = (cardWidth - boxWidth) / 2;
-    const nameBoxY = textStartY - boxHeight / 2;
-    drawRoundedRect(ctx, nameBoxX, nameBoxY, boxWidth, boxHeight, 10);
+    const nameBoxY = textStartY;
+    drawRoundedRect(ctx, nameBoxX, nameBoxY, boxWidth, boxHeight, 8);
     ctx.fillStyle = '#f9fafb';
     ctx.fill();
     ctx.strokeStyle = '#e5e7eb';
     ctx.lineWidth = 1;
     ctx.stroke();
     ctx.fillStyle = '#111827';
-    ctx.font = 'bold 16px "Inter", system-ui, -apple-system, sans-serif';
-    ctx.fillText(truncateLabel(namaLengkap || 'Nama belum diisi', 28), center, nameBoxY + boxHeight / 2 + 5);
+    ctx.font = 'bold 22px Arial, sans-serif';
+    ctx.fillText(truncateLabel(namaLengkap || 'Nama belum diisi', 22), center, nameBoxY + boxHeight / 2 + 8);
 
     // Kelompok box
-    const groupBoxY = nameBoxY + boxHeight + 12;
-    drawRoundedRect(ctx, nameBoxX, groupBoxY, boxWidth, boxHeight, 10);
+    const groupBoxY = nameBoxY + boxHeight + 8; // Tighter gap
+    drawRoundedRect(ctx, nameBoxX, groupBoxY, boxWidth, boxHeight, 8);
     ctx.fillStyle = '#eef2ff';
     ctx.fill();
     ctx.strokeStyle = '#c7d2fe';
     ctx.stroke();
     ctx.fillStyle = '#4f46e5';
-    ctx.font = '14px "Inter", system-ui, -apple-system, sans-serif';
-    ctx.fillText(truncateLabel(kelompok || 'Belum ada kelompok'), center, groupBoxY + boxHeight / 2 + 4);
+    ctx.font = 'bold 18px Arial, sans-serif';
+    ctx.fillText(truncateLabel(kelompok || 'Belum ada kelompok'), center, groupBoxY + boxHeight / 2 + 7);
+
+    // Kategori box
+    const categoryBoxY = groupBoxY + boxHeight + 8; // Tighter gap
+    drawRoundedRect(ctx, nameBoxX, categoryBoxY, boxWidth, boxHeight, 8);
+    ctx.fillStyle = '#fdf2f8'; // Pinkish bg
+    ctx.fill();
+    ctx.strokeStyle = '#fbcfe8';
+    ctx.stroke();
+    ctx.fillStyle = '#db2777'; // Pink text
+    ctx.font = 'bold 18px Arial, sans-serif';
+    ctx.fillText(truncateLabel(kategori || 'Kategori tidak ada'), center, categoryBoxY + boxHeight / 2 + 7);
 
     return canvas;
   };
@@ -145,6 +160,7 @@ export default function UserQRCode() {
     pdf.addImage(imgData, 'JPEG', 20, 50, canvas.width, canvas.height);
     pdf.text(`Nama: ${namaLengkap || '-'}`, 20, 60 + canvas.height);
     pdf.text(`Kelompok: ${kelompok || '-'}`, 20, 80 + canvas.height);
+    pdf.text(`Kategori: ${kategori || '-'}`, 20, 100 + canvas.height);
     pdf.save(getSafeFileName(namaLengkap, 'pdf'));
   };
 
@@ -190,6 +206,10 @@ export default function UserQRCode() {
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Kelompok</p>
                 <p className="text-lg font-medium text-indigo-600 dark:text-indigo-300">{kelompok || 'Belum ada kelompok'}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Kategori</p>
+                <p className="text-lg font-medium text-pink-600 dark:text-pink-300">{kategori || '-'}</p>
               </div>
             </div>
 

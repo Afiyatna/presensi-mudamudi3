@@ -223,10 +223,10 @@ export default function QrScannerUniversal() {
         return '';
       }
 
-      // Parse QR code data: user_id|nama|kelompok|desa
+      // Parse QR code data: user_id|nama|kelompok|desa|kategori
       const parts = qrData.split('|');
       console.log('[QR Process] Parsed data parts:', parts);
-      const [userId, nama, kelompok, desa] = parts;
+      const [userId, nama, kelompok, desa, kategori] = parts;
 
       if (!userId || !nama || !kelompok || !desa) {
         console.error('[QR Process] Invalid QR Format. Data:', qrData);
