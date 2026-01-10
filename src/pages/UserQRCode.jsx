@@ -119,22 +119,22 @@ export default function UserQRCode() {
     // Kelompok box
     const groupBoxY = nameBoxY + boxHeight + 8; // Tighter gap
     drawRoundedRect(ctx, nameBoxX, groupBoxY, boxWidth, boxHeight, 8);
-    ctx.fillStyle = '#eef2ff';
+    ctx.fillStyle = '#f9fafb';
     ctx.fill();
-    ctx.strokeStyle = '#c7d2fe';
+    ctx.strokeStyle = '#e5e7eb';
     ctx.stroke();
-    ctx.fillStyle = '#4f46e5';
+    ctx.fillStyle = '#111827'; // Black text to match name
     ctx.font = 'bold 18px Arial, sans-serif';
     ctx.fillText(truncateLabel(kelompok || 'Belum ada kelompok'), center, groupBoxY + boxHeight / 2 + 7);
 
     // Kategori box
     const categoryBoxY = groupBoxY + boxHeight + 8; // Tighter gap
     drawRoundedRect(ctx, nameBoxX, categoryBoxY, boxWidth, boxHeight, 8);
-    ctx.fillStyle = '#fdf2f8'; // Pinkish bg
+    ctx.fillStyle = '#f9fafb'; // Pinkish bg
     ctx.fill();
-    ctx.strokeStyle = '#fbcfe8';
+    ctx.strokeStyle = '#e5e7eb';
     ctx.stroke();
-    ctx.fillStyle = '#db2777'; // Pink text
+    ctx.fillStyle = '#111827'; // Black text to match name
     ctx.font = 'bold 18px Arial, sans-serif';
     ctx.fillText(truncateLabel(kategori || 'Kategori tidak ada'), center, categoryBoxY + boxHeight / 2 + 7);
 

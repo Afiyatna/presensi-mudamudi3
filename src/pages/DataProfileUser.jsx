@@ -168,22 +168,22 @@ export default function DataProfileUser() {
     // Kelompok box
     const groupBoxY = nameBoxY + boxHeight + 8; // Tighter gap
     drawRoundedRect(ctx, nameBoxX, groupBoxY, boxWidth, boxHeight, 8);
-    ctx.fillStyle = '#eef2ff';
+    ctx.fillStyle = '#f9fafb';
     ctx.fill();
-    ctx.strokeStyle = '#c7d2fe';
+    ctx.strokeStyle = '#e5e7eb';
     ctx.stroke();
-    ctx.fillStyle = '#4f46e5';
+    ctx.fillStyle = '#111827'; // Black text
     ctx.font = 'bold 18px Arial, sans-serif';
     ctx.fillText(truncateLabel(user?.kelompok || 'Belum ada kelompok'), center, groupBoxY + boxHeight / 2 + 7);
 
     // Kategori box
     const categoryBoxY = groupBoxY + boxHeight + 8; // Tighter gap
     drawRoundedRect(ctx, nameBoxX, categoryBoxY, boxWidth, boxHeight, 8);
-    ctx.fillStyle = '#fdf2f8';
+    ctx.fillStyle = '#f9fafb';
     ctx.fill();
-    ctx.strokeStyle = '#fbcfe8';
+    ctx.strokeStyle = '#e5e7eb';
     ctx.stroke();
-    ctx.fillStyle = '#db2777';
+    ctx.fillStyle = '#111827'; // Black text
     ctx.font = 'bold 18px Arial, sans-serif';
     ctx.fillText(truncateLabel(user?.kategori || 'Kategori tidak ada'), center, categoryBoxY + boxHeight / 2 + 7);
 
@@ -292,7 +292,7 @@ export default function DataProfileUser() {
       ctx.fill();
       ctx.strokeStyle = '#c7d2fe';
       ctx.stroke();
-      ctx.fillStyle = '#4f46e5';
+      ctx.fillStyle = '#111827'; // Black text
       ctx.font = 'bold 18px Arial, sans-serif';
       ctx.fillText(truncateLabel(user?.kelompok || 'Belum ada kelompok'), center, groupBoxY + boxHeight / 2 + 7);
 
@@ -303,7 +303,7 @@ export default function DataProfileUser() {
       ctx.fill();
       ctx.strokeStyle = '#fbcfe8';
       ctx.stroke();
-      ctx.fillStyle = '#db2777';
+      ctx.fillStyle = '#111827'; // Black text
       ctx.font = 'bold 18px Arial, sans-serif';
       ctx.fillText(truncateLabel(user?.kategori || 'Kategori tidak ada'), center, categoryBoxY + boxHeight / 2 + 7);
 
