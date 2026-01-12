@@ -8,6 +8,7 @@ import jsPDF from 'jspdf';
 import JSZip from 'jszip';
 import QRCode from 'qrcode';
 import { toast } from 'react-hot-toast';
+import Pagination from '../components/Pagination';
 
 export default function DataProfileUser() {
   const [profiles, setProfiles] = useState([]);
@@ -19,6 +20,8 @@ export default function DataProfileUser() {
   const [filters, setFilters] = useState({ jenis_kelamin: 'Semua', kelompok: 'Semua', desa: 'Semua', kategori: 'Semua', search: '' });
   const [downloadingAll, setDownloadingAll] = useState(false);
   const [downloadingFiltered, setDownloadingFiltered] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
   useEffect(() => {
     const fetchProfiles = async () => {
@@ -71,6 +74,19 @@ export default function DataProfileUser() {
       return matchGender && matchKelompok && matchDesa && matchKategori && matchSearch;
     });
   }, [profiles, filters]);
+
+  // Pagination logic
+  useEffect(() => {
+    setCurrentPage(1); // Reset to first page when filters change
+  }, [filters]);
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredProfiles.slice(indexOfFirstItem, indexOfLastItem);
+
+  const onPageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   // Handler reset
   const handleResetFilters = () => {
@@ -697,7 +713,7 @@ export default function DataProfileUser() {
                 </tr>
               </thead>
               <tbody>
-                {filteredProfiles.map((profile) => (
+                {currentItems.map((profile) => (
                   <tr key={profile.id} className="text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50">
                     <td className="px-4 py-2 border dark:border-gray-700">{profile.nama_lengkap}</td>
                     <td className="px-4 py-2 border dark:border-gray-700">{profile.email}</td>
@@ -730,6 +746,16 @@ export default function DataProfileUser() {
               </tbody>
             </table>
           </div>
+        )}
+
+        {filteredProfiles.length > 0 && !loading && (
+          <Pagination
+            currentPage={currentPage}
+            totalItems={filteredProfiles.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={onPageChange}
+            className="mt-4 border border-gray-200 dark:border-gray-700 rounded-lg"
+          />
         )}
         {role === 'admin' && <BottomNavigation role="admin" />}
       </div>

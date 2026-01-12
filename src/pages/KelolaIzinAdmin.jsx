@@ -5,6 +5,7 @@ import LayoutDashboard from '../layouts/LayoutDashboard';
 import DataLoadingSpinner from '../components/DataLoadingSpinner';
 import BulkActions from '../components/BulkActions';
 import { toast } from 'react-hot-toast';
+import Pagination from '../components/Pagination';
 
 export default function KelolaIzinAdmin() {
   const [izinList, setIzinList] = useState([]);
@@ -15,19 +16,22 @@ export default function KelolaIzinAdmin() {
     kegiatan: '',
     tanggal: ''
   });
-  const [showBulkActions, setShowBulkActions] = useState(false);
+  const [showBulkActions] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
   useEffect(() => {
     fetchIzinList();
+    setCurrentPage(1);
   }, [filters]);
 
   const fetchIzinList = async () => {
     try {
       setLoading(true);
       let { data, error } = await izinKegiatanService.getAllIzinKegiatan();
-      
+
       if (error) throw error;
-      
+
       // Apply filters
       if (filters.status) {
         data = data.filter(izin => izin.status === filters.status);
@@ -38,7 +42,7 @@ export default function KelolaIzinAdmin() {
       if (filters.tanggal) {
         data = data.filter(izin => izin.tanggal_izin === filters.tanggal);
       }
-      
+
       setIzinList(data || []);
     } catch (error) {
       console.error('Error fetching izin list:', error);
@@ -168,6 +172,15 @@ export default function KelolaIzinAdmin() {
     });
   };
 
+  // Pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = izinList.slice(indexOfFirstItem, indexOfLastItem);
+
+  const onPageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
   if (loading) return <DataLoadingSpinner />;
 
   return (
@@ -235,8 +248,8 @@ export default function KelolaIzinAdmin() {
         {/* Bulk Actions */}
         <BulkActions
           selectedItems={selectedIzin}
-          onBulkDelete={() => {}} // Not implemented for izin
-          onBulkExport={() => {}} // Not implemented for izin
+          onBulkDelete={() => { }} // Not implemented for izin
+          onBulkExport={() => { }} // Not implemented for izin
           onBulkStatusChange={async (ids, newStatus) => {
             try {
               const { data: { user } } = await supabase.auth.getUser();
@@ -247,7 +260,7 @@ export default function KelolaIzinAdmin() {
               } else if (newStatus === 'rejected') {
                 await izinKegiatanService.bulkRejectIzin(ids, user.id);
               }
-              
+
               setSelectedIzin([]);
               fetchIzinList();
             } catch (error) {
@@ -299,7 +312,7 @@ export default function KelolaIzinAdmin() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {izinList.map((izin) => (
+                    {currentItems.map((izin) => (
                       <tr key={izin.id} className="hover:bg-gray-50">
                         <td className="relative px-6 py-4 whitespace-nowrap">
                           <input
@@ -335,8 +348,8 @@ export default function KelolaIzinAdmin() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(izin.status)}`}>
-                            {izin.status === 'pending' ? 'Menunggu' : 
-                             izin.status === 'approved' ? 'Disetujui' : 'Ditolak'}
+                            {izin.status === 'pending' ? 'Menunggu' :
+                              izin.status === 'approved' ? 'Disetujui' : 'Ditolak'}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -375,6 +388,16 @@ export default function KelolaIzinAdmin() {
           <div className="text-center py-12">
             <div className="text-gray-500">Tidak ada data izin</div>
           </div>
+        )}
+
+        {izinList.length > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalItems={izinList.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={onPageChange}
+            className="mt-4 border-t border-gray-200 pt-4"
+          />
         )}
       </div>
     </LayoutDashboard>

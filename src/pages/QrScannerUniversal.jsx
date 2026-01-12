@@ -258,9 +258,10 @@ export default function QrScannerUniversal() {
 
       if (existingPresensi.data && existingPresensi.data.length > 0) {
         console.warn('[QR Process] User already present:', existingPresensi.data);
-        toast.error('User sudah melakukan presensi untuk kegiatan ini');
+        // Toast tetap ada sebagai fallback/log
+        toast.success('User sudah presensi');
         setPresensiLoading(false);
-        return '';
+        return 'already_present'; // Return status khusus
       }
 
       // Get user profile data
@@ -396,14 +397,23 @@ export default function QrScannerUniversal() {
             const status = await handleScanPresensi(decodedText);
             if (status) {
               setSuccessStatus(status);
-              setSuccessMessage(`Presensi berhasil! Status: ${status}`);
+
+              // Tentukan pesan berdasarkan status
+              let message = '';
+              if (status === 'already_present') {
+                message = 'Anda sudah presensi';
+              } else {
+                message = `Presensi berhasil! Status: ${status}`;
+              }
+
+              setSuccessMessage(message);
               setShowSuccess(true);
 
-              // Auto restart scanner after 3 seconds
+              // Auto restart scanner after 1 second
               setTimeout(() => {
                 setShowSuccess(false);
                 setScanning(true);
-              }, 3000);
+              }, 1000);
             }
           } catch (e) {
             console.error('Scan callback error:', e);
@@ -563,8 +573,12 @@ export default function QrScannerUniversal() {
               )}
               {showSuccess && (
                 <div className="w-full max-w-md rounded-xl border-2 border-blue-200 shadow-lg flex flex-col items-center justify-center min-h-[300px] bg-white animate-fade-in">
-                  <div className={`text-5xl mb-2 ${successStatus === 'hadir' ? 'text-green-500' : 'text-red-500'} animate-bounce`}>{successStatus === 'hadir' ? '✅' : '⏰'}</div>
-                  <div className={`text-xl font-bold ${successStatus === 'hadir' ? 'text-green-600' : 'text-red-600'} mb-1`}>{successMessage}</div>
+                  <div className={`text-5xl mb-2 ${successStatus === 'hadir' ? 'text-green-500' : successStatus === 'already_present' ? 'text-blue-500' : 'text-red-500'} animate-bounce`}>
+                    {successStatus === 'hadir' ? '✅' : successStatus === 'already_present' ? 'ℹ️' : '⏰'}
+                  </div>
+                  <div className={`text-xl font-bold ${successStatus === 'hadir' ? 'text-green-600' : successStatus === 'already_present' ? 'text-blue-600' : 'text-red-600'} mb-1`}>
+                    {successMessage}
+                  </div>
                   <div className="text-gray-500 animate-pulse">Menyiapkan scanner berikutnya...</div>
                 </div>
               )}

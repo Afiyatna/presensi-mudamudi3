@@ -1,6 +1,7 @@
 import { supabase } from '../supabaseClient';
 
 // Presensi Kegiatan Service
+// Presensi Kegiatan Service
 export const presensiKegiatanService = {
   // Get all presensi kegiatan
   async getAllPresensiKegiatan() {
@@ -19,11 +20,12 @@ export const presensiKegiatanService = {
             nama_lengkap,
             kelompok,
             desa,
-            jenis_kelamin
+            jenis_kelamin,
+            kategori
           )
         `)
         .order('created_at', { ascending: false });
-      
+
       if (error) throw error;
       return { data, error: null };
     } catch (error) {
@@ -49,12 +51,13 @@ export const presensiKegiatanService = {
             nama_lengkap,
             kelompok,
             desa,
-            jenis_kelamin
+            jenis_kelamin,
+            kategori
           )
         `)
         .eq('kegiatan_id', kegiatanId)
         .order('created_at', { ascending: false });
-      
+
       if (error) throw error;
       return { data, error: null };
     } catch (error) {
@@ -84,7 +87,7 @@ export const presensiKegiatanService = {
         `)
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
-      
+
       if (error) throw error;
       return { data, error: null };
     } catch (error) {
@@ -101,7 +104,7 @@ export const presensiKegiatanService = {
         .insert([presensiData])
         .select()
         .single();
-      
+
       if (error) throw error;
       return { data, error: null };
     } catch (error) {
@@ -119,7 +122,7 @@ export const presensiKegiatanService = {
         .eq('id', id)
         .select()
         .single();
-      
+
       if (error) throw error;
       return { data, error: null };
     } catch (error) {
@@ -135,7 +138,7 @@ export const presensiKegiatanService = {
         .from('presensi_kegiatan')
         .delete()
         .eq('id', id);
-      
+
       if (error) throw error;
       return { error: null };
     } catch (error) {
@@ -151,7 +154,7 @@ export const presensiKegiatanService = {
         .from('presensi_kegiatan')
         .delete()
         .in('id', ids);
-      
+
       if (error) throw error;
       return { error: null };
     } catch (error) {
@@ -166,15 +169,15 @@ export const presensiKegiatanService = {
       let query = supabase
         .from('presensi_kegiatan')
         .select('status, kegiatan_id');
-      
+
       if (kegiatanId) {
         query = query.eq('kegiatan_id', kegiatanId);
       }
-      
+
       const { data, error } = await query;
-      
+
       if (error) throw error;
-      
+
       // Calculate statistics
       const stats = {
         total: data.length,
@@ -182,7 +185,7 @@ export const presensiKegiatanService = {
         terlambat: data.filter(p => p.status === 'terlambat').length,
         izin: data.filter(p => p.status === 'izin').length
       };
-      
+
       return { data: stats, error: null };
     } catch (error) {
       console.error('Error fetching presensi stats:', error);
@@ -207,18 +210,19 @@ export const presensiKegiatanService = {
             nama_lengkap,
             kelompok,
             desa,
-            jenis_kelamin
+            jenis_kelamin,
+            kategori
           )
         `)
         .gte('waktu_presensi', startDate)
         .lte('waktu_presensi', endDate);
-      
+
       if (kegiatanId) {
         query = query.eq('kegiatan_id', kegiatanId);
       }
-      
+
       const { data, error } = await query.order('waktu_presensi', { ascending: false });
-      
+
       if (error) throw error;
       return { data, error: null };
     } catch (error) {
@@ -235,7 +239,7 @@ export const presensiKegiatanService = {
         .select('*')
         .eq('user_id', userId)
         .eq('kegiatan_id', kegiatanId);
-      
+
       if (error) throw error;
       return { data, error: null };
     } catch (error) {
@@ -252,7 +256,7 @@ export const presensiKegiatanService = {
         .insert([presensiData])
         .select()
         .single();
-      
+
       if (error) throw error;
       return { data, error: null };
     } catch (error) {
