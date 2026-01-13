@@ -5,6 +5,8 @@ const Pagination = ({
     totalItems,
     itemsPerPage,
     onPageChange,
+    onItemsPerPageChange,
+    itemsPerPageOptions = [10, 25, 50, 100],
     className = ''
 }) => {
     const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -62,12 +64,31 @@ const Pagination = ({
                 </button>
             </div>
             <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                <div>
+                <div className="flex items-center space-x-4">
                     <p className="text-sm text-gray-700 dark:text-gray-300">
                         Showing <span className="font-medium">{Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)}</span> to{' '}
                         <span className="font-medium">{Math.min(currentPage * itemsPerPage, totalItems)}</span> of{' '}
                         <span className="font-medium">{totalItems}</span> results
                     </p>
+                    {onItemsPerPageChange && (
+                        <div className="flex items-center space-x-2 border-l border-gray-200 dark:border-gray-700 pl-4">
+                            <label htmlFor="itemsPerPage" className="text-sm text-gray-600 dark:text-gray-400">
+                                Rows:
+                            </label>
+                            <select
+                                id="itemsPerPage"
+                                value={itemsPerPage}
+                                onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
+                                className="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 py-1 pl-2 pr-8 text-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 transition-colors cursor-pointer"
+                            >
+                                {itemsPerPageOptions.map((option) => (
+                                    <option key={option} value={option}>
+                                        {option}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
                 </div>
                 <div>
                     <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
@@ -92,8 +113,8 @@ const Pagination = ({
                                         onClick={() => onPageChange(page)}
                                         aria-current={currentPage === page ? 'page' : undefined}
                                         className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold focus:z-20 focus:outline-offset-0 ${currentPage === page
-                                                ? 'z-10 bg-blue-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600'
-                                                : 'text-gray-900 dark:text-gray-300 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                                            ? 'z-10 bg-blue-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600'
+                                            : 'text-gray-900 dark:text-gray-300 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
                                             }`}
                                     >
                                         {page}

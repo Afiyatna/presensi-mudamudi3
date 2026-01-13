@@ -29,7 +29,7 @@ export default function RiwayatPresensiTerintegrasi() {
     });
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(10); // Show 10 items per page
+    const [itemsPerPage, setItemsPerPage] = useState(10); // Default to 10
 
     useEffect(() => {
         fetchPresensiList();
@@ -619,7 +619,7 @@ export default function RiwayatPresensiTerintegrasi() {
                                         <table className="min-w-full divide-y divide-gray-300">
                                             <thead className="bg-gray-50">
                                                 <tr>
-                                                    <th scope="col" className="relative px-6 py-3">
+                                                    <th scope="col" className="relative px-6 py-2">
                                                         <input
                                                             type="checkbox"
                                                             checked={selectedPresensi.length === presensiList.length && presensiList.length > 0}
@@ -627,33 +627,33 @@ export default function RiwayatPresensiTerintegrasi() {
                                                             className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                                         />
                                                     </th>
-                                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    <th scope="col" className="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                         User
                                                     </th>
-                                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    <th scope="col" className="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                         Jenis Kelamin
                                                     </th>
-                                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    <th scope="col" className="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                         Kategori
                                                     </th>
-                                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    <th scope="col" className="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                         Jenis Kegiatan
                                                     </th>
-                                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    <th scope="col" className="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                         Tanggal & Waktu
                                                     </th>
-                                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    <th scope="col" className="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                         Status
                                                     </th>
-                                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    <th scope="col" className="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                         Lokasi
                                                     </th>
                                                 </tr>
                                             </thead>
                                             <tbody className="bg-white divide-y divide-gray-200">
                                                 {currentItems.map((presensi) => (
-                                                    <tr key={presensi.id} className="hover:bg-gray-50">
-                                                        <td className="relative px-6 py-4 whitespace-nowrap">
+                                                    <tr key={presensi.id} className="hover:bg-gray-50 transition-colors">
+                                                        <td className="relative px-6 py-2.5 whitespace-nowrap">
                                                             <input
                                                                 type="checkbox"
                                                                 checked={selectedPresensi.includes(presensi.id)}
@@ -661,7 +661,7 @@ export default function RiwayatPresensiTerintegrasi() {
                                                                 className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                                             />
                                                         </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                        <td className="px-6 py-2.5 whitespace-nowrap">
                                                             <div className="text-sm font-medium text-gray-900">
                                                                 {presensi.nama_lengkap}
                                                             </div>
@@ -669,13 +669,13 @@ export default function RiwayatPresensiTerintegrasi() {
                                                                 {presensi.kelompok} • {presensi.desa}
                                                             </div>
                                                         </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                        <td className="px-6 py-2.5 whitespace-nowrap">
                                                             <div className="text-sm text-gray-900">{presensi.jenis_kelamin || '-'}</div>
                                                         </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                        <td className="px-6 py-2.5 whitespace-nowrap">
                                                             <div className="text-sm text-gray-900">{presensi.user?.kategori || '-'}</div>
                                                         </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                        <td className="px-6 py-2.5 whitespace-nowrap">
                                                             <div className="text-sm font-medium text-gray-900">
                                                                 {presensi.kegiatan?.nama_kegiatan}
                                                             </div>
@@ -683,7 +683,7 @@ export default function RiwayatPresensiTerintegrasi() {
                                                                 {presensi.kegiatan?.jam_mulai}
                                                             </div>
                                                         </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                        <td className="px-6 py-2.5 whitespace-nowrap">
                                                             <div className="text-sm text-gray-900">
                                                                 {formatDate(presensi.waktu_presensi)}
                                                             </div>
@@ -691,13 +691,13 @@ export default function RiwayatPresensiTerintegrasi() {
                                                                 {formatTime(presensi.waktu_presensi)}
                                                             </div>
                                                         </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                        <td className="px-6 py-2.5 whitespace-nowrap">
                                                             <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(presensi.status)}`}>
                                                                 {presensi.status === 'hadir' ? 'Hadir' :
                                                                     presensi.status === 'terlambat' ? 'Terlambat' : 'Izin'}
                                                             </span>
                                                         </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                        <td className="px-6 py-2.5 whitespace-nowrap text-sm text-gray-900">
                                                             {presensi.kegiatan?.lokasi}
                                                         </td>
                                                     </tr>
@@ -707,6 +707,16 @@ export default function RiwayatPresensiTerintegrasi() {
                                     </div>
                                 </div>
                             </div>
+                        </div>
+
+                        <div className="mt-8">
+                            <Pagination
+                                currentPage={currentPage}
+                                totalItems={presensiList.length}
+                                itemsPerPage={itemsPerPage}
+                                onPageChange={setCurrentPage}
+                                onItemsPerPageChange={setItemsPerPage}
+                            />
                         </div>
                     </>
                 )}

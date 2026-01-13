@@ -4,6 +4,7 @@ import { presensiKegiatanService } from '../lib/presensiKegiatanService';
 import LayoutDashboard from '../layouts/LayoutDashboard';
 import DateRangePicker from '../components/DateRangePicker';
 import DataLoadingSpinner from '../components/DataLoadingSpinner';
+import Pagination from '../components/Pagination';
 
 export default function UserPresensiHistory() {
   const [presensi, setPresensi] = useState([]);
@@ -13,6 +14,8 @@ export default function UserPresensiHistory() {
   const [filterJenis, setFilterJenis] = useState('');
   const [filterDateRange, setFilterDateRange] = useState({ from: '', to: '' });
   const [filterStatus, setFilterStatus] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   useEffect(() => {
     const fetchPresensi = async () => {
@@ -100,6 +103,7 @@ export default function UserPresensiHistory() {
     }
 
     setFilteredPresensi(filtered);
+    setCurrentPage(1); // Reset to first page on filter change
   }, [presensi, filterJenis, filterDateRange, filterStatus]);
 
   // Untuk dropdown Jenis Presensi dan Status
@@ -185,39 +189,39 @@ export default function UserPresensiHistory() {
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                   <thead className="bg-gray-50 dark:bg-gray-700/50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      <th className="px-6 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         Tanggal & Waktu
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      <th className="px-6 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         Nama Kegiatan
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      <th className="px-6 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         Kelompok
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      <th className="px-6 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         Desa
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      <th className="px-6 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         Status
                       </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    {filteredPresensi.map((row) => (
-                      <tr key={row.id + row.jenis_presensi} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    {filteredPresensi.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((row) => (
+                      <tr key={row.id + row.jenis_presensi} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                        <td className="px-6 py-2.5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                           {new Date(row.waktu_presensi).toLocaleString('id-ID')}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                        <td className="px-6 py-2.5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                           {row.jenis_presensi}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                        <td className="px-6 py-2.5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                           {row.kelompok}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                        <td className="px-6 py-2.5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                           {row.desa}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-6 py-2.5 whitespace-nowrap">
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${row.status === 'hadir'
                             ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
                             : row.status === 'terlambat'
@@ -231,6 +235,16 @@ export default function UserPresensiHistory() {
                     ))}
                   </tbody>
                 </table>
+              </div>
+
+              <div className="mt-6">
+                <Pagination
+                  currentPage={currentPage}
+                  totalItems={filteredPresensi.length}
+                  itemsPerPage={itemsPerPage}
+                  onPageChange={setCurrentPage}
+                  onItemsPerPageChange={setItemsPerPage}
+                />
               </div>
             </>
           )}
