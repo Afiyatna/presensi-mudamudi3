@@ -22,6 +22,7 @@ export default function DataProfileUser() {
   const [downloadingFiltered, setDownloadingFiltered] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [editCategoryModal, setEditCategoryModal] = useState({ open: false, user: null, newCategory: '' });
 
   useEffect(() => {
     const fetchProfiles = async () => {
@@ -110,6 +111,32 @@ export default function DataProfileUser() {
     } catch (error) {
       console.error('Error deleting user:', error);
       toast.error(`Gagal menghapus user: ${error.message}`);
+    }
+  };
+
+  const handleUpdateCategory = async (e) => {
+    e.preventDefault();
+    if (!editCategoryModal.user || !editCategoryModal.newCategory) return;
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ kategori: editCategoryModal.newCategory })
+        .eq('id', editCategoryModal.user.id);
+
+      if (error) throw error;
+
+      toast.success(`Kategori ${editCategoryModal.user.nama_lengkap} berhasil diperbarui`);
+
+      // Update local state
+      setProfiles(prev => prev.map(p =>
+        p.id === editCategoryModal.user.id ? { ...p, kategori: editCategoryModal.newCategory } : p
+      ));
+
+      setEditCategoryModal({ open: false, user: null, newCategory: '' });
+    } catch (error) {
+      console.error('Error updating category:', error);
+      toast.error(`Gagal memperbarui kategori: ${error.message}`);
     }
   };
 
@@ -725,12 +752,20 @@ export default function DataProfileUser() {
                     <td className="px-4 py-2 border dark:border-gray-700">{profile.kategori || '-'}</td>
                     <td className="px-4 py-2 border dark:border-gray-700">{profile.role}</td>
                     <td className="px-4 py-2 border dark:border-gray-700 text-center">
-                      <button
-                        onClick={() => handleDelete(profile.id, profile.nama_lengkap)}
-                        className="text-red-600 hover:text-red-800 font-medium text-sm bg-red-50 dark:bg-red-900/20 px-3 py-1 rounded hover:bg-red-100 dark:hover:bg-red-900/40 transition"
-                      >
-                        Hapus
-                      </button>
+                      <div className="flex flex-col gap-1 items-center">
+                        <button
+                          onClick={() => setEditCategoryModal({ open: true, user: profile, newCategory: profile.kategori || '' })}
+                          className="w-full text-indigo-600 hover:text-indigo-800 font-medium text-xs bg-indigo-50 dark:bg-indigo-900/20 px-2 py-1 rounded hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(profile.id, profile.nama_lengkap)}
+                          className="w-full text-red-600 hover:text-red-800 font-medium text-xs bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded hover:bg-red-100 dark:hover:bg-red-900/40 transition"
+                        >
+                          Hapus
+                        </button>
+                      </div>
                     </td>
                     <td className="px-4 py-2 border dark:border-gray-700 text-center">
                       <button
@@ -816,6 +851,53 @@ export default function DataProfileUser() {
                 Export PDF
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Category Modal */}
+      {editCategoryModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setEditCategoryModal({ open: false, user: null, newCategory: '' })} />
+          <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 max-w-sm w-full p-6">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Edit Kategori User</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 text-justify">
+              Ubah kategori untuk <b>{editCategoryModal.user?.nama_lengkap}</b>.
+              Pastikan kategori yang dipilih sudah sesuai dengan status user tersebut.
+            </p>
+            <form onSubmit={handleUpdateCategory}>
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Pilih Kategori Baru</label>
+                <select
+                  className="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none"
+                  value={editCategoryModal.newCategory}
+                  onChange={(e) => setEditCategoryModal(prev => ({ ...prev, newCategory: e.target.value }))}
+                  required
+                >
+                  <option value="">Pilih Kategori</option>
+                  <option value="Muda - Mudi">Muda - Mudi</option>
+                  <option value="Orang Tua">Orang Tua</option>
+                  <option value="Pengurus">Pengurus</option>
+                  <option value="Guru Pondok">Guru Pondok</option>
+                  <option value="MT">MT</option>
+                </select>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  type="submit"
+                  className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 font-semibold transition-colors"
+                >
+                  Simpan
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEditCategoryModal({ open: false, user: null, newCategory: '' })}
+                  className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 font-semibold transition-colors"
+                >
+                  Batal
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

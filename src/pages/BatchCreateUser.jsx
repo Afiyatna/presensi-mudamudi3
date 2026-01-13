@@ -176,7 +176,7 @@ export default function BatchCreateUser() {
                         </div>
                     </div>
                     <p className="text-sm text-gray-500 mt-2">
-                        Pastikan format file sesuai template. Kolom <code>kategori</code> harus diisi 'Muda - Mudi' atau 'Orang Tua'.
+                        Pastikan format file sesuai template. Kolom <code>kategori</code> harus diisi 'Muda - Mudi', 'Orang Tua', 'Pengurus', 'Guru Pondok', atau 'MT'.
                     </p>
                 </div>
 

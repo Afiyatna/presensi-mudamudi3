@@ -377,6 +377,9 @@ export default function Register() {
                   <option value="">Pilih Kategori</option>
                   <option value="Muda - Mudi">Muda - Mudi</option>
                   <option value="Orang Tua">Orang Tua</option>
+                  <option value="Pengurus">Pengurus</option>
+                  <option value="Guru Pondok">Guru Pondok</option>
+                  <option value="MT">MT</option>
                 </select>
                 <button type="submit" className="w-full bg-gradient-to-r from-violet-600 to-pink-500 text-white font-bold py-2 rounded-full mt-2 shadow-md hover:from-violet-700 hover:to-pink-600 transition" disabled={loading}>
                   {loading ? 'Loading...' : 'Register'}

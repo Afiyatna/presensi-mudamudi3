@@ -252,6 +252,9 @@ export default function Profile() {
                   <option value="">Pilih Kategori</option>
                   <option value="Muda - Mudi">Muda - Mudi</option>
                   <option value="Orang Tua">Orang Tua</option>
+                  <option value="Pengurus">Pengurus</option>
+                  <option value="Guru Pondok">Guru Pondok</option>
+                  <option value="MT">MT</option>
                 </select>
               </div>
               <div>
