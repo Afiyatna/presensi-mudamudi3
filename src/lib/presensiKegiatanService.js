@@ -24,7 +24,7 @@ export const presensiKegiatanService = {
             kategori
           )
         `)
-        .order('created_at', { ascending: false });
+        .order('waktu_presensi', { ascending: true });
 
       if (error) throw error;
       return { data, error: null };
@@ -56,7 +56,7 @@ export const presensiKegiatanService = {
           )
         `)
         .eq('kegiatan_id', kegiatanId)
-        .order('created_at', { ascending: false });
+        .order('waktu_presensi', { ascending: true });
 
       if (error) throw error;
       return { data, error: null };
@@ -86,7 +86,7 @@ export const presensiKegiatanService = {
           )
         `)
         .eq('user_id', userId)
-        .order('created_at', { ascending: false });
+        .order('waktu_presensi', { ascending: true });
 
       if (error) throw error;
       return { data, error: null };
@@ -221,7 +221,7 @@ export const presensiKegiatanService = {
         query = query.eq('kegiatan_id', kegiatanId);
       }
 
-      const { data, error } = await query.order('waktu_presensi', { ascending: false });
+      const { data, error } = await query.order('waktu_presensi', { ascending: true });
 
       if (error) throw error;
       return { data, error: null };

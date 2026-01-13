@@ -53,11 +53,11 @@ export default function UserPresensiHistory() {
         kategori_kegiatan: row.kegiatan?.kategori_kegiatan,
       }));
 
-      // Urutkan berdasarkan waktu_presensi terbaru
+      // Urutkan berdasarkan waktu_presensi terawal
       const allData = dataKegiatan.sort((a, b) => {
         const dateA = new Date(a.waktu_presensi);
         const dateB = new Date(b.waktu_presensi);
-        return dateB - dateA; // Terbaru di atas
+        return dateA - dateB; // Terawal di atas
       });
 
       setPresensi(allData);
@@ -219,10 +219,10 @@ export default function UserPresensiHistory() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${row.status === 'hadir'
-                              ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
-                              : row.status === 'terlambat'
-                                ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
-                                : 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300'
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+                            : row.status === 'terlambat'
+                              ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+                              : 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300'
                             }`}>
                             {row.status}
                           </span>
