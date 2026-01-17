@@ -3,7 +3,7 @@ import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import html2canvas from 'html2canvas';
 import { toast } from 'react-hot-toast';
-import { jsPDF } from 'jspdf';
+import * as XLSX from 'xlsx';
 import Pagination from './Pagination';
 
 const DetailPresensiTable = ({ presensiList, kegiatan, onQrScanner }) => {
@@ -134,49 +134,52 @@ const DetailPresensiTable = ({ presensiList, kegiatan, onQrScanner }) => {
         }
     };
 
-    const handleExportPDF = async () => {
+    const handleExportExcel = () => {
         try {
-            const exportContainer = document.getElementById('presensi-export-container');
-            if (!exportContainer) {
-                toast.error('Kontainer export tidak ditemukan');
-                return;
-            }
+            toast.loading('Menyiapkan data Excel...', { duration: 2000 });
 
-            toast.loading('Mengkonversi ke PDF...', { duration: 2000 });
+            // Prepare data for Excel
+            const excelData = filteredPresensi.map((presensi, index) => ({
+                'No': index + 1,
+                'Nama Lengkap': presensi.nama_lengkap,
+                'Jenis Kelamin': presensi.jenis_kelamin || '-',
+                'Kelompok': presensi.kelompok || '-',
+                'Desa': presensi.desa || '-',
+                'Kategori': presensi.user?.kategori || '-',
+                'Status': getStatusLabel(presensi.status),
+                'Waktu Presensi': formatDateTime(presensi.waktu_presensi),
+                'Keterangan': presensi.alasan_izin || '-'
+            }));
 
-            const canvas = await html2canvas(exportContainer, {
-                backgroundColor: '#ffffff',
-                scale: 2,
-                useCORS: true,
-                allowTaint: true,
-                logging: false,
-                onclone: (clonedDoc) => {
-                    const clonedButtons = clonedDoc.querySelectorAll('.no-export');
-                    clonedButtons.forEach(btn => btn.style.display = 'none');
-                }
-            });
+            // Create worksheet
+            const ws = XLSX.utils.json_to_sheet(excelData);
 
-            const imgData = canvas.toDataURL('image/jpeg', 1.0);
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const pageWidth = pdf.internal.pageSize.getWidth();
-            const pageHeight = pdf.internal.pageSize.getHeight();
-            const canvasWidth = canvas.width;
-            const canvasHeight = canvas.height;
-            const ratio = canvasWidth / canvasHeight;
-            let imgWidth = pageWidth - 20; // Margin 10mm
-            let imgHeight = imgWidth / ratio;
+            // Set column widths
+            const wscols = [
+                { wch: 5 },  // No
+                { wch: 30 }, // Nama Lengkap
+                { wch: 15 }, // Jenis Kelamin
+                { wch: 20 }, // Kelompok
+                { wch: 20 }, // Desa
+                { wch: 15 }, // Kategori
+                { wch: 15 }, // Status
+                { wch: 20 }, // Waktu Presensi
+                { wch: 30 }  // Keterangan
+            ];
+            ws['!cols'] = wscols;
 
-            if (imgHeight > pageHeight - 20) {
-                imgHeight = pageHeight - 20;
-                imgWidth = imgHeight * ratio;
-            }
+            // Create workbook
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Data Presensi');
 
-            pdf.addImage(imgData, 'JPEG', 10, 10, imgWidth, imgHeight);
-            pdf.save(`presensi-${kegiatan.nama_kegiatan}-${new Date().toISOString().split('T')[0]}.pdf`);
-            toast.success('Export PDF berhasil');
+            // Save file
+            const fileName = `presensi-${kegiatan.nama_kegiatan}-${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+
+            toast.success('Export Excel berhasil');
         } catch (error) {
-            console.error('Error exporting PDF:', error);
-            toast.error('Gagal export PDF');
+            console.error('Error exporting Excel:', error);
+            toast.error('Gagal export Excel');
         }
     };
 
@@ -204,13 +207,13 @@ const DetailPresensiTable = ({ presensiList, kegiatan, onQrScanner }) => {
                 </div>
                 <div className="flex space-x-2 no-export">
                     <button
-                        onClick={handleExportPDF}
-                        className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
+                        onClick={handleExportExcel}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        <span>Export PDF</span>
+                        <span>Export Excel</span>
                     </button>
                     <button
                         onClick={handleExportJPG}
