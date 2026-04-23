@@ -196,7 +196,7 @@ const DetailPresensiTable = ({ presensiList, kegiatan, onQrScanner }) => {
     return (
         <div id="presensi-export-container" className="space-y-6 bg-white dark:bg-gray-800 p-4 rounded-xl">
             {/* Header dengan tombol QR Scanner */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
                         Presensi: {kegiatan.nama_kegiatan}
@@ -205,7 +205,7 @@ const DetailPresensiTable = ({ presensiList, kegiatan, onQrScanner }) => {
                         {format(new Date(kegiatan.tanggal), 'EEEE, d MMMM yyyy', { locale: id })} • {kegiatan.jam_mulai.substring(0, 5)}
                     </p>
                 </div>
-                <div className="flex space-x-2 no-export">
+                <div className="flex flex-wrap gap-2 no-export">
                     <button
                         onClick={handleExportExcel}
                         className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
