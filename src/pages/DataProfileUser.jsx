@@ -22,7 +22,7 @@ export default function DataProfileUser() {
   const [downloadingFiltered, setDownloadingFiltered] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
-  const [editCategoryModal, setEditCategoryModal] = useState({ open: false, user: null, newCategory: '' });
+  const [editUserModal, setEditUserModal] = useState({ open: false, user: null, newName: '', newCategory: '' });
 
   useEffect(() => {
     const fetchProfiles = async () => {
@@ -114,29 +114,32 @@ export default function DataProfileUser() {
     }
   };
 
-  const handleUpdateCategory = async (e) => {
+  const handleUpdateUser = async (e) => {
     e.preventDefault();
-    if (!editCategoryModal.user || !editCategoryModal.newCategory) return;
+    if (!editUserModal.user || !editUserModal.newCategory || !editUserModal.newName.trim()) return;
 
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({ kategori: editCategoryModal.newCategory })
-        .eq('id', editCategoryModal.user.id);
+        .update({ 
+          kategori: editUserModal.newCategory,
+          nama_lengkap: editUserModal.newName.trim()
+        })
+        .eq('id', editUserModal.user.id);
 
       if (error) throw error;
 
-      toast.success(`Kategori ${editCategoryModal.user.nama_lengkap} berhasil diperbarui`);
+      toast.success(`Data ${editUserModal.newName.trim()} berhasil diperbarui`);
 
       // Update local state
       setProfiles(prev => prev.map(p =>
-        p.id === editCategoryModal.user.id ? { ...p, kategori: editCategoryModal.newCategory } : p
+        p.id === editUserModal.user.id ? { ...p, kategori: editUserModal.newCategory, nama_lengkap: editUserModal.newName.trim() } : p
       ));
 
-      setEditCategoryModal({ open: false, user: null, newCategory: '' });
+      setEditUserModal({ open: false, user: null, newName: '', newCategory: '' });
     } catch (error) {
-      console.error('Error updating category:', error);
-      toast.error(`Gagal memperbarui kategori: ${error.message}`);
+      console.error('Error updating user:', error);
+      toast.error(`Gagal memperbarui data: ${error.message}`);
     }
   };
 
@@ -754,7 +757,7 @@ export default function DataProfileUser() {
                     <td className="px-4 py-2 border dark:border-gray-700 text-center">
                       <div className="flex flex-col gap-1 items-center">
                         <button
-                          onClick={() => setEditCategoryModal({ open: true, user: profile, newCategory: profile.kategori || '' })}
+                          onClick={() => setEditUserModal({ open: true, user: profile, newName: profile.nama_lengkap || '', newCategory: profile.kategori || '' })}
                           className="w-full text-indigo-600 hover:text-indigo-800 font-medium text-xs bg-indigo-50 dark:bg-indigo-900/20 px-2 py-1 rounded hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition"
                         >
                           Edit
@@ -855,23 +858,32 @@ export default function DataProfileUser() {
         </div>
       )}
 
-      {/* Edit Category Modal */}
-      {editCategoryModal.open && (
+      {/* Edit User Modal */}
+      {editUserModal.open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setEditCategoryModal({ open: false, user: null, newCategory: '' })} />
+          <div className="absolute inset-0 bg-black/40" onClick={() => setEditUserModal({ open: false, user: null, newName: '', newCategory: '' })} />
           <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 max-w-sm w-full p-6">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Edit Kategori User</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Edit Data User</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 text-justify">
-              Ubah kategori untuk <b>{editCategoryModal.user?.nama_lengkap}</b>.
-              Pastikan kategori yang dipilih sudah sesuai dengan status user tersebut.
+              Ubah nama atau kategori untuk <b>{editUserModal.user?.nama_lengkap}</b>.
             </p>
-            <form onSubmit={handleUpdateCategory}>
+            <form onSubmit={handleUpdateUser}>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nama Lengkap</label>
+                <input
+                  type="text"
+                  className="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none"
+                  value={editUserModal.newName}
+                  onChange={(e) => setEditUserModal(prev => ({ ...prev, newName: e.target.value }))}
+                  required
+                />
+              </div>
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Pilih Kategori Baru</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Kategori</label>
                 <select
                   className="w-full p-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none"
-                  value={editCategoryModal.newCategory}
-                  onChange={(e) => setEditCategoryModal(prev => ({ ...prev, newCategory: e.target.value }))}
+                  value={editUserModal.newCategory}
+                  onChange={(e) => setEditUserModal(prev => ({ ...prev, newCategory: e.target.value }))}
                   required
                 >
                   <option value="">Pilih Kategori</option>
@@ -891,7 +903,7 @@ export default function DataProfileUser() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setEditCategoryModal({ open: false, user: null, newCategory: '' })}
+                  onClick={() => setEditUserModal({ open: false, user: null, newName: '', newCategory: '' })}
                   className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 font-semibold transition-colors"
                 >
                   Batal
