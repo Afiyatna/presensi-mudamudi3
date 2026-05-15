@@ -29,6 +29,7 @@ export default function QrScannerUniversal() {
   const qrRef = useRef();
   const html5QrInstance = useRef(null);
   const beepAudio = useRef(null);
+  const scanningRef = useRef(false); // ref untuk melacak state scanning di dalam event listener
 
   useEffect(() => {
     beepAudio.current = new window.Audio(beepUrl);
@@ -472,6 +473,7 @@ export default function QrScannerUniversal() {
   };
 
   useEffect(() => {
+    scanningRef.current = scanning;
     if (scanning && !showSuccess) {
       startScanner();
     } else if (!scanning && !showSuccess) {
@@ -479,6 +481,35 @@ export default function QrScannerUniversal() {
     }
     // eslint-disable-next-line
   }, [scanning, cameraFacing, showSuccess]);
+
+  // Fix bug kamera mati saat pindah aplikasi di mobile Chrome
+  // Ketika user kembali ke halaman, restart scanner secara otomatis
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        // Halaman disembunyikan (pindah aplikasi/tab) — matikan kamera
+        if (html5QrInstance.current) {
+          html5QrInstance.current.stop().catch(() => {});
+          html5QrInstance.current.clear().catch(() => {});
+        }
+        if (qrRef.current) qrRef.current.innerHTML = '';
+      } else if (document.visibilityState === 'visible') {
+        // Halaman terlihat kembali — restart scanner jika sebelumnya aktif
+        if (scanningRef.current) {
+          // Beri jeda singkat agar browser siap mengakses kamera kembali
+          setTimeout(() => {
+            startScanner();
+          }, 300);
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+    // eslint-disable-next-line
+  }, []);
 
   const clearHistory = () => {
     setScanHistory([]);
