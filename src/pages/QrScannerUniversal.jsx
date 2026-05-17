@@ -30,6 +30,9 @@ export default function QrScannerUniversal() {
   const html5QrInstance = useRef(null);
   const beepAudio = useRef(null);
   const scanningRef = useRef(false); // ref untuk melacak state scanning di dalam event listener
+  const isProcessingRef = useRef(false); // guard mencegah double-scan bersamaan
+  const isStoppingRef = useRef(false);
+  const wasScanningRef = useRef(false); // melacak state sebelum app di-minimize
 
   useEffect(() => {
     beepAudio.current = new window.Audio(beepUrl);
@@ -150,7 +153,10 @@ export default function QrScannerUniversal() {
   // Helper function to refresh session if needed
   const refreshSessionIfNeeded = async () => {
     try {
-      const { data: { session }, error } = await supabase.auth.getSession();
+      // Gunakan Promise.race dengan timeout 1.5 detik untuk mencegah hang karena Web Locks
+      const sessionPromise = supabase.auth.getSession();
+      const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 1500));
+      const { data: { session }, error } = await Promise.race([sessionPromise, timeoutPromise]);
       if (error) {
         console.error('Session error:', error);
         // If there's an error getting session, try to get user
@@ -196,6 +202,14 @@ export default function QrScannerUniversal() {
       }
       return true;
     } catch (error) {
+      if (error.message === 'timeout') {
+        console.warn('Session check timed out, Supabase lock likely stuck. Auto-reloading page...');
+        toast.error('Koneksi tertunda karena pindah aplikasi. Me-refresh otomatis...', { duration: 1500 });
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+        return false; // Hentikan proses presensi agar tidak hang
+      }
       console.error('Error checking session:', error);
       // Try one more time with getUser
       try {
@@ -373,6 +387,10 @@ export default function QrScannerUniversal() {
           disableFlip: false
         },
         async (decodedText) => {
+          // Guard: abaikan jika sedang memproses scan sebelumnya
+          if (isProcessingRef.current) return;
+          isProcessingRef.current = true;
+
           try {
             setLastScannedId(decodedText);
             setLastScanTime(Date.now());
@@ -419,6 +437,8 @@ export default function QrScannerUniversal() {
           } catch (e) {
             console.error('Scan callback error:', e);
             toast.error('Error saat memproses scan: ' + e.message);
+          } finally {
+            isProcessingRef.current = false;
           }
         },
         (errorMessage) => {
@@ -465,11 +485,24 @@ export default function QrScannerUniversal() {
 
   const stopScanner = async () => {
     setScanning(false);
-    if (html5QrInstance.current) {
-      try { await html5QrInstance.current.stop(); } catch (e) { }
-      try { await html5QrInstance.current.clear(); } catch (e) { }
+    if (!html5QrInstance.current || isStoppingRef.current) return;
+    
+    isStoppingRef.current = true;
+    try {
+      await html5QrInstance.current.stop();
+    } catch (e) {
+      // Abaikan error jika sudah stopped
     }
+    
+    try {
+      await html5QrInstance.current.clear();
+    } catch (e) {
+      // Abaikan error
+    }
+    
+    html5QrInstance.current = null;
     if (qrRef.current) qrRef.current.innerHTML = '';
+    isStoppingRef.current = false;
   };
 
   useEffect(() => {
@@ -487,19 +520,19 @@ export default function QrScannerUniversal() {
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
-        // Halaman disembunyikan (pindah aplikasi/tab) — matikan kamera
-        if (html5QrInstance.current) {
-          html5QrInstance.current.stop().catch(() => {});
-          html5QrInstance.current.clear().catch(() => {});
+        // Halaman disembunyikan (pindah aplikasi/tab)
+        wasScanningRef.current = scanningRef.current;
+        if (scanningRef.current) {
+          stopScanner(); // Matikan kamera dengan aman
         }
-        if (qrRef.current) qrRef.current.innerHTML = '';
+        isProcessingRef.current = false; // reset jika ada scan yang tertunda
       } else if (document.visibilityState === 'visible') {
         // Halaman terlihat kembali — restart scanner jika sebelumnya aktif
-        if (scanningRef.current) {
-          // Beri jeda singkat agar browser siap mengakses kamera kembali
+        if (wasScanningRef.current) {
+          // Beri jeda agak lama (500ms) agar browser siap mengakses kamera kembali
           setTimeout(() => {
-            startScanner();
-          }, 300);
+            setScanning(true); // Ini akan men-trigger useEffect untuk startScanner
+          }, 500);
         }
       }
     };
